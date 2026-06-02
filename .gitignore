@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Env & secrets
+.env
+*.local
+
+# Cache data service
+data_service/.cache/
+*.log
+
+# MT5 / MQL5 build artifacts
+ea/*.ex5
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

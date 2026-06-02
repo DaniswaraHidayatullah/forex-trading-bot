@@ -1,0 +1,15 @@
+# Normalisasi line ending agar konsisten lintas OS (Windows <-> Railway/Linux).
+* text=auto eol=lf
+
+# File yang wajib LF (kalau CRLF bisa bikin gagal di Linux/Railway).
+*.py     text eol=lf
+*.sh     text eol=lf
+*.yml    text eol=lf
+*.yaml   text eol=lf
+*.json   text eol=lf
+*.toml   text eol=lf
+*.md     text eol=lf
+Procfile text eol=lf
+
+# File MQL5 dibuka di Windows (MetaEditor) -> biarkan CRLF.
+*.mq5    text eol=crlf
