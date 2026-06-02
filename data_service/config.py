@@ -17,6 +17,9 @@ class Settings(BaseSettings):
 
     # --- Sentimen berita (scraping RSS + skoring leksikon) ----------------
     sentiment_enabled: bool = True
+    # Backend skoring: "lexicon" (gratis, default) | "llm" (butuh ANTHROPIC_API_KEY
+    # + paket anthropic; otomatis fallback ke lexicon bila tak tersedia).
+    sentiment_backend: str = "lexicon"
     sentiment_threshold: float = 0.15   # |skor| di atas ini baru jadi bias arah
     sentiment_min_headlines: int = 3    # minimal headline relevan agar tak "flat"
     # Cache khusus berita lebih pendek (berita cepat basi).

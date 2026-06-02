@@ -73,6 +73,15 @@ input EA (`InpEquityBase`, `InpEquityStep`, `InpLotStep`, `InpLotMax`, dst).
   `SENTIMENT_FEEDS`), lalu memberi skor pakai **leksikon penggerak harga emas**
   (mis. "rate cut"/"weak dollar" = bullish emas; "hawkish"/"strong dollar" =
   bearish emas). Hasilnya: `bias` long/short/flat + `score` di [-1, 1].
+- Scorer leksikon sudah ditingkatkan: **handling negasi** ("no rate hike" tak
+  dianggap bearish), **intensifier/dampener** ("very/slightly"), **dedup**
+  headline berulang antar-feed, dan leksikon diperluas (real yields, DXY, ETF
+  flow, central-bank buying, dll.). Semua tetap **gratis & ringan**.
+- **Backend pluggable** (`SENTIMENT_BACKEND`): `lexicon` (default, gratis) atau
+  `llm` (lebih akurat, butuh `ANTHROPIC_API_KEY` + `pip install anthropic`).
+  Kalau `llm` dipilih tapi key/paket tak ada, **otomatis fallback ke lexicon**
+  sehingga default selalu jalan tanpa biaya. (FinBERT bisa ditambah belakangan
+  dengan pola yang sama, tapi berat untuk Railway free tier.)
 - Endpoint `GET /sentiment?symbol=XAUUSD` mengembalikan skor sentimen ini.
 - `GET /context` menggabungkan **sentimen berita (utama)** dengan **COT
   (konfirmasi)** jadi satu `sentiment_bias` yang dibaca EA. Berita yang memimpin
@@ -87,24 +96,39 @@ input EA (`InpEquityBase`, `InpEquityStep`, `InpLotStep`, `InpLotMax`, dst).
 
 ## Cara push ke GitHub kamu
 
+Repo sudah di-`git init` + commit awal. Tinggal hubungkan ke GitHub:
+
 ```bash
 cd forex-trading-bot
-git init
-git add .
-git commit -m "Initial scaffold: data service + EA + CI/CD"
-git branch -M main
+# buat repo kosong dulu di github.com (tanpa README), lalu:
 git remote add origin https://github.com/<username>/<repo>.git
 git push -u origin main
 ```
 
 ## Deploy data_service ke Railway
 
-1. Buat project baru di Railway, hubungkan ke repo ini.
-2. Set **Root Directory** = `data_service`.
-3. Start command otomatis dari `Procfile`.
-4. Tambahkan environment variable bila perlu (lihat `.env.example`).
-5. Setelah live, salin URL publiknya (mis. `https://xxx.up.railway.app`)
-   ke input `DataServiceUrl` di EA.
+Ada **dua cara**. Cara A paling simpel dan tidak butuh token di GitHub.
+
+### Cara A — Railway connect GitHub (disarankan)
+1. Push repo ke GitHub (lihat di atas).
+2. railway.app → **New Project → Deploy from GitHub repo** → pilih repo ini.
+3. **Settings → Root Directory = `data_service`** (penting, karena app ada di
+   subfolder). Build pakai Nixpacks, start dari `Procfile`/`railway.json` otomatis.
+4. **Variables**: tambah bila perlu (lihat `.env.example`). Untuk awal cukup
+   default; isi `API_TOKEN` kalau mau endpoint diproteksi.
+5. Railway auto-deploy **setiap push ke `main`**. Salin URL publik
+   (mis. `https://xxx.up.railway.app`) → isi ke input `InpDataServiceUrl` di EA.
+6. Tes: buka `https://xxx.up.railway.app/health` → `{"status":"ok"}` dan
+   `/context?symbol=XAUUSD`.
+
+### Cara B — GitHub Actions + Railway CLI (sudah disiapkan)
+- Workflow `.github/workflows/deploy.yml` akan `railway up` otomatis setelah CI
+  hijau. Syaratnya: di Railway buat service bernama **`data-service`**, lalu
+  tambahkan secret **`RAILWAY_TOKEN`** di GitHub repo → Settings → Secrets and
+  variables → Actions. Kalau pakai Cara A, workflow ini boleh diabaikan/dihapus.
+
+> Catatan free tier: filesystem Railway bersifat sementara (cache `.cache/`
+> ter-reset tiap redeploy) — tidak masalah, cache akan terisi ulang otomatis.
 
 ## Jalanin data_service lokal (untuk tes)
 

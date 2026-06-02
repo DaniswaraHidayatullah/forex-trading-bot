@@ -96,12 +96,13 @@ def sentiment(symbol: str = Query(..., min_length=6)) -> dict:
         return {"symbol": symbol, "bias": "flat", "score": 0.0, "headlines_scored": 0}
 
     data = get_or_set(
-        "news_sentiment",
+        f"news_sentiment_{settings.sentiment_backend}",
         settings.sentiment_cache_ttl_seconds,
         lambda: sentiment_fetcher.fetch_sentiment(
             feeds=settings.sentiment_feeds,
             threshold=settings.sentiment_threshold,
             min_headlines=settings.sentiment_min_headlines,
+            backend=settings.sentiment_backend,
         ),
     )
     return {"symbol": symbol, **data}

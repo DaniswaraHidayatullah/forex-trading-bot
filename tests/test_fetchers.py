@@ -6,7 +6,13 @@ from datetime import datetime, timedelta, timezone
 
 from data_service.fetchers.cot import _net_bias
 from data_service.fetchers.forexfactory import _normalize_impact, upcoming_blackout
-from data_service.fetchers.sentiment import _parse_feed, score_sentiment
+from data_service.fetchers.sentiment import (
+    _dedupe,
+    _parse_feed,
+    _score_one,
+    score_sentiment,
+    score_texts,
+)
 
 
 def test_normalize_impact():
@@ -91,6 +97,50 @@ def test_sentiment_below_min_headlines_flat():
     headlines = ["Gold jumps on weak dollar"]  # cuma 1 sinyal, di bawah minimum
     res = score_sentiment(headlines, min_headlines=3)
     assert res["bias"] == "flat"
+
+
+def test_sentiment_negation_flips_sign():
+    # "rate hike" bearish; "no rate hike" harusnya tidak bearish (>= 0).
+    bearish = _score_one("fed signals rate hike soon")
+    negated = _score_one("fed signals no rate hike this year")
+    assert bearish < 0
+    assert negated >= 0  # negasi membalik -> tidak lagi bearish
+
+
+def test_sentiment_intensifier_and_dampener():
+    base = _score_one("fed sounds dovish")           # 'dovish' = +1.3
+    strong = _score_one("fed sounds very dovish")    # 'very' intensifier
+    weak = _score_one("fed sounds slightly dovish")  # 'slightly' dampener
+    assert strong > base > weak > 0
+
+
+def test_sentiment_dedupe():
+    dupes = ["Gold rises on weak dollar", "Gold rises on weak dollar", "Different headline"]
+    assert len(_dedupe(dupes)) == 2
+
+
+def test_score_texts_defaults_to_lexicon():
+    headlines = [
+        "Gold rallies as dovish Fed signals rate cut",
+        "Weak dollar lifts bullion to record high",
+        "Safe haven demand for gold rises on geopolitical tension",
+    ]
+    res = score_texts(headlines, min_headlines=3, backend="lexicon")
+    assert res["backend"] == "lexicon"
+    assert res["bias"] == "long"
+
+
+def test_score_texts_llm_falls_back_without_key(monkeypatch):
+    # Tanpa ANTHROPIC_API_KEY, backend 'llm' harus fallback ke lexicon (tetap jalan).
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    headlines = [
+        "Gold falls as hawkish Fed eyes rate hike",
+        "Strong dollar and rising yields pressure bullion",
+        "Gold tumbles after robust jobs report",
+    ]
+    res = score_texts(headlines, min_headlines=3, backend="llm")
+    assert res["backend"] == "lexicon"   # fallback
+    assert res["bias"] == "short"
 
 
 def test_storage_max_stale_blocks_old_cache():
