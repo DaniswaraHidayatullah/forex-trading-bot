@@ -1,9 +1,11 @@
 //+------------------------------------------------------------------+
 //|                                                      TrendEA.mq5  |
-//|   EA tren-following: H4 EMA50/200 + entry H1 (RSI) + ATR stop.    |
+//|   EA tren-following: tren EMA50/200 (TF tren) + entry RSI pullback |
+//|   (TF entry, default M30) + ATR stop. Timeframe bisa diatur lewat  |
+//|   input InpTrendTF / InpEntryTF.                                   |
 //|   RR 1:3. LAYERING: 1 entry awal + maks 2 layer (total 3 posisi)  |
 //|   searah, ditambah hanya saat harga bergerak menguntungkan        |
-//|   (pyramiding). Operasi 24 jam, tanpa batas waktu sesi.           |
+//|   (pyramiding). Operasi 24 jam; batas trade/hari via InpMaxTradesDay|
 //|   News blackout + bias sentimen (berita + COT) lewat data_service |
 //|   (HTTP /context).                                                |
 //|                                                                   |
@@ -20,11 +22,13 @@
 #include <Trade/Trade.mqh>
 
 //--- Input strategi ----------------------------------------------------
-input double InpRewardRatio   = 3.0;     // Risk : Reward (1 : X)  -> 1:3
-input int    InpMaxTradesDay  = 0;       // Maks trade per hari (0 = tanpa batas / 24 jam)
-input int    InpEmaFast       = 50;      // EMA cepat (tren H4)
-input int    InpEmaSlow       = 200;     // EMA lambat (tren H4)
-input int    InpRsiPeriod     = 14;      // Periode RSI (entry H1)
+input double          InpRewardRatio  = 3.0;          // Risk : Reward (1 : X)  -> 1:3
+input int             InpMaxTradesDay = 6;            // Maks trade per hari (0 = tanpa batas)
+input ENUM_TIMEFRAMES InpTrendTF      = PERIOD_H4;    // Timeframe arah tren (EMA)
+input ENUM_TIMEFRAMES InpEntryTF      = PERIOD_M30;   // Timeframe entry (RSI/ATR & evaluasi)
+input int    InpEmaFast       = 50;      // EMA cepat (tren)
+input int    InpEmaSlow       = 200;     // EMA lambat (tren)
+input int    InpRsiPeriod     = 14;      // Periode RSI (entry)
 input double InpRsiBuyMin     = 40.0;    // RSI min saat cari BUY (pullback bawah)
 input double InpRsiBuyMax     = 60.0;    // RSI maks saat cari BUY (pullback atas)
 input double InpRsiSellMin    = 40.0;    // RSI min saat cari SELL (pullback bawah)
@@ -70,10 +74,10 @@ int OnInit()
    trade.SetTypeFillingBySymbol(_Symbol);   // IOC/FOK sesuai broker (penting utk XAUUSD)
    trade.SetDeviationInPoints(30);          // toleransi slippage agar tak gampang requote
 
-   hEmaFastH4 = iMA(_Symbol, PERIOD_H4, InpEmaFast, 0, MODE_EMA, PRICE_CLOSE);
-   hEmaSlowH4 = iMA(_Symbol, PERIOD_H4, InpEmaSlow, 0, MODE_EMA, PRICE_CLOSE);
-   hRsiH1     = iRSI(_Symbol, PERIOD_H1, InpRsiPeriod, PRICE_CLOSE);
-   hAtrH1     = iATR(_Symbol, PERIOD_H1, InpAtrPeriod);
+   hEmaFastH4 = iMA(_Symbol, InpTrendTF, InpEmaFast, 0, MODE_EMA, PRICE_CLOSE);
+   hEmaSlowH4 = iMA(_Symbol, InpTrendTF, InpEmaSlow, 0, MODE_EMA, PRICE_CLOSE);
+   hRsiH1     = iRSI(_Symbol, InpEntryTF, InpRsiPeriod, PRICE_CLOSE);
+   hAtrH1     = iATR(_Symbol, InpEntryTF, InpAtrPeriod);
 
    if(hEmaFastH4==INVALID_HANDLE || hEmaSlowH4==INVALID_HANDLE ||
       hRsiH1==INVALID_HANDLE || hAtrH1==INVALID_HANDLE)
@@ -262,12 +266,12 @@ void MovePositionsToBreakeven(int dir)
 }
 
 //+------------------------------------------------------------------+
-//| Jalankan logika hanya sekali per bar H1 baru                     |
+//| Jalankan logika hanya sekali per bar baru (timeframe entry)      |
 //+------------------------------------------------------------------+
-bool IsNewH1Bar()
+bool IsNewEntryBar()
 {
    static datetime last = 0;
-   datetime cur = iTime(_Symbol, PERIOD_H1, 0);
+   datetime cur = iTime(_Symbol, InpEntryTF, 0);
    if(cur != last) { last = cur; return true; }
    return false;
 }
@@ -275,7 +279,7 @@ bool IsNewH1Bar()
 //+------------------------------------------------------------------+
 void OnTick()
 {
-   if(!IsNewH1Bar()) return;       // evaluasi sekali per bar H1 (berlaku 24 jam)
+   if(!IsNewEntryBar()) return;    // evaluasi sekali per bar (timeframe entry)
    RefreshDailyCounter();
 
    // Batas trade/hari opsional (0 = tanpa batas, operasi 24 jam penuh).
