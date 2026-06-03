@@ -280,6 +280,18 @@ def test_storage_max_stale_blocks_old_cache():
     path.unlink(missing_ok=True)
 
 
+def test_finbert_bias_aggregation():
+    from data_service.fetchers.sentiment import _finbert_bias
+    pos = [[{"label": "positive", "score": 0.9}, {"label": "negative", "score": 0.05},
+            {"label": "neutral", "score": 0.05}]] * 3
+    bias, score = _finbert_bias(pos)
+    assert bias == "long" and score > 0
+    neg = [[{"label": "positive", "score": 0.05}, {"label": "negative", "score": 0.9},
+            {"label": "neutral", "score": 0.05}]] * 3
+    bias2, score2 = _finbert_bias(neg)
+    assert bias2 == "short" and score2 < 0
+
+
 def test_parse_feed_basic_rss():
     xml = """<?xml version='1.0'?>
     <rss version='2.0'><channel>

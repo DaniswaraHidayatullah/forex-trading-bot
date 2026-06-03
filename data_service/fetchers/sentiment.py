@@ -299,18 +299,82 @@ def _score_llm(headlines: list[str], threshold: float, min_headlines: int) -> di
             "samples": items[:5]}
 
 
+# Kata yang menandai headline benar-benar TENTANG emas (bukan makro/USD),
+# supaya label FinBERT bisa dipetakan langsung: positif = bullish emas.
+_GOLD_TERMS = ("gold", "xau", "bullion")
+
+# Endpoint FinBERT terkelola di Hugging Face (inference serverless).
+FINBERT_URL = "https://api-inference.huggingface.co/models/ProsusAI/finbert"
+
+
+def _finbert_bias(results: list[Any], threshold: float = 0.15) -> tuple[str, float]:
+    """Agregasi keluaran FinBERT (list per teks berisi {label,score}) jadi bias.
+
+    positif - negatif (dinormalisasi) -> skor [-1,1]; arah dipetakan ke emas
+    karena hanya headline gold-centric yang diberi ke FinBERT.
+    """
+    pos = 0.0
+    neg = 0.0
+    for res in results:
+        scores = {x["label"].lower(): float(x["score"]) for x in res}
+        pos += scores.get("positive", 0.0)
+        neg += scores.get("negative", 0.0)
+    denom = pos + neg
+    score = 0.0 if denom <= 0 else (pos - neg) / denom
+    bias = "long" if score > threshold else "short" if score < -threshold else "flat"
+    return bias, round(score, 4)
+
+
+def _score_finbert(headlines: list[str], threshold: float, min_headlines: int) -> dict[str, Any]:
+    """Backend FinBERT lewat Hugging Face Inference API (butuh HF_API_TOKEN).
+
+    Hanya menilai headline yang spesifik tentang EMAS (positif=bullish emas).
+    Lempar exception bila token/HF tak tersedia -> pemanggil fallback ke lexicon.
+    """
+    token = os.getenv("HF_API_TOKEN", "")
+    if not token:
+        raise ValueError("HF_API_TOKEN belum diset")
+
+    items = _dedupe([h for h in headlines if any(g in h.lower() for g in _GOLD_TERMS)])[:30]
+    if len(items) < min_headlines:
+        return {"bias": "flat", "score": 0.0, "backend": "finbert",
+                "headlines_total": len(headlines), "headlines_scored": len(items),
+                "samples": items[:5]}
+
+    with httpx.Client(timeout=30.0) as client:
+        resp = client.post(
+            FINBERT_URL,
+            headers={"Authorization": f"Bearer {token}"},
+            json={"inputs": items, "options": {"wait_for_model": True}},
+        )
+        resp.raise_for_status()
+        data = resp.json()
+    if isinstance(data, dict) and data.get("error"):
+        raise RuntimeError(str(data["error"]))
+
+    bias, score = _finbert_bias(data, threshold)
+    return {"bias": bias, "score": score, "backend": "finbert",
+            "headlines_total": len(headlines), "headlines_scored": len(items),
+            "samples": items[:5]}
+
+
 def score_texts(
     headlines: list[str],
     threshold: float = 0.15,
     min_headlines: int = 3,
     backend: str = "lexicon",
 ) -> dict[str, Any]:
-    """Dispatcher backend. Default 'lexicon' (gratis). 'llm' opsional dgn
-    fallback otomatis ke lexicon bila tak tersedia -> default selalu jalan.
+    """Dispatcher backend. Default 'lexicon' (gratis). 'llm' & 'finbert' opsional;
+    keduanya otomatis fallback ke lexicon bila tak tersedia -> default selalu jalan.
     """
     if backend == "llm":
         try:
             return _score_llm(headlines, threshold, min_headlines)
+        except Exception:
+            pass  # fallback aman ke lexicon
+    elif backend == "finbert":
+        try:
+            return _score_finbert(headlines, threshold, min_headlines)
         except Exception:
             pass  # fallback aman ke lexicon
     return score_sentiment(headlines, threshold=threshold, min_headlines=min_headlines)
