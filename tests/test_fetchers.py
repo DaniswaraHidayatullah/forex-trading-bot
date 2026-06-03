@@ -187,6 +187,46 @@ def test_signal_no_api_key():
     assert r["suggested_lot"] == 0.01
 
 
+def test_build_signal_buy_full_path_with_confidence():
+    def fake_fetch(interval, size):
+        if size >= 100:  # series tren -> naik kuat
+            return [{"open": 1000 + i, "high": 1001 + i, "low": 999 + i, "close": 1000 + i}
+                    for i in range(size)]
+        bars = []  # series entry -> osilasi -> RSI ~50
+        for i in range(size):
+            c = 2000 + (1 if i % 2 == 0 else -1)
+            bars.append({"open": c, "high": c + 1, "low": c - 1, "close": c})
+        return bars
+
+    r = build_signal(
+        sentiment_bias="long", news_blocked=False, api_key="x",
+        profile="intraday", sentiment_score=0.5, fetch_fn=fake_fetch,
+    )
+    assert r["signal"] == "buy"
+    assert r["confidence_level"] == 3        # searah long + sentimen kuat (0.5)
+    assert r["tp_pips"] == r["sl_pips"] * 3  # RR 1:3
+    assert r["profile"] == "Intraday"
+
+
+def test_build_signal_confidence_weak_when_flat():
+    def fake_fetch(interval, size):
+        if size >= 100:
+            return [{"open": 1000 + i, "high": 1001 + i, "low": 999 + i, "close": 1000 + i}
+                    for i in range(size)]
+        bars = []
+        for i in range(size):
+            c = 2000 + (1 if i % 2 == 0 else -1)
+            bars.append({"open": c, "high": c + 1, "low": c - 1, "close": c})
+        return bars
+
+    r = build_signal(
+        sentiment_bias="flat", news_blocked=False, api_key="x",
+        profile="intraday", sentiment_score=0.0, fetch_fn=fake_fetch,
+    )
+    assert r["signal"] == "buy"           # flat -> tetap boleh (gerbang lolos)
+    assert r["confidence_level"] == 1     # lemah (teknikal saja)
+
+
 def test_discord_embed_buy():
     from data_service.fetchers.notifier import format_embed
     sig = {

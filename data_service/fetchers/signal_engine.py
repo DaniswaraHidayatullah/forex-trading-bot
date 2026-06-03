@@ -131,7 +131,8 @@ PROFILES: dict[str, dict[str, Any]] = {
     },
 }
 
-PIP = 0.10  # 1 pip emas = $0.10 gerak harga
+PIP = 0.10          # 1 pip emas = $0.10 gerak harga
+SENT_STRONG = 0.30  # |skor sentimen| >= ini dianggap kuat
 
 
 # --- Pembentuk sinyal ---------------------------------------------------
@@ -149,6 +150,7 @@ def build_signal(
     rsi_lo: float = 40.0,
     rsi_hi: float = 60.0,
     use_sentiment: bool = True,
+    sentiment_score: float = 0.0,
     fetch_fn: Callable[[str, int], list[dict[str, float]]] | None = None,
 ) -> dict[str, Any]:
     """Bangun sinyal XAUUSD untuk satu profil (scalp/intraday/swing).
@@ -172,7 +174,9 @@ def build_signal(
         "sl_pips": None, "tp_pips": None,
         "risk_per_001": None, "reward_per_001": None,
         "atr": None, "trend": "flat", "rsi": None,
-        "sentiment_bias": sentiment_bias, "news_blocked": news_blocked,
+        "sentiment_bias": sentiment_bias, "sentiment_score": round(sentiment_score, 3),
+        "confidence": None, "confidence_level": 0, "confidence_stars": "",
+        "news_blocked": news_blocked,
         "suggested_lot": _lot_for_equity(equity),
         "price_source": "twelvedata:" + symbol,
         "time_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -261,4 +265,18 @@ def build_signal(
             "tp": round(price - tp_dist, 2),
             "reason": f"Downtrend {trend_interval} + RSI pullback {rsi_val:.0f} + sentimen {sentiment_bias}",
         })
+
+    # Keyakinan: pakai keselarasan + kekuatan sentimen sbg booster.
+    side = base["signal"]
+    aligned = (
+        (side == "buy" and sentiment_bias == "long")
+        or (side == "sell" and sentiment_bias == "short")
+    )
+    if aligned and abs(sentiment_score) >= SENT_STRONG:
+        level, label, stars = 3, "Kuat", "⭐⭐⭐"
+    elif aligned:
+        level, label, stars = 2, "Sedang", "⭐⭐"
+    else:
+        level, label, stars = 1, "Lemah (teknikal saja)", "⭐"
+    base.update({"confidence": label, "confidence_level": level, "confidence_stars": stars})
     return base

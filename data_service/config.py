@@ -46,6 +46,8 @@ class Settings(BaseSettings):
     signal_poll_seconds: int = 1800      # cek sinyal tiap N detik (default 30 mnt)
     # Profil yang di-auto-push (pisah koma): scalp, intraday, swing
     signal_profiles: str = "intraday"
+    # Minimal keyakinan untuk auto-push: none | medium | strong
+    signal_min_confidence: str = "none"
 
     # Mata uang yang relevan per simbol -> dipakai untuk memfilter berita & COT
     symbol_currencies: dict[str, list[str]] = {

@@ -124,6 +124,7 @@ def _signal_for(symbol: str, equity: float, profile: str) -> dict:
     ctx = context(symbol)  # type: ignore[arg-type]
     bias = ctx.get("sentiment_bias", "flat")
     blocked = not ctx.get("trade_allowed", True)
+    sent_score = float((ctx.get("sentiment") or {}).get("score", 0.0) or 0.0)
 
     def _cached_fetch(interval: str, size: int) -> list[dict]:
         return get_or_set(
@@ -144,6 +145,7 @@ def _signal_for(symbol: str, equity: float, profile: str) -> dict:
             profile=profile,
             rr=settings.signal_reward_ratio,
             use_sentiment=settings.signal_use_sentiment,
+            sentiment_score=sent_score,
             fetch_fn=_cached_fetch,
         )
 
@@ -207,16 +209,18 @@ def _signal_poller() -> None:
     last_side: dict[str, str | None] = {}
     interval = max(60, settings.signal_poll_seconds)
     profiles = [p.strip() for p in settings.signal_profiles.split(",") if p.strip()]
+    min_level = {"none": 0, "medium": 2, "strong": 3}.get(settings.signal_min_confidence, 0)
     while True:
         for profile in profiles:
             try:
                 sig = _signal_for("XAUUSD", 100.0, profile)
                 side = sig.get("signal", "none")
-                if side in ("buy", "sell"):
+                strong_enough = sig.get("confidence_level", 0) >= min_level
+                if side in ("buy", "sell") and strong_enough:
                     if last_side.get(profile) != side:
                         notifier.send_discord(settings.discord_webhook_url, sig)
                         last_side[profile] = side
-                else:
+                elif side == "none":
                     last_side[profile] = None
             except Exception as e:  # noqa: BLE001 - jangan matikan loop
                 print("signal poller error:", profile, e)

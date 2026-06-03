@@ -17,10 +17,11 @@ def format_embed(sig: dict[str, Any]) -> dict[str, Any]:
     """Bentuk payload embed Discord dari dict sinyal."""
     side = sig.get("signal", "none")
     prof = sig.get("profile", "")
+    stars = sig.get("confidence_stars", "")
     if side == "buy":
-        title = f"🟢 BUY XAUUSD • {prof}"
+        title = f"🟢 BUY XAUUSD • {prof} {stars}"
     elif side == "sell":
-        title = f"🔴 SELL XAUUSD • {prof}"
+        title = f"🔴 SELL XAUUSD • {prof} {stars}"
     else:
         title = f"⚪ Tidak ada sinyal • {prof}"
 
@@ -40,7 +41,8 @@ def format_embed(sig: dict[str, Any]) -> dict[str, Any]:
             fld("Take Profit", tp_txt, inline=False),
             fld("Tahan posisi", sig.get("hold")),
             fld("RSI / Tren", f"{sig.get('rsi')} / {sig.get('trend')}"),
-            fld("Sentimen", sig.get("sentiment_bias")),
+            fld("Sentimen", f"{sig.get('sentiment_bias')} ({sig.get('sentiment_score')})"),
+            fld("Keyakinan", f"{stars} {sig.get('confidence')}"),
         ]
     fields.append(fld("Alasan", sig.get("reason", "-"), inline=False))
 
