@@ -44,6 +44,8 @@ class Settings(BaseSettings):
     discord_webhook_url: str = ""        # set via env DISCORD_WEBHOOK_URL
     signal_auto_push: bool = True        # auto kirim ke Discord saat ada sinyal
     signal_poll_seconds: int = 1800      # cek sinyal tiap N detik (default 30 mnt)
+    # Profil yang di-auto-push (pisah koma): scalp, intraday, swing
+    signal_profiles: str = "intraday"
 
     # Mata uang yang relevan per simbol -> dipakai untuk memfilter berita & COT
     symbol_currencies: dict[str, list[str]] = {

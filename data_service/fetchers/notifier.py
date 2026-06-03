@@ -16,24 +16,29 @@ _COLORS = {"buy": 3066993, "sell": 15158332, "none": 9807270}  # hijau/merah/abu
 def format_embed(sig: dict[str, Any]) -> dict[str, Any]:
     """Bentuk payload embed Discord dari dict sinyal."""
     side = sig.get("signal", "none")
+    prof = sig.get("profile", "")
     if side == "buy":
-        title = "🟢 SINYAL BUY XAUUSD"
+        title = f"🟢 BUY XAUUSD • {prof}"
     elif side == "sell":
-        title = "🔴 SINYAL SELL XAUUSD"
+        title = f"🔴 SELL XAUUSD • {prof}"
     else:
-        title = "⚪ Tidak ada sinyal XAUUSD"
+        title = f"⚪ Tidak ada sinyal • {prof}"
 
     def fld(name: str, val: Any, inline: bool = True) -> dict[str, Any]:
         return {"name": name, "value": str(val), "inline": inline}
 
     fields: list[dict[str, Any]] = []
     if side in ("buy", "sell"):
+        sl_txt = f"`{sig.get('sl')}`  ({sig.get('sl_pips')} pips • -${sig.get('risk_per_001')})"
+        tp_txt = f"`{sig.get('tp')}`  ({sig.get('tp_pips')} pips • +${sig.get('reward_per_001')})"
         fields += [
-            fld("Entry", sig.get("entry")),
-            fld("SL", sig.get("sl")),
-            fld("TP", sig.get("tp")),
+            fld("Profil", f"{prof}  ({sig.get('trend_tf')}→{sig.get('entry_tf')})", inline=False),
+            fld("Entry", f"`{sig.get('entry')}`"),
             fld("Lot", sig.get("suggested_lot")),
             fld("RR", f"1:{int(sig.get('rr', 3))}"),
+            fld("Stop Loss", sl_txt, inline=False),
+            fld("Take Profit", tp_txt, inline=False),
+            fld("Tahan posisi", sig.get("hold")),
             fld("RSI / Tren", f"{sig.get('rsi')} / {sig.get('trend')}"),
             fld("Sentimen", sig.get("sentiment_bias")),
         ]
@@ -44,7 +49,7 @@ def format_embed(sig: dict[str, Any]) -> dict[str, Any]:
             "title": title,
             "color": _COLORS.get(side, _COLORS["none"]),
             "fields": fields,
-            "footer": {"text": "forex-bot • eksekusi MANUAL • bukan saran finansial"},
+            "footer": {"text": "forex-bot • eksekusi MANUAL • bukan saran finansial • risiko di tangan kamu"},
             "timestamp": sig.get("time_utc"),
         }]
     }

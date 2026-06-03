@@ -114,6 +114,26 @@ def _lot_for_equity(equity: float) -> float:
     return min(round(lot, 2), 0.05)
 
 
+# --- Profil strategi (RR tetap 1:3) ------------------------------------
+# Tiap profil = timeframe + pengali SL berbeda. RR sama (1:3).
+PROFILES: dict[str, dict[str, Any]] = {
+    "scalp": {
+        "label": "Scalping", "trend": "30min", "entry": "5min",
+        "atr_mult": 1.2, "hold": "menit s/d ~1 jam",
+    },
+    "intraday": {
+        "label": "Intraday", "trend": "4h", "entry": "30min",
+        "atr_mult": 1.5, "hold": "jam s/d ~1-2 hari",
+    },
+    "swing": {
+        "label": "Swing", "trend": "1day", "entry": "4h",
+        "atr_mult": 2.0, "hold": "hari s/d minggu",
+    },
+}
+
+PIP = 0.10  # 1 pip emas = $0.10 gerak harga
+
+
 # --- Pembentuk sinyal ---------------------------------------------------
 
 def build_signal(
@@ -122,10 +142,8 @@ def build_signal(
     api_key: str,
     symbol: str = "XAU/USD",
     equity: float = 100.0,
-    trend_interval: str = "4h",
-    entry_interval: str = "30min",
+    profile: str = "intraday",
     rr: float = 3.0,
-    atr_mult: float = 1.5,
     ema_fast: int = 50,
     ema_slow: int = 200,
     rsi_lo: float = 40.0,
@@ -133,16 +151,26 @@ def build_signal(
     use_sentiment: bool = True,
     fetch_fn: Callable[[str, int], list[dict[str, float]]] | None = None,
 ) -> dict[str, Any]:
-    """Bangun sinyal XAUUSD. Selalu kembalikan dict (tidak pernah lempar).
+    """Bangun sinyal XAUUSD untuk satu profil (scalp/intraday/swing).
 
-    fetch_fn(interval, outputsize) bisa di-inject untuk caching harga
-    (hemat kuota API). Default: ambil langsung dari Twelve Data.
+    Selalu kembalikan dict (tidak pernah lempar). fetch_fn(interval, size)
+    bisa di-inject untuk caching harga (hemat kuota API).
     """
+    prof = PROFILES.get(profile, PROFILES["intraday"])
+    trend_interval = prof["trend"]
+    entry_interval = prof["entry"]
+    atr_mult = prof["atr_mult"]
+
     base: dict[str, Any] = {
         "symbol": "XAUUSD",
         "signal": "none",
         "reason": "",
+        "profile": prof["label"],
+        "trend_tf": trend_interval, "entry_tf": entry_interval,
+        "hold": prof["hold"],
         "entry": None, "sl": None, "tp": None, "rr": rr,
+        "sl_pips": None, "tp_pips": None,
+        "risk_per_001": None, "reward_per_001": None,
         "atr": None, "trend": "flat", "rsi": None,
         "sentiment_bias": sentiment_bias, "news_blocked": news_blocked,
         "suggested_lot": _lot_for_equity(equity),
@@ -194,7 +222,7 @@ def build_signal(
     base["entry"] = round(price, 2)
 
     if trend == 0:
-        base["reason"] = "Tren H4 flat (EMA50 ~ EMA200) -> tunggu"
+        base["reason"] = f"Tren {trend_interval} flat (EMA50 ~ EMA200) -> tunggu"
         return base
 
     want_buy = trend == 1 and rsi_lo <= rsi_val <= rsi_hi
@@ -213,18 +241,24 @@ def build_signal(
 
     sl_dist = atr_val * atr_mult
     tp_dist = sl_dist * rr
+    base.update({
+        "sl_pips": round(sl_dist / PIP),
+        "tp_pips": round(tp_dist / PIP),
+        "risk_per_001": round(sl_dist, 2),     # $ rugi per 0.01 lot bila kena SL
+        "reward_per_001": round(tp_dist, 2),   # $ untung per 0.01 lot bila kena TP
+    })
     if want_buy:
         base.update({
             "signal": "buy",
             "sl": round(price - sl_dist, 2),
             "tp": round(price + tp_dist, 2),
-            "reason": f"Uptrend H4 + RSI pullback {rsi_val:.0f} + sentimen {sentiment_bias}",
+            "reason": f"Uptrend {trend_interval} + RSI pullback {rsi_val:.0f} + sentimen {sentiment_bias}",
         })
     else:
         base.update({
             "signal": "sell",
             "sl": round(price + sl_dist, 2),
             "tp": round(price - tp_dist, 2),
-            "reason": f"Downtrend H4 + RSI pullback {rsi_val:.0f} + sentimen {sentiment_bias}",
+            "reason": f"Downtrend {trend_interval} + RSI pullback {rsi_val:.0f} + sentimen {sentiment_bias}",
         })
     return base

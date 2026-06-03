@@ -112,27 +112,23 @@ def sentiment(symbol: str = Query(..., min_length=6)) -> dict:
     return {"symbol": symbol, **data}
 
 
-@app.get("/signal", dependencies=[Depends(_auth)])
-def signal(
-    symbol: str = Query("XAUUSD", min_length=6),
-    equity: float = Query(100.0, gt=0),
-) -> dict:
-    """Sinyal trading XAUUSD untuk EKSEKUSI MANUAL (cloud, 24/7).
+# Cache TTL harga per interval (detik) -> hemat kuota Twelve Data.
+_PRICE_TTL = {"5min": 120, "15min": 300, "30min": 600, "1h": 900,
+              "2h": 1800, "4h": 3600, "1day": 7200}
 
-    Menggabungkan indikator (harga dari Twelve Data) + sentimen/berita dari
-    /context. Hasil di-cache singkat (per bar M30) supaya cepat & hemat.
-    """
+
+def _signal_for(symbol: str, equity: float, profile: str) -> dict:
+    """Hitung sinyal untuk satu profil (dipakai endpoint & poller Discord)."""
+    if profile not in signal_engine.PROFILES:
+        profile = "intraday"
     ctx = context(symbol)  # type: ignore[arg-type]
     bias = ctx.get("sentiment_bias", "flat")
     blocked = not ctx.get("trade_allowed", True)
 
     def _cached_fetch(interval: str, size: int) -> list[dict]:
-        # Cache harga per-interval supaya hemat kuota Twelve Data:
-        # H4 berubah lambat (cache 1 jam), M30 (cache 15 menit).
-        ttl = 3600 if interval == "4h" else 900
         return get_or_set(
             f"px_{settings.signal_symbol}_{interval}",
-            ttl,
+            _PRICE_TTL.get(interval, 600),
             lambda: signal_engine.fetch_series(
                 settings.signal_symbol, interval, size, settings.twelvedata_api_key
             ),
@@ -145,18 +141,30 @@ def signal(
             api_key=settings.twelvedata_api_key,
             symbol=settings.signal_symbol,
             equity=equity,
+            profile=profile,
             rr=settings.signal_reward_ratio,
-            atr_mult=settings.signal_atr_mult,
             use_sentiment=settings.signal_use_sentiment,
             fetch_fn=_cached_fetch,
         )
 
-    data = get_or_set(
-        f"signal_{symbol.upper()}_{int(equity)}",
+    return get_or_set(
+        f"signal_{symbol.upper()}_{profile}_{int(equity)}",
         settings.signal_cache_ttl_seconds,
         _produce,
     )
-    return data
+
+
+@app.get("/signal", dependencies=[Depends(_auth)])
+def signal(
+    symbol: str = Query("XAUUSD", min_length=6),
+    equity: float = Query(100.0, gt=0),
+    profile: str = Query("intraday"),
+) -> dict:
+    """Sinyal XAUUSD untuk EKSEKUSI MANUAL (cloud, 24/7).
+
+    profile: scalp | intraday | swing (RR tetap 1:3, beda timeframe & jarak SL).
+    """
+    return _signal_for(symbol, equity, profile)
 
 
 @app.get("/context", dependencies=[Depends(_auth)])
@@ -190,25 +198,28 @@ def context(symbol: str = Query(..., min_length=6)) -> dict:
 # --- Auto-push sinyal ke Discord (background, jalan di Railway 24/7) -----
 
 def _signal_poller() -> None:
-    """Loop: cek sinyal tiap N detik, kirim ke Discord saat ada sinyal BARU.
+    """Loop: cek sinyal tiap N detik untuk tiap profil, kirim ke Discord saat
+    ada sinyal BARU.
 
-    Dedupe sederhana: kirim hanya saat arah berubah (none->buy/sell atau
+    Dedupe per-profil: kirim hanya saat arah berubah (none->buy/sell atau
     buy<->sell), supaya tidak spam tiap siklus untuk kondisi yang sama.
     """
-    last_side: str | None = None
+    last_side: dict[str, str | None] = {}
     interval = max(60, settings.signal_poll_seconds)
+    profiles = [p.strip() for p in settings.signal_profiles.split(",") if p.strip()]
     while True:
-        try:
-            sig = signal("XAUUSD", 100.0)  # type: ignore[arg-type]
-            side = sig.get("signal", "none")
-            if side in ("buy", "sell"):
-                if side != last_side:
-                    notifier.send_discord(settings.discord_webhook_url, sig)
-                    last_side = side
-            else:
-                last_side = None  # reset -> setup berikutnya akan dikirim lagi
-        except Exception as e:  # noqa: BLE001 - jangan matikan loop
-            print("signal poller error:", e)
+        for profile in profiles:
+            try:
+                sig = _signal_for("XAUUSD", 100.0, profile)
+                side = sig.get("signal", "none")
+                if side in ("buy", "sell"):
+                    if last_side.get(profile) != side:
+                        notifier.send_discord(settings.discord_webhook_url, sig)
+                        last_side[profile] = side
+                else:
+                    last_side[profile] = None
+            except Exception as e:  # noqa: BLE001 - jangan matikan loop
+                print("signal poller error:", profile, e)
         time.sleep(interval)
 
 

@@ -194,12 +194,13 @@ def test_discord_embed_buy():
         "suggested_lot": 0.01, "rr": 3, "rsi": 47.0, "trend": "up",
         "sentiment_bias": "long", "reason": "uptrend", "time_utc": "2026-06-03T00:00:00+00:00",
     }
+    sig["profile"] = "Scalping"
     p = format_embed(sig)
     emb = p["embeds"][0]
     assert emb["color"] == 3066993
     assert "BUY" in emb["title"]
     names = [f["name"] for f in emb["fields"]]
-    assert {"Entry", "SL", "TP", "Lot"}.issubset(set(names))
+    assert {"Entry", "Lot", "Stop Loss", "Take Profit"}.issubset(set(names))
 
 
 def test_discord_embed_none():
