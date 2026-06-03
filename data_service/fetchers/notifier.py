@@ -14,49 +14,45 @@ _COLORS = {"buy": 3066993, "sell": 15158332, "none": 9807270}  # hijau/merah/abu
 
 
 def format_embed(sig: dict[str, Any]) -> dict[str, Any]:
-    """Bentuk payload embed Discord dari dict sinyal."""
+    """Bentuk payload embed Discord yang bersih & ringkas dari dict sinyal."""
     side = sig.get("signal", "none")
     prof = sig.get("profile", "")
     stars = sig.get("confidence_stars", "")
-    if side == "buy":
-        title = f"🟢 BUY XAUUSD • {prof} {stars}"
-    elif side == "sell":
-        title = f"🔴 SELL XAUUSD • {prof} {stars}"
-    else:
-        title = f"⚪ Tidak ada sinyal • {prof}"
+    conf = sig.get("confidence", "")
 
-    def fld(name: str, val: Any, inline: bool = True) -> dict[str, Any]:
-        return {"name": name, "value": str(val), "inline": inline}
+    if side not in ("buy", "sell"):
+        # Tidak ada sinyal -> kartu minimalis.
+        desc = f"**{prof}**\n\n⚪ {sig.get('reason', 'Belum ada setup, tunggu.')}"
+        return {"embeds": [{
+            "title": "⚪ XAUUSD — tunggu",
+            "description": desc,
+            "color": _COLORS["none"],
+            "footer": {"text": "Eksekusi manual · bukan saran finansial"},
+            "timestamp": sig.get("time_utc"),
+        }]}
 
-    fields: list[dict[str, Any]] = []
-    if side in ("buy", "sell"):
-        sl_txt = f"`{sig.get('sl')}`  ({sig.get('sl_pips')} pips • -${sig.get('risk_per_001')})"
-        tp_txt = f"`{sig.get('tp')}`  ({sig.get('tp_pips')} pips • +${sig.get('reward_per_001')})"
-        entry_txt = (
-            f"`{sig.get('entry')}` (zona {sig.get('entry_zone_low')}-"
-            f"{sig.get('entry_zone_high')}, market)"
-        )
-        fields += [
-            fld("Profil", f"{prof}  ({sig.get('trend_tf')}→{sig.get('entry_tf')})", inline=False),
-            fld("📍 Entry (di mana)", entry_txt, inline=False),
-            fld("⏱️ Kapan", sig.get("timing"), inline=False),
-            fld("Lot", sig.get("suggested_lot")),
-            fld("RR", f"1:{int(sig.get('rr', 3))}"),
-            fld("Stop Loss", sl_txt, inline=False),
-            fld("Take Profit", tp_txt, inline=False),
-            fld("Tahan posisi", sig.get("hold")),
-            fld("RSI / Tren", f"{sig.get('rsi')} / {sig.get('trend')}"),
-            fld("Sentimen", f"{sig.get('sentiment_bias')} ({sig.get('sentiment_score')})"),
-            fld("Keyakinan", f"{stars} {sig.get('confidence')}"),
-        ]
-    fields.append(fld("Alasan", sig.get("reason", "-"), inline=False))
+    arrow = "↑" if side == "buy" else "↓"
+    title = "🟢 BUY XAUUSD" if side == "buy" else "🔴 SELL XAUUSD"
+
+    desc = "\n".join([
+        f"**{prof}**  ·  {stars} {conf}",
+        "",
+        f"💰 **Entry**  `{sig.get('entry')}`   _(zona {sig.get('entry_zone_low')}–{sig.get('entry_zone_high')})_",
+        f"🎯 **Take Profit**  `{sig.get('tp')}`   → **+${sig.get('reward_per_001')}**  _({sig.get('tp_pips')} pips)_",
+        f"🛑 **Stop Loss**  `{sig.get('sl')}`   → **−${sig.get('risk_per_001')}**  _({sig.get('sl_pips')} pips)_",
+        f"📦 **Lot** `{sig.get('suggested_lot')}`   ·   ⚖️ **RR 1:{int(sig.get('rr', 3))}**",
+        "",
+        f"⏱️ Masuk **sekarang** — berlaku ~{sig.get('valid_minutes')} menit",
+        f"⏳ Perkiraan tahan: {sig.get('hold')}",
+        f"📊 Tren {arrow} · RSI {sig.get('rsi')} · Sentimen {sig.get('sentiment_bias')} ({sig.get('sentiment_score')})",
+    ])
 
     return {
         "embeds": [{
             "title": title,
+            "description": desc,
             "color": _COLORS.get(side, _COLORS["none"]),
-            "fields": fields,
-            "footer": {"text": "forex-bot • eksekusi MANUAL • bukan saran finansial • risiko di tangan kamu"},
+            "footer": {"text": "Eksekusi manual · bukan saran finansial"},
             "timestamp": sig.get("time_utc"),
         }]
     }

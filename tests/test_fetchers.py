@@ -239,16 +239,17 @@ def test_discord_embed_buy():
     emb = p["embeds"][0]
     assert emb["color"] == 3066993
     assert "BUY" in emb["title"]
-    names = [f["name"] for f in emb["fields"]]
-    assert {"Lot", "Stop Loss", "Take Profit"}.issubset(set(names))
-    assert any("Entry" in n for n in names)
-    assert any("Kapan" in n for n in names)   # panduan timing entry
+    desc = emb["description"]
+    for token in ("Entry", "Take Profit", "Stop Loss", "Lot", "sekarang", "berlaku"):
+        assert token in desc
 
 
 def test_discord_embed_none():
     from data_service.fetchers.notifier import format_embed
     p = format_embed({"signal": "none", "reason": "tunggu"})
-    assert p["embeds"][0]["color"] == 9807270
+    emb = p["embeds"][0]
+    assert emb["color"] == 9807270
+    assert "tunggu" in emb["description"]
 
 
 def test_storage_max_stale_blocks_old_cache():
