@@ -31,6 +31,15 @@ class Settings(BaseSettings):
         "https://www.investing.com/rss/commodities_Gold.rss",
     ]
 
+    # --- Signal engine (sinyal untuk eksekusi manual) ---------------------
+    signal_reward_ratio: float = 3.0     # RR 1:3
+    signal_atr_mult: float = 1.5         # SL = ATR * ini
+    signal_use_sentiment: bool = True    # gate arah pakai sentimen
+    signal_cache_ttl_seconds: int = 300  # cache sinyal (per ~bar M30)
+    signal_symbol: str = "XAU/USD"       # simbol di Twelve Data
+    # API key Twelve Data (GRATIS di twelvedata.com). Set via env TWELVEDATA_API_KEY.
+    twelvedata_api_key: str = ""
+
     # Mata uang yang relevan per simbol -> dipakai untuk memfilter berita & COT
     symbol_currencies: dict[str, list[str]] = {
         "XAUUSD": ["USD"],          # emas digerakkan terutama oleh USD

@@ -13,6 +13,12 @@ from data_service.fetchers.sentiment import (
     score_sentiment,
     score_texts,
 )
+from data_service.fetchers.signal_engine import (
+    atr_series,
+    build_signal,
+    ema_series,
+    rsi_series,
+)
 
 
 def test_normalize_impact():
@@ -141,6 +147,44 @@ def test_score_texts_llm_falls_back_without_key(monkeypatch):
     res = score_texts(headlines, min_headlines=3, backend="llm")
     assert res["backend"] == "lexicon"   # fallback
     assert res["bias"] == "short"
+
+
+# --- Signal engine ----------------------------------------------------
+
+def test_ema_lags_and_follows():
+    e = ema_series([float(i) for i in range(1, 21)], 5)
+    assert e[0] == 1.0
+    assert e[-1] > e[0]
+    assert e[-1] < 20.0  # EMA tertinggal di bawah harga terbaru
+
+
+def test_rsi_all_gains_is_100():
+    closes = [float(i) for i in range(1, 30)]
+    assert rsi_series(closes, 14)[-1] == 100.0
+
+
+def test_rsi_all_losses_is_0():
+    closes = [float(i) for i in range(30, 0, -1)]
+    assert rsi_series(closes, 14)[-1] == 0.0
+
+
+def test_atr_constant_range():
+    n = 25
+    a = atr_series([10.0] * n, [8.0] * n, [9.0] * n, 14)
+    assert abs(a[-1] - 2.0) < 0.3   # true range ~2
+
+
+def test_signal_news_blocked():
+    r = build_signal(sentiment_bias="flat", news_blocked=True, api_key="x")
+    assert r["signal"] == "none"
+    assert "Blackout" in r["reason"]
+
+
+def test_signal_no_api_key():
+    r = build_signal(sentiment_bias="flat", news_blocked=False, api_key="")
+    assert r["signal"] == "none"
+    assert "API_KEY" in r["reason"] or "key" in r["reason"].lower()
+    assert r["suggested_lot"] == 0.01
 
 
 def test_storage_max_stale_blocks_old_cache():

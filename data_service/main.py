@@ -16,6 +16,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from fetchers import cot as cot_fetcher
 from fetchers import forexfactory as ff
 from fetchers import sentiment as sentiment_fetcher
+from fetchers import signal_engine
 from storage import get_or_set
 
 app = FastAPI(title="Forex Bot Data Service", version="1.0.0")
@@ -106,6 +107,40 @@ def sentiment(symbol: str = Query(..., min_length=6)) -> dict:
         ),
     )
     return {"symbol": symbol, **data}
+
+
+@app.get("/signal", dependencies=[Depends(_auth)])
+def signal(
+    symbol: str = Query("XAUUSD", min_length=6),
+    equity: float = Query(100.0, gt=0),
+) -> dict:
+    """Sinyal trading XAUUSD untuk EKSEKUSI MANUAL (cloud, 24/7).
+
+    Menggabungkan indikator (harga dari Yahoo) + sentimen/berita dari /context.
+    Hasil di-cache singkat (per bar M30) supaya cepat & hemat.
+    """
+    ctx = context(symbol)  # type: ignore[arg-type]
+    bias = ctx.get("sentiment_bias", "flat")
+    blocked = not ctx.get("trade_allowed", True)
+
+    def _produce() -> dict:
+        return signal_engine.build_signal(
+            sentiment_bias=bias,
+            news_blocked=blocked,
+            api_key=settings.twelvedata_api_key,
+            symbol=settings.signal_symbol,
+            equity=equity,
+            rr=settings.signal_reward_ratio,
+            atr_mult=settings.signal_atr_mult,
+            use_sentiment=settings.signal_use_sentiment,
+        )
+
+    data = get_or_set(
+        f"signal_{symbol.upper()}_{int(equity)}",
+        settings.signal_cache_ttl_seconds,
+        _produce,
+    )
+    return data
 
 
 @app.get("/context", dependencies=[Depends(_auth)])
