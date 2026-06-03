@@ -126,6 +126,18 @@ def signal(
     bias = ctx.get("sentiment_bias", "flat")
     blocked = not ctx.get("trade_allowed", True)
 
+    def _cached_fetch(interval: str, size: int) -> list[dict]:
+        # Cache harga per-interval supaya hemat kuota Twelve Data:
+        # H4 berubah lambat (cache 1 jam), M30 (cache 15 menit).
+        ttl = 3600 if interval == "4h" else 900
+        return get_or_set(
+            f"px_{settings.signal_symbol}_{interval}",
+            ttl,
+            lambda: signal_engine.fetch_series(
+                settings.signal_symbol, interval, size, settings.twelvedata_api_key
+            ),
+        )
+
     def _produce() -> dict:
         return signal_engine.build_signal(
             sentiment_bias=bias,
@@ -136,6 +148,7 @@ def signal(
             rr=settings.signal_reward_ratio,
             atr_mult=settings.signal_atr_mult,
             use_sentiment=settings.signal_use_sentiment,
+            fetch_fn=_cached_fetch,
         )
 
     data = get_or_set(

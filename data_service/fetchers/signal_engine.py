@@ -16,6 +16,7 @@ untuk Railway free tier.
 """
 from __future__ import annotations
 
+from collections.abc import Callable
 from datetime import datetime, timezone
 from typing import Any
 
@@ -130,8 +131,13 @@ def build_signal(
     rsi_lo: float = 40.0,
     rsi_hi: float = 60.0,
     use_sentiment: bool = True,
+    fetch_fn: Callable[[str, int], list[dict[str, float]]] | None = None,
 ) -> dict[str, Any]:
-    """Bangun sinyal XAUUSD. Selalu kembalikan dict (tidak pernah lempar)."""
+    """Bangun sinyal XAUUSD. Selalu kembalikan dict (tidak pernah lempar).
+
+    fetch_fn(interval, outputsize) bisa di-inject untuk caching harga
+    (hemat kuota API). Default: ambil langsung dari Twelve Data.
+    """
     base: dict[str, Any] = {
         "symbol": "XAUUSD",
         "signal": "none",
@@ -151,9 +157,13 @@ def build_signal(
         base["reason"] = "TWELVEDATA_API_KEY belum diset di server"
         return base
 
+    if fetch_fn is None:
+        def fetch_fn(interval: str, size: int) -> list[dict[str, float]]:
+            return fetch_series(symbol, interval, size, api_key)
+
     try:
-        h4 = fetch_series(symbol, trend_interval, ema_slow + 30, api_key)
-        m30 = fetch_series(symbol, entry_interval, 60, api_key)
+        h4 = fetch_fn(trend_interval, ema_slow + 30)
+        m30 = fetch_fn(entry_interval, 60)
     except Exception as e:  # noqa: BLE001 - tetap balas, jangan 500
         base["reason"] = f"Data harga tidak tersedia: {e}"
         return base
