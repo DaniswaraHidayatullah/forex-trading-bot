@@ -134,6 +134,10 @@ PROFILES: dict[str, dict[str, Any]] = {
 PIP = 0.10          # 1 pip emas = $0.10 gerak harga
 SENT_STRONG = 0.30  # |skor sentimen| >= ini dianggap kuat
 
+# Validitas sinyal (menit) per timeframe entry -> "kapan" entry.
+_TF_MINUTES = {"5min": 5, "15min": 15, "30min": 30, "1h": 60,
+               "2h": 120, "4h": 240, "1day": 1440}
+
 
 # --- Pembentuk sinyal ---------------------------------------------------
 
@@ -171,6 +175,8 @@ def build_signal(
         "trend_tf": trend_interval, "entry_tf": entry_interval,
         "hold": prof["hold"],
         "entry": None, "sl": None, "tp": None, "rr": rr,
+        "entry_type": None, "entry_zone_low": None, "entry_zone_high": None,
+        "valid_minutes": None, "timing": None,
         "sl_pips": None, "tp_pips": None,
         "risk_per_001": None, "reward_per_001": None,
         "atr": None, "trend": "flat", "rsi": None,
@@ -245,11 +251,22 @@ def build_signal(
 
     sl_dist = atr_val * atr_mult
     tp_dist = sl_dist * rr
+    zone = round(0.15 * atr_val, 2)            # toleransi zona entry (~0.15 ATR)
+    zlow = round(price - zone, 2)
+    zhigh = round(price + zone, 2)
+    valid_minutes = _TF_MINUTES.get(entry_interval, 30)
     base.update({
         "sl_pips": round(sl_dist / PIP),
         "tp_pips": round(tp_dist / PIP),
         "risk_per_001": round(sl_dist, 2),     # $ rugi per 0.01 lot bila kena SL
         "reward_per_001": round(tp_dist, 2),   # $ untung per 0.01 lot bila kena TP
+        "entry_type": "market",
+        "entry_zone_low": zlow, "entry_zone_high": zhigh,
+        "valid_minutes": valid_minutes,
+        "timing": (
+            f"Masuk SEKARANG (market) di zona {zlow}-{zhigh}. "
+            f"Sinyal fresh, valid ~{valid_minutes} mnt (sampai bar {entry_interval} berikutnya)."
+        ),
     })
     if want_buy:
         base.update({

@@ -32,9 +32,14 @@ def format_embed(sig: dict[str, Any]) -> dict[str, Any]:
     if side in ("buy", "sell"):
         sl_txt = f"`{sig.get('sl')}`  ({sig.get('sl_pips')} pips • -${sig.get('risk_per_001')})"
         tp_txt = f"`{sig.get('tp')}`  ({sig.get('tp_pips')} pips • +${sig.get('reward_per_001')})"
+        entry_txt = (
+            f"`{sig.get('entry')}` (zona {sig.get('entry_zone_low')}-"
+            f"{sig.get('entry_zone_high')}, market)"
+        )
         fields += [
             fld("Profil", f"{prof}  ({sig.get('trend_tf')}→{sig.get('entry_tf')})", inline=False),
-            fld("Entry", f"`{sig.get('entry')}`"),
+            fld("📍 Entry (di mana)", entry_txt, inline=False),
+            fld("⏱️ Kapan", sig.get("timing"), inline=False),
             fld("Lot", sig.get("suggested_lot")),
             fld("RR", f"1:{int(sig.get('rr', 3))}"),
             fld("Stop Loss", sl_txt, inline=False),

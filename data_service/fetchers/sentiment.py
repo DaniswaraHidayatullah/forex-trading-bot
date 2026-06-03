@@ -44,7 +44,9 @@ _RELEVANCE = (
     "gold", "xau", "bullion", "dollar", "usd", "greenback", "dxy",
     "fed", "fomc", "powell", "inflation", "cpi", "pce", "ppi",
     "treasury", "yield", "yields", "rate", "rates", "jobs", "payroll",
-    "nonfarm", "geopolitical", "safe haven", "safe-haven",
+    "nonfarm", "geopolitical", "safe haven", "safe-haven", "haven",
+    "risk", "stocks", "equities", "unemployment", "recession",
+    "war", "tension", "tensions", "ceasefire",
 )
 
 # Frasa bullish utk EMAS (skor positif). Bobot = nilai.
@@ -65,6 +67,19 @@ _BULLISH: dict[str, float] = {
     "gold rises": 1.4, "gold jumps": 1.5, "gold gains": 1.4, "gold climbs": 1.4,
     "gold rallies": 1.5, "gold surges": 1.5, "gold soars": 1.6,
     "gold hits record": 1.6, "record high": 1.2, "all-time high": 1.3,
+    # Risk-off / safe-haven (bullish emas)
+    "risk-off": 1.1, "risk aversion": 1.1, "flight to safety": 1.3,
+    "haven buying": 1.2, "market fear": 1.0, "stocks tumble": 0.9,
+    "equities fall": 0.9, "stocks selloff": 1.0, "banking crisis": 1.3,
+    "debt ceiling": 0.9, "default risk": 1.0,
+    # Pelonggaran moneter / ekonomi lemah (bullish emas)
+    "rate cut bets": 1.4, "fed cuts": 1.4, "lower rates": 1.2,
+    "dovish minutes": 1.2, "easing cycle": 1.2, "weak jobs": 1.0,
+    "weak payrolls": 1.0, "rising unemployment": 1.0, "weak economic data": 1.0,
+    # Permintaan fisik / bank sentral (bullish emas)
+    "central banks buy": 1.3, "central-bank demand": 1.2,
+    "reserve diversification": 1.0, "de-dollarization": 1.1,
+    "physical demand": 1.0, "gold breakout": 1.3, "gold uptrend": 1.2,
 }
 
 # Frasa bearish utk EMAS (skor negatif). Bobot = nilai.
@@ -83,6 +98,19 @@ _BEARISH: dict[str, float] = {
     "gold falls": 1.4, "gold drops": 1.4, "gold slips": 1.3, "gold slides": 1.4,
     "gold tumbles": 1.5, "gold retreats": 1.3, "gold edges lower": 1.2,
     "gold sinks": 1.5, "profit-taking": 0.9,
+    # Pengetatan / hawkish (bearish emas)
+    "rate hike bets": 1.4, "higher for longer": 1.3, "more hikes": 1.3,
+    "fed hikes": 1.4, "hawkish minutes": 1.3,
+    # Ekonomi kuat / yield naik (bearish emas)
+    "strong economic data": 1.1, "robust economy": 1.1, "hot jobs": 1.1,
+    "blowout jobs": 1.2, "soaring yields": 1.2, "treasury selloff": 1.1,
+    "bond yields surge": 1.2, "dxy rises": 1.2, "dollar index rises": 1.2,
+    "real rates rise": 1.2,
+    # Risk-on / ketegangan mereda (bearish emas)
+    "risk-on rally": 1.0, "stocks surge": 0.9, "equities rally": 0.9,
+    "record stocks": 0.9, "ceasefire": 1.0, "peace deal": 1.0,
+    "de-escalation": 1.0, "easing tensions": 1.0, "calm markets": 0.8,
+    "gold downtrend": 1.2, "gold breakdown": 1.3, "outflows from gold": 1.1,
 }
 
 # Kata yang membalik arti frasa sesudahnya (negasi).

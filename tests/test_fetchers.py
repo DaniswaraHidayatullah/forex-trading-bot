@@ -240,7 +240,9 @@ def test_discord_embed_buy():
     assert emb["color"] == 3066993
     assert "BUY" in emb["title"]
     names = [f["name"] for f in emb["fields"]]
-    assert {"Entry", "Lot", "Stop Loss", "Take Profit"}.issubset(set(names))
+    assert {"Lot", "Stop Loss", "Take Profit"}.issubset(set(names))
+    assert any("Entry" in n for n in names)
+    assert any("Kapan" in n for n in names)   # panduan timing entry
 
 
 def test_discord_embed_none():
