@@ -40,6 +40,11 @@ class Settings(BaseSettings):
     # API key Twelve Data (GRATIS di twelvedata.com). Set via env TWELVEDATA_API_KEY.
     twelvedata_api_key: str = ""
 
+    # --- Notifikasi Discord (auto-push sinyal) ----------------------------
+    discord_webhook_url: str = ""        # set via env DISCORD_WEBHOOK_URL
+    signal_auto_push: bool = True        # auto kirim ke Discord saat ada sinyal
+    signal_poll_seconds: int = 1800      # cek sinyal tiap N detik (default 30 mnt)
+
     # Mata uang yang relevan per simbol -> dipakai untuk memfilter berita & COT
     symbol_currencies: dict[str, list[str]] = {
         "XAUUSD": ["USD"],          # emas digerakkan terutama oleh USD

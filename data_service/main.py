@@ -11,12 +11,15 @@ Endpoint /context inilah yang dipanggil EA sebelum entry.
 """
 from __future__ import annotations
 
+import threading
+import time
+
 from config import settings
 from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from fetchers import cot as cot_fetcher
 from fetchers import forexfactory as ff
+from fetchers import notifier, signal_engine
 from fetchers import sentiment as sentiment_fetcher
-from fetchers import signal_engine
 from storage import get_or_set
 
 app = FastAPI(title="Forex Bot Data Service", version="1.0.0")
@@ -116,8 +119,8 @@ def signal(
 ) -> dict:
     """Sinyal trading XAUUSD untuk EKSEKUSI MANUAL (cloud, 24/7).
 
-    Menggabungkan indikator (harga dari Yahoo) + sentimen/berita dari /context.
-    Hasil di-cache singkat (per bar M30) supaya cepat & hemat.
+    Menggabungkan indikator (harga dari Twelve Data) + sentimen/berita dari
+    /context. Hasil di-cache singkat (per bar M30) supaya cepat & hemat.
     """
     ctx = context(symbol)  # type: ignore[arg-type]
     bias = ctx.get("sentiment_bias", "flat")
@@ -169,3 +172,35 @@ def context(symbol: str = Query(..., min_length=6)) -> dict:
         "sentiment": s,
         "cot": c,
     }
+
+
+# --- Auto-push sinyal ke Discord (background, jalan di Railway 24/7) -----
+
+def _signal_poller() -> None:
+    """Loop: cek sinyal tiap N detik, kirim ke Discord saat ada sinyal BARU.
+
+    Dedupe sederhana: kirim hanya saat arah berubah (none->buy/sell atau
+    buy<->sell), supaya tidak spam tiap siklus untuk kondisi yang sama.
+    """
+    last_side: str | None = None
+    interval = max(60, settings.signal_poll_seconds)
+    while True:
+        try:
+            sig = signal("XAUUSD", 100.0)  # type: ignore[arg-type]
+            side = sig.get("signal", "none")
+            if side in ("buy", "sell"):
+                if side != last_side:
+                    notifier.send_discord(settings.discord_webhook_url, sig)
+                    last_side = side
+            else:
+                last_side = None  # reset -> setup berikutnya akan dikirim lagi
+        except Exception as e:  # noqa: BLE001 - jangan matikan loop
+            print("signal poller error:", e)
+        time.sleep(interval)
+
+
+@app.on_event("startup")
+def _start_poller() -> None:
+    if settings.discord_webhook_url and settings.signal_auto_push:
+        threading.Thread(target=_signal_poller, daemon=True).start()
+        print("Discord signal poller aktif.")

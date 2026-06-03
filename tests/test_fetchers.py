@@ -187,6 +187,27 @@ def test_signal_no_api_key():
     assert r["suggested_lot"] == 0.01
 
 
+def test_discord_embed_buy():
+    from data_service.fetchers.notifier import format_embed
+    sig = {
+        "signal": "buy", "entry": 2350.4, "sl": 2345.1, "tp": 2366.3,
+        "suggested_lot": 0.01, "rr": 3, "rsi": 47.0, "trend": "up",
+        "sentiment_bias": "long", "reason": "uptrend", "time_utc": "2026-06-03T00:00:00+00:00",
+    }
+    p = format_embed(sig)
+    emb = p["embeds"][0]
+    assert emb["color"] == 3066993
+    assert "BUY" in emb["title"]
+    names = [f["name"] for f in emb["fields"]]
+    assert {"Entry", "SL", "TP", "Lot"}.issubset(set(names))
+
+
+def test_discord_embed_none():
+    from data_service.fetchers.notifier import format_embed
+    p = format_embed({"signal": "none", "reason": "tunggu"})
+    assert p["embeds"][0]["color"] == 9807270
+
+
 def test_storage_max_stale_blocks_old_cache():
     import json
     import time
