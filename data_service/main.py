@@ -199,6 +199,22 @@ def context(symbol: str = Query(..., min_length=6)) -> dict:
 
 # --- Auto-push sinyal ke Discord (background, jalan di Railway 24/7) -----
 
+def _discord_configured() -> bool:
+    return bool(
+        (settings.discord_bot_token and settings.discord_channel_id)
+        or settings.discord_webhook_url
+    )
+
+
+def _push_discord(sig: dict) -> bool:
+    """Kirim sinyal ke Discord: pakai BOT bila token+channel ada, kalau tidak webhook."""
+    if settings.discord_bot_token and settings.discord_channel_id:
+        return notifier.send_bot(settings.discord_bot_token, settings.discord_channel_id, sig)
+    if settings.discord_webhook_url:
+        return notifier.send_webhook(settings.discord_webhook_url, sig)
+    return False
+
+
 def _signal_poller() -> None:
     """Loop: cek sinyal tiap N detik untuk tiap profil, kirim ke Discord saat
     ada sinyal BARU.
@@ -218,7 +234,7 @@ def _signal_poller() -> None:
                 strong_enough = sig.get("confidence_level", 0) >= min_level
                 if side in ("buy", "sell") and strong_enough:
                     if last_side.get(profile) != side:
-                        notifier.send_discord(settings.discord_webhook_url, sig)
+                        _push_discord(sig)
                         last_side[profile] = side
                 elif side == "none":
                     last_side[profile] = None
@@ -229,6 +245,6 @@ def _signal_poller() -> None:
 
 @app.on_event("startup")
 def _start_poller() -> None:
-    if settings.discord_webhook_url and settings.signal_auto_push:
+    if _discord_configured() and settings.signal_auto_push:
         threading.Thread(target=_signal_poller, daemon=True).start()
         print("Discord signal poller aktif.")

@@ -41,7 +41,11 @@ class Settings(BaseSettings):
     twelvedata_api_key: str = ""
 
     # --- Notifikasi Discord (auto-push sinyal) ----------------------------
+    # Pilih SALAH SATU: webhook (paling gampang) ATAU bot (token + channel id).
+    # Kalau bot token & channel id diisi, itu yang dipakai; jika tidak, webhook.
     discord_webhook_url: str = ""        # set via env DISCORD_WEBHOOK_URL
+    discord_bot_token: str = ""          # set via env DISCORD_BOT_TOKEN
+    discord_channel_id: str = ""         # set via env DISCORD_CHANNEL_ID
     signal_auto_push: bool = True        # auto kirim ke Discord saat ada sinyal
     signal_poll_seconds: int = 1800      # cek sinyal tiap N detik (default 30 mnt)
     # Profil yang di-auto-push (pisah koma): scalp, intraday, swing

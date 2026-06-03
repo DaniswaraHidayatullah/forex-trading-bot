@@ -58,11 +58,37 @@ def format_embed(sig: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def send_discord(webhook_url: str, sig: dict[str, Any], timeout: float = 10.0) -> bool:
-    """POST embed ke Discord webhook. Return True bila terkirim (2xx)."""
+DISCORD_API = "https://discord.com/api/v10"
+
+
+def send_webhook(webhook_url: str, sig: dict[str, Any], timeout: float = 10.0) -> bool:
+    """Kirim embed lewat Discord WEBHOOK. Return True bila terkirim (2xx)."""
     if not webhook_url:
         return False
     with httpx.Client(timeout=timeout) as client:
         resp = client.post(webhook_url, json=format_embed(sig))
         resp.raise_for_status()
     return True
+
+
+def send_bot(token: str, channel_id: str, sig: dict[str, Any], timeout: float = 10.0) -> bool:
+    """Kirim embed lewat Discord BOT (REST API) ke sebuah channel.
+
+    Syarat: bot sudah di-invite ke server & punya izin kirim pesan di channel.
+    Hanya butuh REST (tanpa gateway/websocket) -> ringan.
+    """
+    if not token or not channel_id:
+        return False
+    url = f"{DISCORD_API}/channels/{channel_id}/messages"
+    with httpx.Client(timeout=timeout) as client:
+        resp = client.post(
+            url,
+            headers={"Authorization": f"Bot {token}"},
+            json=format_embed(sig),
+        )
+        resp.raise_for_status()
+    return True
+
+
+# Alias kompatibilitas lama.
+send_discord = send_webhook
