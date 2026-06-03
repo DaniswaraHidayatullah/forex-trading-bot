@@ -1,0 +1,54 @@
+name: Signal Bot
+
+# Jalankan bot sinyal terjadwal (GRATIS, tanpa server 24/7).
+# - cron: tiap 30 menit (jadwal GitHub bisa molor sedikit saat sibuk, itu wajar)
+# - workflow_dispatch: bisa dijalankan manual dari tab Actions (tombol "Run workflow")
+#
+# Set RAHASIA di: repo -> Settings -> Secrets and variables -> Actions -> New
+#   TWELVEDATA_API_KEY   (wajib, harga emas)
+#   DISCORD_BOT_TOKEN    + DISCORD_CHANNEL_ID   (cara bot)  -- ATAU --
+#   DISCORD_WEBHOOK_URL  (cara webhook)
+# Variabel non-rahasia (opsional) di tab "Variables":
+#   SIGNAL_PROFILES (mis. intraday) , SIGNAL_MIN_CONFIDENCE (none|medium|strong)
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {}
+
+# Jangan jalankan dua run bersamaan (hindari kirim dobel).
+concurrency:
+  group: signal-bot
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install deps
+        run: pip install -r data_service/requirements.txt
+
+      - name: Restore state (anti-spam)
+        uses: actions/cache@v4
+        with:
+          path: signal_state.json
+          key: signal-state-${{ github.run_id }}
+          restore-keys: |
+            signal-state-
+
+      - name: Run signal bot
+        env:
+          TWELVEDATA_API_KEY: ${{ secrets.TWELVEDATA_API_KEY }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          SIGNAL_PROFILES: ${{ vars.SIGNAL_PROFILES || 'intraday' }}
+          SIGNAL_MIN_CONFIDENCE: ${{ vars.SIGNAL_MIN_CONFIDENCE || 'none' }}
+        run: python tools/run_signal_once.py
