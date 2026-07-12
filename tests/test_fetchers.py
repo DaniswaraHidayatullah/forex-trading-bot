@@ -174,14 +174,87 @@ def test_atr_constant_range():
     assert abs(a[-1] - 2.0) < 0.3   # true range ~2
 
 
+# Rabu 12:00 UTC (pasar buka) -- dipakai supaya test tak tergantung hari nyata.
+_WEEKDAY = datetime(2026, 1, 7, 12, 0, tzinfo=timezone.utc)
+
+
+def _trend_up_fetch(interval, size):
+    if size >= 100:
+        return [{"open": 1000 + i, "high": 1001 + i, "low": 999 + i, "close": 1000 + i}
+                for i in range(size)]
+    bars = []
+    for i in range(size):
+        c = 2000 + (1 if i % 2 == 0 else -1)
+        bars.append({"open": c, "high": c + 1, "low": c - 1, "close": c})
+    return bars
+
+
 def test_signal_news_blocked():
-    r = build_signal(sentiment_bias="flat", news_blocked=True, api_key="x")
+    r = build_signal(sentiment_bias="flat", news_blocked=True, api_key="x", now_utc=_WEEKDAY)
     assert r["signal"] == "none"
     assert "Blackout" in r["reason"]
 
 
+def test_signal_weekend_closed():
+    saturday = datetime(2026, 1, 10, 12, 0, tzinfo=timezone.utc)
+
+    def boom(interval, size):
+        raise AssertionError("tidak boleh fetch saat pasar tutup")
+
+    r = build_signal(sentiment_bias="long", news_blocked=False, api_key="x",
+                     fetch_fn=boom, now_utc=saturday)
+    assert r["signal"] == "none"
+    assert "TUTUP" in r["reason"]
+
+
+def test_signal_risk_cap_skips():
+    def big_atr_fetch(interval, size):
+        if size >= 100:
+            return [{"open": 1000 + i, "high": 1001 + i, "low": 999 + i, "close": 1000 + i}
+                    for i in range(size)]
+        bars = []
+        for i in range(size):  # range tiap bar $20 -> ATR ~20 -> SL ~30
+            c = 2000 + (1 if i % 2 == 0 else -1)
+            bars.append({"open": c, "high": c + 10, "low": c - 10, "close": c})
+        return bars
+
+    r = build_signal(sentiment_bias="long", news_blocked=False, api_key="x",
+                     profile="intraday", fetch_fn=big_atr_fetch,
+                     max_risk_usd=12.0, now_utc=_WEEKDAY)
+    assert r["signal"] == "none"
+    assert "risiko" in r["reason"].lower()
+
+
+def test_signal_stale_quote_skips():
+    r = build_signal(sentiment_bias="long", news_blocked=False, api_key="x",
+                     profile="intraday", fetch_fn=_trend_up_fetch,
+                     quote=2100.0, now_utc=_WEEKDAY)  # jauh dari ~2000
+    assert r["signal"] == "none"
+    assert "bergerak cepat" in r["reason"] or "sinkron" in r["reason"]
+
+
+def test_tracker_outcomes():
+    from data_service.fetchers.tracker import check_outcome, summarize
+
+    bars = [
+        {"datetime": "2026-01-07 12:05:00", "high": 2005, "low": 1998, "close": 2000},
+        {"datetime": "2026-01-07 12:10:00", "high": 2012, "low": 1999, "close": 2010},
+    ]
+    # BUY tp=2011 tercapai di bar ke-2
+    assert check_outcome(bars, "buy", sl=1990, tp=2011) == "win"
+    # BUY sl=1999 kena di bar pertama (sebelum TP)
+    assert check_outcome(bars, "buy", sl=1999, tp=2011) == "loss"
+    # SL & TP di bar yang sama -> konservatif loss
+    assert check_outcome(bars, "buy", sl=1999.5, tp=2004) == "loss"
+    # filter waktu: bar pertama dilewati
+    assert check_outcome(bars, "buy", sl=1998.5, tp=2011,
+                         after_utc="2026-01-07T12:06:00+00:00") == "win"
+    s = summarize([{"status": "win", "rr": 3}, {"status": "loss"}, {"status": "open"}])
+    assert s["winrate_pct"] == 50.0 and s["net_r"] == 2.0 and s["open"] == 1
+
+
 def test_signal_no_api_key():
-    r = build_signal(sentiment_bias="flat", news_blocked=False, api_key="")
+    r = build_signal(sentiment_bias="flat", news_blocked=False, api_key="", now_utc=_WEEKDAY)
     assert r["signal"] == "none"
     assert "API_KEY" in r["reason"] or "key" in r["reason"].lower()
     assert r["suggested_lot"] == 0.01
@@ -201,6 +274,7 @@ def test_build_signal_buy_full_path_with_confidence():
     r = build_signal(
         sentiment_bias="long", news_blocked=False, api_key="x",
         profile="intraday", sentiment_score=0.5, fetch_fn=fake_fetch,
+        now_utc=_WEEKDAY,
     )
     assert r["signal"] == "buy"
     assert r["confidence_level"] == 3        # searah long + sentimen kuat (0.5)
@@ -222,6 +296,7 @@ def test_build_signal_confidence_weak_when_flat():
     r = build_signal(
         sentiment_bias="flat", news_blocked=False, api_key="x",
         profile="intraday", sentiment_score=0.0, fetch_fn=fake_fetch,
+        now_utc=_WEEKDAY,
     )
     assert r["signal"] == "buy"           # flat -> tetap boleh (gerbang lolos)
     assert r["confidence_level"] == 1     # lemah (teknikal saja)

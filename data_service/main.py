@@ -124,7 +124,20 @@ def _signal_for(symbol: str, equity: float, profile: str) -> dict:
     ctx = context(symbol)  # type: ignore[arg-type]
     bias = ctx.get("sentiment_bias", "flat")
     blocked = not ctx.get("trade_allowed", True)
-    sent_score = float((ctx.get("sentiment") or {}).get("score", 0.0) or 0.0)
+    sent = ctx.get("sentiment") or {}
+    sent_score = float(sent.get("score", 0.0) or 0.0)
+    sent_available = int(sent.get("headlines_total", 0) or 0) > 0
+
+    # Harga real-time (cache 60 dtk). Gagal -> None (fallback ke bar terakhir).
+    try:
+        quote = get_or_set(
+            f"quote_{settings.signal_symbol}", 60,
+            lambda: signal_engine.fetch_price(
+                settings.signal_symbol, settings.twelvedata_api_key
+            ),
+        )
+    except Exception:  # noqa: BLE001
+        quote = None
 
     def _cached_fetch(interval: str, size: int) -> list[dict]:
         return get_or_set(
@@ -146,6 +159,9 @@ def _signal_for(symbol: str, equity: float, profile: str) -> dict:
             rr=settings.signal_reward_ratio,
             use_sentiment=settings.signal_use_sentiment,
             sentiment_score=sent_score,
+            sentiment_available=sent_available,
+            quote=quote,
+            max_risk_usd=settings.signal_max_risk_usd,
             fetch_fn=_cached_fetch,
         )
 

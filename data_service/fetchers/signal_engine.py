@@ -23,16 +23,17 @@ from typing import Any
 import httpx
 
 TD_URL = "https://api.twelvedata.com/time_series"
+TD_PRICE_URL = "https://api.twelvedata.com/price"
 
 
 # --- Pengambilan harga --------------------------------------------------
 
 def fetch_series(symbol: str, interval: str, outputsize: int, api_key: str,
-                 timeout: float = 15.0) -> list[dict[str, float]]:
-    """Ambil OHLC dari Twelve Data, urut lama->baru. Lempar bila gagal."""
+                 timeout: float = 15.0) -> list[dict[str, Any]]:
+    """Ambil OHLC (dgn datetime UTC) dari Twelve Data, urut lama->baru."""
     params = {
         "symbol": symbol, "interval": interval, "outputsize": str(outputsize),
-        "order": "ASC", "apikey": api_key, "format": "JSON",
+        "order": "ASC", "apikey": api_key, "format": "JSON", "timezone": "UTC",
     }
     with httpx.Client(timeout=timeout) as client:
         resp = client.get(TD_URL, params=params)
@@ -43,13 +44,25 @@ def fetch_series(symbol: str, interval: str, outputsize: int, api_key: str,
     values = data.get("values") if isinstance(data, dict) else None
     if not values:
         raise RuntimeError("data harga kosong")
-    out: list[dict[str, float]] = []
+    out: list[dict[str, Any]] = []
     for v in values:
         out.append({
+            "datetime": v.get("datetime", ""),
             "open": float(v["open"]), "high": float(v["high"]),
             "low": float(v["low"]), "close": float(v["close"]),
         })
     return out
+
+
+def fetch_price(symbol: str, api_key: str, timeout: float = 10.0) -> float:
+    """Harga real-time (1 kredit). Lempar bila gagal."""
+    with httpx.Client(timeout=timeout) as client:
+        resp = client.get(TD_PRICE_URL, params={"symbol": symbol, "apikey": api_key})
+        resp.raise_for_status()
+        data = resp.json()
+    if isinstance(data, dict) and data.get("price"):
+        return float(data["price"])
+    raise RuntimeError(str(data)[:120])
 
 
 # --- Indikator (pure Python) -------------------------------------------
@@ -134,6 +147,21 @@ PROFILES: dict[str, dict[str, Any]] = {
 PIP = 0.10          # 1 pip emas = $0.10 gerak harga
 SENT_STRONG = 0.30  # |skor sentimen| >= ini dianggap kuat
 
+
+def market_open(now: datetime | None = None) -> bool:
+    """Pasar emas buka? Tutup: Jumat ~21:00 UTC s/d Minggu ~22:00 UTC.
+    Saat tutup, data harga jadi basi -> sinyal weekend = artefak (harus di-skip).
+    """
+    now = now or datetime.now(timezone.utc)
+    wd, hr = now.weekday(), now.hour  # Mon=0 .. Sun=6
+    if wd == 5:
+        return False
+    if wd == 4 and hr >= 21:
+        return False
+    if wd == 6 and hr < 22:
+        return False
+    return True
+
 # Validitas sinyal (menit) per timeframe entry -> "kapan" entry.
 _TF_MINUTES = {"5min": 5, "15min": 15, "30min": 30, "1h": 60,
                "2h": 120, "4h": 240, "1day": 1440}
@@ -155,6 +183,10 @@ def build_signal(
     rsi_hi: float = 60.0,
     use_sentiment: bool = True,
     sentiment_score: float = 0.0,
+    sentiment_available: bool = True,
+    quote: float | None = None,
+    max_risk_usd: float | None = None,
+    now_utc: datetime | None = None,
     fetch_fn: Callable[[str, int], list[dict[str, float]]] | None = None,
 ) -> dict[str, Any]:
     """Bangun sinyal XAUUSD untuk satu profil (scalp/intraday/swing).
@@ -181,13 +213,17 @@ def build_signal(
         "risk_per_001": None, "reward_per_001": None,
         "atr": None, "trend": "flat", "rsi": None,
         "sentiment_bias": sentiment_bias, "sentiment_score": round(sentiment_score, 3),
+        "sentiment_available": sentiment_available,
         "confidence": None, "confidence_level": 0, "confidence_stars": "",
-        "news_blocked": news_blocked,
+        "news_blocked": news_blocked, "risk_pct": None,
         "suggested_lot": _lot_for_equity(equity),
         "price_source": "twelvedata:" + symbol,
         "time_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
 
+    if not market_open(now_utc):
+        base["reason"] = "Pasar emas TUTUP (weekend) -> tidak ada sinyal"
+        return base
     if news_blocked:
         base["reason"] = "Blackout berita high-impact -> tunggu"
         return base
@@ -226,6 +262,15 @@ def build_signal(
         base["reason"] = "Indikator belum siap (data kurang)"
         return base
 
+    # Pakai harga REAL-TIME bila tersedia; kalau menyimpang jauh dari bar
+    # terakhir (pasar lari / data tidak sinkron), jangan kasih sinyal basi.
+    if quote is not None and quote > 0:
+        if abs(quote - price) > 1.0 * atr_val:
+            base["entry"] = round(quote, 2)
+            base["reason"] = "Harga bergerak cepat / data tidak sinkron -> tunggu bar berikutnya"
+            return base
+        price = quote
+
     base["trend"] = "up" if trend == 1 else "down" if trend == -1 else "flat"
     base["rsi"] = round(rsi_val, 1)
     base["atr"] = round(atr_val, 2)
@@ -251,6 +296,18 @@ def build_signal(
 
     sl_dist = atr_val * atr_mult
     tp_dist = sl_dist * rr
+
+    # Batas risiko: di akun kecil, lot minimum 0.01 tidak bisa diperkecil.
+    # Kalau jarak SL (=$ risiko per 0.01 lot) melebihi batas, JANGAN kirim
+    # sinyal -- lebih baik tidak trading daripada risiko tak masuk akal.
+    if max_risk_usd is not None and sl_dist > max_risk_usd:
+        base["risk_pct"] = round(sl_dist / equity * 100, 1)
+        base["reason"] = (
+            f"Volatilitas tinggi: risiko ${sl_dist:.0f}/trade (~{sl_dist/equity*100:.0f}% akun) "
+            f"> batas ${max_risk_usd:.0f} -> skip demi keamanan"
+        )
+        return base
+
     zone = round(0.15 * atr_val, 2)            # toleransi zona entry (~0.15 ATR)
     zlow = round(price - zone, 2)
     zhigh = round(price + zone, 2)
@@ -260,6 +317,7 @@ def build_signal(
         "tp_pips": round(tp_dist / PIP),
         "risk_per_001": round(sl_dist, 2),     # $ rugi per 0.01 lot bila kena SL
         "reward_per_001": round(tp_dist, 2),   # $ untung per 0.01 lot bila kena TP
+        "risk_pct": round(sl_dist / equity * 100, 1),
         "entry_type": "market",
         "entry_zone_low": zlow, "entry_zone_high": zhigh,
         "valid_minutes": valid_minutes,

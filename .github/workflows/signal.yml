@@ -1,25 +1,25 @@
 name: Signal Bot
 
-# Jalankan bot sinyal terjadwal (GRATIS, tanpa server 24/7).
-# - cron: tiap 30 menit (jadwal GitHub bisa molor sedikit saat sibuk, itu wajar)
-# - workflow_dispatch: bisa dijalankan manual dari tab Actions (tombol "Run workflow")
+# Bot sinyal terjadwal (GRATIS, tanpa server 24/7).
+# - cron tiap 30 menit (jadwal GitHub bisa molor sedikit; run antre dijalankan
+#   berurutan berkat concurrency group -> log commit mencegah kirim dobel)
+# - workflow_dispatch: bisa dijalankan manual dari tab Actions
 #
-# Set RAHASIA di: repo -> Settings -> Secrets and variables -> Actions -> New
-#   TWELVEDATA_API_KEY   (wajib, harga emas)
-#   DISCORD_BOT_TOKEN    + DISCORD_CHANNEL_ID   (cara bot)  -- ATAU --
-#   DISCORD_WEBHOOK_URL  (cara webhook)
-# Variabel non-rahasia (opsional) di tab "Variables":
-#   SIGNAL_PROFILES (mis. intraday) , SIGNAL_MIN_CONFIDENCE (none|medium|strong)
+# Rahasia di Settings -> Secrets and variables -> Actions:
+#   TWELVEDATA_API_KEY, DISCORD_BOT_TOKEN + DISCORD_CHANNEL_ID (atau DISCORD_WEBHOOK_URL)
+# Non-rahasia (tab Variables): SIGNAL_PROFILES, SIGNAL_MIN_CONFIDENCE, SIGNAL_MAX_RISK_USD
 
 on:
   schedule:
     - cron: "*/30 * * * *"
   workflow_dispatch: {}
 
-# Jangan jalankan dua run bersamaan (hindari kirim dobel).
 concurrency:
   group: signal-bot
   cancel-in-progress: false
+
+permissions:
+  contents: write   # untuk commit signals/log.json (riwayat & anti-spam)
 
 jobs:
   run:
@@ -35,14 +35,6 @@ jobs:
       - name: Install deps
         run: pip install -r data_service/requirements.txt
 
-      - name: Restore state (anti-spam)
-        uses: actions/cache@v4
-        with:
-          path: signal_state.json
-          key: signal-state-${{ github.run_id }}
-          restore-keys: |
-            signal-state-
-
       - name: Run signal bot
         env:
           TWELVEDATA_API_KEY: ${{ secrets.TWELVEDATA_API_KEY }}
@@ -50,5 +42,19 @@ jobs:
           DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           SIGNAL_PROFILES: ${{ vars.SIGNAL_PROFILES || 'intraday' }}
-          SIGNAL_MIN_CONFIDENCE: ${{ vars.SIGNAL_MIN_CONFIDENCE || 'none' }}
+          SIGNAL_MIN_CONFIDENCE: ${{ vars.SIGNAL_MIN_CONFIDENCE || 'medium' }}
+          SIGNAL_MAX_RISK_USD: ${{ vars.SIGNAL_MAX_RISK_USD || '12' }}
         run: python tools/run_signal_once.py
+
+      - name: Commit log sinyal
+        run: |
+          if git status --porcelain signals/ | grep -q .; then
+            git config user.name "signal-bot"
+            git config user.email "bot@users.noreply.github.com"
+            git add signals/
+            git commit -m "log: update sinyal [skip ci]"
+            git pull --rebase origin main || true
+            git push
+          else
+            echo "log tidak berubah"
+          fi

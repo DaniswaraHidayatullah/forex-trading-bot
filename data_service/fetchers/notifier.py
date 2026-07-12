@@ -34,17 +34,24 @@ def format_embed(sig: dict[str, Any]) -> dict[str, Any]:
     arrow = "↑" if side == "buy" else "↓"
     title = "🟢 BUY XAUUSD" if side == "buy" else "🔴 SELL XAUUSD"
 
+    sent_txt = (
+        f"Sentimen {sig.get('sentiment_bias')} ({sig.get('sentiment_score')})"
+        if sig.get("sentiment_available", True)
+        else "Sentimen tidak tersedia"
+    )
+    risk_pct = sig.get("risk_pct")
+    risk_note = f"  ·  ⚠️ ~{risk_pct}% akun" if risk_pct else ""
     desc = "\n".join([
         f"**{prof}**  ·  {stars} {conf}",
         "",
         f"💰 **Entry**  `{sig.get('entry')}`   _(zona {sig.get('entry_zone_low')}–{sig.get('entry_zone_high')})_",
         f"🎯 **Take Profit**  `{sig.get('tp')}`   → **+${sig.get('reward_per_001')}**  _({sig.get('tp_pips')} pips)_",
-        f"🛑 **Stop Loss**  `{sig.get('sl')}`   → **−${sig.get('risk_per_001')}**  _({sig.get('sl_pips')} pips)_",
+        f"🛑 **Stop Loss**  `{sig.get('sl')}`   → **−${sig.get('risk_per_001')}**{risk_note}  _({sig.get('sl_pips')} pips)_",
         f"📦 **Lot** `{sig.get('suggested_lot')}`   ·   ⚖️ **RR 1:{int(sig.get('rr', 3))}**",
         "",
         f"⏱️ Masuk **sekarang** — berlaku ~{sig.get('valid_minutes')} menit",
         f"⏳ Perkiraan tahan: {sig.get('hold')}",
-        f"📊 Tren {arrow} · RSI {sig.get('rsi')} · Sentimen {sig.get('sentiment_bias')} ({sig.get('sentiment_score')})",
+        f"📊 Tren {arrow} · RSI {sig.get('rsi')} · {sent_txt}",
     ])
 
     return {
@@ -58,7 +65,38 @@ def format_embed(sig: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def format_outcome_embed(entry: dict[str, Any], stats_text: str) -> dict[str, Any]:
+    """Embed laporan hasil sinyal (kena TP / kena SL / kedaluwarsa)."""
+    status = entry.get("status")
+    side = str(entry.get("side", "")).upper()
+    prof = entry.get("profile", "")
+    rr = entry.get("rr", 3)
+    if status == "win":
+        title = f"✅ TP TERCAPAI — {side} XAUUSD"
+        color = 3066993
+        line = f"Entry `{entry.get('entry')}` → TP `{entry.get('tp')}`  (**+{rr}R**, +${entry.get('reward_usd', '')})"
+    elif status == "loss":
+        title = f"❌ SL KENA — {side} XAUUSD"
+        color = 15158332
+        line = f"Entry `{entry.get('entry')}` → SL `{entry.get('sl')}`  (**−1R**, −${entry.get('risk_usd', '')})"
+    else:
+        title = f"⌛ KEDALUWARSA — {side} XAUUSD"
+        color = 9807270
+        line = f"Entry `{entry.get('entry')}` tidak menyentuh TP/SL dalam batas waktu."
+    desc = "\n".join([f"**{prof}** · sinyal {entry.get('time_utc', '')[:16]} UTC", "", line,
+                      "", f"📈 {stats_text}"])
+    return {"embeds": [{"title": title, "description": desc, "color": color,
+                        "footer": {"text": "Rekap otomatis · eksekusi manual"}}]}
+
+
 DISCORD_API = "https://discord.com/api/v10"
+
+
+def _payload(sig_or_payload: dict[str, Any]) -> dict[str, Any]:
+    """Terima dict sinyal ATAU payload embed jadi (punya key 'embeds')."""
+    if "embeds" in sig_or_payload:
+        return sig_or_payload
+    return format_embed(sig_or_payload)
 
 
 def send_webhook(webhook_url: str, sig: dict[str, Any], timeout: float = 10.0) -> bool:
@@ -66,7 +104,7 @@ def send_webhook(webhook_url: str, sig: dict[str, Any], timeout: float = 10.0) -
     if not webhook_url:
         return False
     with httpx.Client(timeout=timeout) as client:
-        resp = client.post(webhook_url, json=format_embed(sig))
+        resp = client.post(webhook_url, json=_payload(sig))
         resp.raise_for_status()
     return True
 
@@ -84,7 +122,7 @@ def send_bot(token: str, channel_id: str, sig: dict[str, Any], timeout: float = 
         resp = client.post(
             url,
             headers={"Authorization": f"Bot {token}"},
-            json=format_embed(sig),
+            json=_payload(sig),
         )
         resp.raise_for_status()
     return True
