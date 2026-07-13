@@ -36,6 +36,7 @@ def run_variant(
     tp_mult: float,
     ema_fast: int = 50,
     ema_slow: int = 200,
+    session: tuple[int, int] | None = None,   # jam UTC (mulai, selesai) boleh entry
 ) -> dict:
     closes = [b["close"] for b in entry_bars]
     highs = [b["high"] for b in entry_bars]
@@ -70,7 +71,10 @@ def run_variant(
         r, a = rsi[i - 1], atr[i - 1]
         if r is None or a is None or a <= 0:
             continue
-        tr = trend_at(bar_time(entry_bars[i]))
+        t_i = bar_time(entry_bars[i])
+        if session and not (session[0] <= t_i.hour < session[1]):
+            continue
+        tr = trend_at(t_i)
         if tr == 0 or not (rsi_lo <= r <= rsi_hi):
             continue
         side = "buy" if tr == 1 else "sell"

@@ -66,19 +66,26 @@ def health() -> dict[str, str]:
 @app.get("/news", dependencies=[Depends(_auth)])
 def news(symbol: str = Query(..., min_length=6)) -> dict:
     currencies = _currencies_for(symbol)
-    events = get_or_set(
-        "ff_calendar",
-        settings.cache_ttl_seconds,
-        ff.fetch_calendar,
-        max_stale_seconds=settings.news_max_stale_seconds,
-    )
+    try:
+        events = get_or_set(
+            "ff_calendar",
+            settings.cache_ttl_seconds,
+            ff.fetch_calendar,
+            max_stale_seconds=settings.news_max_stale_seconds,
+        )
+    except Exception as e:  # noqa: BLE001
+        # Kalender tak terjangkau: JANGAN matikan seluruh sinyal. Degradasi:
+        # anggap tidak blackout, tapi tandai supaya kelihatan di log/diagnosa.
+        print("PERINGATAN kalender berita gagal:", e)
+        return {"symbol": symbol.upper(), "blocked": False, "event": None,
+                "available": False}
     result = ff.upcoming_blackout(
         events,
         currencies=currencies,
         min_impact=settings.news_min_impact,
         blackout_minutes=settings.news_blackout_minutes,
     )
-    return {"symbol": symbol.upper(), **result}
+    return {"symbol": symbol.upper(), "available": True, **result}
 
 
 @app.get("/cot", dependencies=[Depends(_auth)])

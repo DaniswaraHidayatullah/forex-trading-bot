@@ -132,9 +132,14 @@ def _lot_for_equity(equity: float) -> float:
 # "harian" = hasil backtest 3.5 bln (Mar-Jul 2026): RR 1:2, M15/H4, RSI 35-65
 # -> ~4 sinyal/hari, WR ~39%, net terbaik (+$417 @0.01 lot) setelah spread.
 PROFILES: dict[str, dict[str, Any]] = {
+    # Hasil backtest ronde-2 (Mei-Jul 2026): tren H1 EMA21/50 (lebih responsif),
+    # sesi London/NY 06-20 UTC, SL 1.2 ATR + RR 1:2 -> ~4 sinyal/hari,
+    # WR ~40%, ekspektasi/trade terbaik (0.216R) & risiko lolos batas $12.
     "harian": {
-        "label": "Harian", "trend": "4h", "entry": "15min",
-        "atr_mult": 1.5, "rr": 2.0, "rsi_lo": 35.0, "rsi_hi": 65.0,
+        "label": "Harian", "trend": "1h", "entry": "15min",
+        "ema_fast": 21, "ema_slow": 50,
+        "atr_mult": 1.2, "rr": 2.0, "rsi_lo": 35.0, "rsi_hi": 65.0,
+        "session": (6, 20),  # jam UTC boleh entry (London+NY)
         "hold": "~1 jam s/d 1 hari",
     },
     "scalp": {
@@ -205,10 +210,13 @@ def build_signal(
     trend_interval = prof["trend"]
     entry_interval = prof["entry"]
     atr_mult = prof["atr_mult"]
-    # Profil boleh membawa rr & zona RSI sendiri (hasil backtest).
+    # Profil boleh membawa rr, zona RSI, EMA tren & sesi sendiri (hasil backtest).
     rr = float(prof.get("rr", rr))
     rsi_lo = float(prof.get("rsi_lo", rsi_lo))
     rsi_hi = float(prof.get("rsi_hi", rsi_hi))
+    ema_fast = int(prof.get("ema_fast", ema_fast))
+    ema_slow = int(prof.get("ema_slow", ema_slow))
+    session = prof.get("session")
 
     base: dict[str, Any] = {
         "symbol": "XAUUSD",
@@ -235,6 +243,14 @@ def build_signal(
     if not market_open(now_utc):
         base["reason"] = "Pasar emas TUTUP (weekend) -> tidak ada sinyal"
         return base
+    if session:
+        hr = (now_utc or datetime.now(timezone.utc)).hour
+        if not (session[0] <= hr < session[1]):
+            base["reason"] = (
+                f"Di luar sesi trading profil ({session[0]:02d}-{session[1]:02d} UTC, "
+                f"London+NY) -> tunggu"
+            )
+            return base
     if news_blocked:
         base["reason"] = "Blackout berita high-impact -> tunggu"
         return base

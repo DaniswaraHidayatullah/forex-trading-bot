@@ -25,13 +25,13 @@ class Settings(BaseSettings):
     # Cache khusus berita lebih pendek (berita cepat basi).
     sentiment_cache_ttl_seconds: int = 900
     # Daftar feed RSS; override lewat env SENTIMENT_FEEDS (pisah koma) bila perlu.
-    # (GDELT selalu ditambahkan otomatis sebagai sumber ekstra.)
     sentiment_feeds: list[str] = [
         "https://www.forexlive.com/feed/news",
         "https://www.fxstreet.com/rss/news",
         "https://www.investing.com/rss/commodities_Gold.rss",
-        "https://news.kitco.com/rss/category/commodities/gold",
-        "https://www.mining.com/markets/feed/",
+        "https://www.cnbc.com/id/20910258/device/rss/rss.html",
+        "https://feeds.marketwatch.com/marketwatch/marketpulse/",
+        "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
     ]
 
     # --- Signal engine (sinyal untuk eksekusi manual) ---------------------
@@ -51,8 +51,9 @@ class Settings(BaseSettings):
     discord_channel_id: str = ""         # set via env DISCORD_CHANNEL_ID
     signal_auto_push: bool = True        # auto kirim ke Discord saat ada sinyal
     signal_poll_seconds: int = 1800      # cek sinyal tiap N detik (default 30 mnt)
-    # Profil yang di-auto-push (pisah koma): harian, scalp, intraday, swing
-    signal_profiles: str = "harian"
+    # Profil yang di-auto-push (pisah koma): harian, scalp, intraday, swing.
+    # Dua aliran default: harian (RR1:2, sering) + intraday (RR1:3, selektif).
+    signal_profiles: str = "harian,intraday"
     # Minimal keyakinan untuk auto-push: none | medium | strong.
     # "none" = kirim juga sinyal teknikal-only (frekuensi harian, tidak ketat);
     # kartu tetap menampilkan status sentimen + bintang keyakinan.

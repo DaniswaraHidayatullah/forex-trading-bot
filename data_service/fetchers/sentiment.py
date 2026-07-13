@@ -33,22 +33,17 @@ from xml.etree import ElementTree as ET
 import httpx
 
 # Feed RSS publik (bisa di-override lewat env SENTIMENT_FEEDS, pisah koma).
-# Beberapa situs memblokir IP datacenter (GitHub/cloud) -> sengaja banyak
-# sumber + GDELT sebagai tulang punggung (API publik, ramah server).
+# Semua sudah DIUJI hidup (200 + berisi item) dari server; situs yang
+# memblokir IP datacenter/404 (kitco, mining, dailyfx) & GDELT (rate-limit
+# 1 req/5 dtk -> selalu 429) sengaja tidak dipakai.
 DEFAULT_FEEDS = [
     "https://www.forexlive.com/feed/news",
     "https://www.fxstreet.com/rss/news",
     "https://www.investing.com/rss/commodities_Gold.rss",
-    "https://news.kitco.com/rss/category/commodities/gold",
-    "https://www.mining.com/markets/feed/",
+    "https://www.cnbc.com/id/20910258/device/rss/rss.html",
+    "https://feeds.marketwatch.com/marketwatch/marketpulse/",
+    "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
 ]
-
-# GDELT: arsip berita global, JSON, tanpa API key, jalan dari datacenter.
-GDELT_URL = (
-    "https://api.gdeltproject.org/api/v2/doc/doc"
-    "?query=(gold%20OR%20bullion%20OR%20XAUUSD)%20sourcelang:english"
-    "&mode=artlist&maxrecords=50&timespan=1d&format=json"
-)
 
 # User-Agent ala browser (UA "bot" sering ditolak feed).
 _UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -179,19 +174,6 @@ def _parse_feed(xml_text: str) -> list[str]:
     return texts
 
 
-def _fetch_gdelt(client: httpx.Client) -> list[str]:
-    """Ambil judul artikel emas 24 jam terakhir dari GDELT (tanpa key)."""
-    resp = client.get(GDELT_URL)
-    resp.raise_for_status()
-    arts = resp.json().get("articles", [])
-    out = []
-    for a in arts:
-        t = re.sub(r"\s+", " ", str(a.get("title", ""))).strip()
-        if t:
-            out.append(t)
-    return out
-
-
 def fetch_headlines_diag(
     feeds: list[str] | None = None, timeout: float = 12.0
 ) -> tuple[list[str], dict[str, int]]:
@@ -214,12 +196,6 @@ def fetch_headlines_diag(
                 continue
             sources[name] = len(got)
             headlines.extend(got)
-        try:
-            got = _fetch_gdelt(client)
-            sources["gdelt"] = len(got)
-            headlines.extend(got)
-        except Exception:  # noqa: BLE001
-            sources["gdelt"] = -1
     return headlines, sources
 
 

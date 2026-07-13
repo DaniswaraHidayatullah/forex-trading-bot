@@ -178,8 +178,12 @@ def test_atr_constant_range():
 _WEEKDAY = datetime(2026, 1, 7, 12, 0, tzinfo=timezone.utc)
 
 
+_TREND_TFS = ("1h", "2h", "4h", "1day")
+
+
 def _trend_up_fetch(interval, size):
-    if size >= 100:
+    # Deteksi per-INTERVAL (bukan ukuran): series tren naik vs entry osilasi.
+    if interval in _TREND_TFS:
         return [{"open": 1000 + i, "high": 1001 + i, "low": 999 + i, "close": 1000 + i}
                 for i in range(size)]
     bars = []
