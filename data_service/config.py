@@ -25,10 +25,13 @@ class Settings(BaseSettings):
     # Cache khusus berita lebih pendek (berita cepat basi).
     sentiment_cache_ttl_seconds: int = 900
     # Daftar feed RSS; override lewat env SENTIMENT_FEEDS (pisah koma) bila perlu.
+    # (GDELT selalu ditambahkan otomatis sebagai sumber ekstra.)
     sentiment_feeds: list[str] = [
         "https://www.forexlive.com/feed/news",
         "https://www.fxstreet.com/rss/news",
         "https://www.investing.com/rss/commodities_Gold.rss",
+        "https://news.kitco.com/rss/category/commodities/gold",
+        "https://www.mining.com/markets/feed/",
     ]
 
     # --- Signal engine (sinyal untuk eksekusi manual) ---------------------
