@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     # + paket anthropic; otomatis fallback ke lexicon bila tak tersedia).
     sentiment_backend: str = "lexicon"
     sentiment_threshold: float = 0.15   # |skor| di atas ini baru jadi bias arah
-    sentiment_min_headlines: int = 3    # minimal headline relevan agar tak "flat"
+    sentiment_min_headlines: int = 2    # minimal headline ter-skor agar tak "flat"
     # Cache khusus berita lebih pendek (berita cepat basi).
     sentiment_cache_ttl_seconds: int = 900
     # Daftar feed RSS; override lewat env SENTIMENT_FEEDS (pisah koma) bila perlu.

@@ -85,6 +85,15 @@ def _new_signals(entries: list[dict]) -> None:
     profiles = [p.strip() for p in main.settings.signal_profiles.split(",") if p.strip()]
     min_level = _LEVEL.get(main.settings.signal_min_confidence, 2)
 
+    # Diagnostik sentimen: sumber mana yang hidup/diblokir dari runner ini.
+    try:
+        s = main.sentiment("XAUUSD")
+        print(f"[sentimen] bias={s.get('bias')} skor={s.get('score')} "
+              f"ter-skor={s.get('headlines_scored')}/{s.get('headlines_total')} "
+              f"| sumber={s.get('sources')}")
+    except Exception as e:  # noqa: BLE001
+        print("[sentimen] ERROR:", e)
+
     for profile in profiles:
         label = signal_engine.PROFILES.get(profile, signal_engine.PROFILES["intraday"])["label"]
         if any(e.get("status") == "open" and e.get("profile") == label for e in entries):

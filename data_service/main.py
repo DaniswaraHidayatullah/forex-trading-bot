@@ -24,12 +24,17 @@ from storage import get_or_set
 
 app = FastAPI(title="Forex Bot Data Service", version="1.0.0")
 
-def _combine_bias(news_bias: str, cot_bias: str) -> str:
+_NEWS_OVERRIDE = 0.30  # |skor berita| >= ini -> berita menang atas COT
+
+
+def _combine_bias(news_bias: str, cot_bias: str, news_score: float = 0.0) -> str:
     """Tentukan bias arah akhir. Sentimen BERITA jadi penggerak utama; COT
     hanya konfirmasi. Aturannya:
-      - berita 'flat'              -> 'flat'  (tak ada sinyal berita -> tak membatasi arah)
-      - COT searah / COT 'flat'    -> ikut arah berita
-      - berita vs COT bertentangan -> 'flat'  (sinyal konflik -> jangan dipaksa)
+      - berita 'flat'                    -> 'flat'
+      - COT searah / COT 'flat'          -> ikut arah berita
+      - konflik, berita KUAT (|skor|>=0.3) -> berita menang (COT itu data
+        mingguan yang lambat; berita hari ini lebih relevan)
+      - konflik, berita lemah            -> 'flat'
 
     Catatan: untuk emas, posisi COT non-commercial hampir selalu net-long,
     jadi COT tidak boleh memaksa arah sendirian (kalau tidak, SELL terblokir
@@ -38,6 +43,8 @@ def _combine_bias(news_bias: str, cot_bias: str) -> str:
     if news_bias == "flat":
         return "flat"
     if cot_bias == "flat" or cot_bias == news_bias:
+        return news_bias
+    if abs(news_score) >= _NEWS_OVERRIDE:
         return news_bias
     return "flat"
 
@@ -201,7 +208,7 @@ def context(symbol: str = Query(..., min_length=6)) -> dict:
 
     news_bias = s.get("bias", "flat")
     cot_bias = c.get("bias", "flat")
-    combined = _combine_bias(news_bias, cot_bias)
+    combined = _combine_bias(news_bias, cot_bias, float(s.get("score", 0.0) or 0.0))
 
     return {
         "symbol": symbol.upper(),

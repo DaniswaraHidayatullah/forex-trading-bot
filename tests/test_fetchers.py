@@ -233,6 +233,32 @@ def test_signal_stale_quote_skips():
     assert "bergerak cepat" in r["reason"] or "sinkron" in r["reason"]
 
 
+def test_combine_bias_strong_news_overrides_cot():
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "data_service"))
+    from main import _combine_bias
+    # Konflik + berita kuat -> berita menang
+    assert _combine_bias("short", "long", news_score=-0.45) == "short"
+    assert _combine_bias("long", "short", news_score=0.35) == "long"
+    # Konflik + berita lemah -> flat
+    assert _combine_bias("short", "long", news_score=-0.2) == "flat"
+    # Searah / COT flat -> ikut berita
+    assert _combine_bias("long", "long", news_score=0.1) == "long"
+    assert _combine_bias("short", "flat", news_score=-0.1) == "short"
+    assert _combine_bias("flat", "long", news_score=0.9) == "flat"
+
+
+def test_min_headlines_two_gives_bias():
+    # 2 headline ter-skor kini cukup (dulu 3 -> sering dipaksa flat di server)
+    headlines = [
+        "Gold rallies as dovish Fed signals rate cut",
+        "Weak dollar lifts bullion to record high",
+    ]
+    res = score_sentiment(headlines, min_headlines=2)
+    assert res["bias"] == "long"
+
+
 def test_harian_profile_rr_1_2():
     r = build_signal(
         sentiment_bias="flat", news_blocked=False, api_key="x",
