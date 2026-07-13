@@ -1,8 +1,9 @@
 name: Signal Bot
 
 # Bot sinyal terjadwal (GRATIS, tanpa server 24/7).
-# - cron tiap 30 menit (jadwal GitHub bisa molor sedikit; run antre dijalankan
-#   berurutan berkat concurrency group -> log commit mencegah kirim dobel)
+# - cron tiap 15 menit (repo PUBLIC = menit Actions unlimited; sampling penuh
+#   bar M15 profil harian). Jadwal GitHub bisa molor sedikit; run antre
+#   dijalankan berurutan berkat concurrency group + log commit anti-dobel.
 # - workflow_dispatch: bisa dijalankan manual dari tab Actions
 #
 # Rahasia di Settings -> Secrets and variables -> Actions:
@@ -11,7 +12,7 @@ name: Signal Bot
 
 on:
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "*/15 * * * *"
   workflow_dispatch: {}
 
 concurrency:
