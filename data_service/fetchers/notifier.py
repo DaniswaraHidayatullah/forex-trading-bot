@@ -47,7 +47,7 @@ def format_embed(sig: dict[str, Any]) -> dict[str, Any]:
         f"💰 **Entry**  `{sig.get('entry')}`   _(zona {sig.get('entry_zone_low')}–{sig.get('entry_zone_high')})_",
         f"🎯 **Take Profit**  `{sig.get('tp')}`   → **+${sig.get('reward_per_001')}**  _({sig.get('tp_pips')} pips)_",
         f"🛑 **Stop Loss**  `{sig.get('sl')}`   → **−${sig.get('risk_per_001')}**{risk_note}  _({sig.get('sl_pips')} pips)_",
-        f"📦 **Lot** `{sig.get('suggested_lot')}`   ·   ⚖️ **RR 1:{int(sig.get('rr', 3))}**",
+        f"📦 **Lot** `{sig.get('suggested_lot')}`   ·   ⚖️ **RR 1:{float(sig.get('rr', 3)):g}**",
         "",
         f"⏱️ Masuk **sekarang** — berlaku ~{sig.get('valid_minutes')} menit",
         f"⏳ Perkiraan tahan: {sig.get('hold')}",

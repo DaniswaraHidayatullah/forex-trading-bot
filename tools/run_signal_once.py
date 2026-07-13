@@ -23,7 +23,7 @@ from fetchers import notifier, signal_engine, tracker  # noqa: E402
 
 LOG_FILE = Path(os.getenv("SIGNAL_LOG", str(ROOT / "signals" / "log.json")))
 EQUITY = float(os.getenv("EQUITY", "100"))
-EXPIRE_DAYS = {"Scalping": 1, "Intraday": 3, "Swing": 10}
+EXPIRE_DAYS = {"Harian": 2, "Scalping": 1, "Intraday": 3, "Swing": 10}
 _LEVEL = {"none": 0, "medium": 2, "strong": 3}
 
 

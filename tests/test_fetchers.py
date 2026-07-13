@@ -233,6 +233,18 @@ def test_signal_stale_quote_skips():
     assert "bergerak cepat" in r["reason"] or "sinkron" in r["reason"]
 
 
+def test_harian_profile_rr_1_2():
+    r = build_signal(
+        sentiment_bias="flat", news_blocked=False, api_key="x",
+        profile="harian", fetch_fn=_trend_up_fetch, now_utc=_WEEKDAY,
+    )
+    assert r["signal"] == "buy"
+    assert r["profile"] == "Harian"
+    assert r["rr"] == 2.0
+    assert r["tp_pips"] == r["sl_pips"] * 2   # RR 1:2 dari profil
+    assert r["entry_tf"] == "15min"
+
+
 def test_tracker_outcomes():
     from data_service.fetchers.tracker import check_outcome, summarize
 

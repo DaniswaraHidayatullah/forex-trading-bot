@@ -127,9 +127,16 @@ def _lot_for_equity(equity: float) -> float:
     return min(round(lot, 2), 0.05)
 
 
-# --- Profil strategi (RR tetap 1:3) ------------------------------------
-# Tiap profil = timeframe + pengali SL berbeda. RR sama (1:3).
+# --- Profil strategi ----------------------------------------------------
+# Tiap profil = timeframe + pengali SL (+ opsional rr & zona RSI sendiri).
+# "harian" = hasil backtest 3.5 bln (Mar-Jul 2026): RR 1:2, M15/H4, RSI 35-65
+# -> ~4 sinyal/hari, WR ~39%, net terbaik (+$417 @0.01 lot) setelah spread.
 PROFILES: dict[str, dict[str, Any]] = {
+    "harian": {
+        "label": "Harian", "trend": "4h", "entry": "15min",
+        "atr_mult": 1.5, "rr": 2.0, "rsi_lo": 35.0, "rsi_hi": 65.0,
+        "hold": "~1 jam s/d 1 hari",
+    },
     "scalp": {
         "label": "Scalping", "trend": "30min", "entry": "5min",
         "atr_mult": 1.2, "hold": "menit s/d ~1 jam",
@@ -198,6 +205,10 @@ def build_signal(
     trend_interval = prof["trend"]
     entry_interval = prof["entry"]
     atr_mult = prof["atr_mult"]
+    # Profil boleh membawa rr & zona RSI sendiri (hasil backtest).
+    rr = float(prof.get("rr", rr))
+    rsi_lo = float(prof.get("rsi_lo", rsi_lo))
+    rsi_hi = float(prof.get("rsi_hi", rsi_hi))
 
     base: dict[str, Any] = {
         "symbol": "XAUUSD",

@@ -48,11 +48,12 @@ class Settings(BaseSettings):
     discord_channel_id: str = ""         # set via env DISCORD_CHANNEL_ID
     signal_auto_push: bool = True        # auto kirim ke Discord saat ada sinyal
     signal_poll_seconds: int = 1800      # cek sinyal tiap N detik (default 30 mnt)
-    # Profil yang di-auto-push (pisah koma): scalp, intraday, swing
-    signal_profiles: str = "intraday"
+    # Profil yang di-auto-push (pisah koma): harian, scalp, intraday, swing
+    signal_profiles: str = "harian"
     # Minimal keyakinan untuk auto-push: none | medium | strong.
-    # Default "medium" = sinyal teknikal-only (sentimen flat/gagal) TIDAK dikirim.
-    signal_min_confidence: str = "medium"
+    # "none" = kirim juga sinyal teknikal-only (frekuensi harian, tidak ketat);
+    # kartu tetap menampilkan status sentimen + bintang keyakinan.
+    signal_min_confidence: str = "none"
     # Batas risiko $ per trade @0.01 lot (jarak SL). Sinyal dgn risiko lebih
     # besar di-skip (akun kecil tak bisa memperkecil lot di bawah 0.01).
     signal_max_risk_usd: float = 12.0

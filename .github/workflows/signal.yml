@@ -41,8 +41,8 @@ jobs:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          SIGNAL_PROFILES: ${{ vars.SIGNAL_PROFILES || 'intraday' }}
-          SIGNAL_MIN_CONFIDENCE: ${{ vars.SIGNAL_MIN_CONFIDENCE || 'medium' }}
+          SIGNAL_PROFILES: ${{ vars.SIGNAL_PROFILES || 'harian' }}
+          SIGNAL_MIN_CONFIDENCE: ${{ vars.SIGNAL_MIN_CONFIDENCE || 'none' }}
           SIGNAL_MAX_RISK_USD: ${{ vars.SIGNAL_MAX_RISK_USD || '12' }}
         run: python tools/run_signal_once.py
 
