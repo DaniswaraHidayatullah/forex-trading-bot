@@ -685,5 +685,20 @@
   "status": "loss",
   "note": "backfill dari Discord",
   "closed_utc": "2026-07-12T20:20:15+00:00"
+ },
+ {
+  "id": "d4e4cc63",
+  "profile": "Harian",
+  "side": "sell",
+  "entry": 4063.06,
+  "sl": 4074.31,
+  "tp": 4040.55,
+  "rr": 2.0,
+  "risk_usd": 11.26,
+  "reward_usd": 22.51,
+  "confidence": 0,
+  "shadow": true,
+  "time_utc": "2026-07-13T13:33:01+00:00",
+  "status": "open"
  }
 ]
