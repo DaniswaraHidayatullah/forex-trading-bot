@@ -297,14 +297,6 @@ def build_signal(
         base["reason"] = f"RSI {rsi_val:.0f} di luar zona pullback ({rsi_lo:.0f}-{rsi_hi:.0f})"
         return base
 
-    if use_sentiment and sentiment_bias != "flat":
-        if want_buy and sentiment_bias != "long":
-            base["reason"] = "Setup BUY tapi sentimen bukan long -> skip"
-            return base
-        if want_sell and sentiment_bias != "short":
-            base["reason"] = "Setup SELL tapi sentimen bukan short -> skip"
-            return base
-
     sl_dist = atr_val * atr_mult
     tp_dist = sl_dist * rr
 
@@ -365,4 +357,15 @@ def build_signal(
     else:
         level, label, stars = 1, "Lemah (teknikal saja)", "⭐"
     base.update({"confidence": label, "confidence_level": level, "confidence_stars": stars})
+
+    # Gate sentimen: sinyal MELAWAN sentimen tidak dikirim, tapi tetap
+    # dikembalikan sbg "bayangan" (shadow) lengkap dgn SL/TP -- supaya bisa
+    # dilacak: apakah blokiran sentimen menyelamatkan atau merugikan.
+    if use_sentiment and sentiment_bias in ("long", "short") and not aligned:
+        base["shadow_side"] = side
+        base["signal"] = "none"
+        base["reason"] = (
+            f"Setup {side.upper()} tapi sentimen {sentiment_bias} -> diblokir "
+            f"(dicatat sbg bayangan utk uji akurasi gate)"
+        )
     return base

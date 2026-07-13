@@ -75,7 +75,18 @@ def _resolve_open(entries: list[dict]) -> None:
         else:
             e["status"] = outcome
         e["closed_utc"] = now.isoformat(timespec="seconds")
-        stats_text = tracker.stats_line(tracker.summarize(entries))
+        if e.get("shadow"):
+            # Bayangan (diblokir sentimen): dilacak diam-diam, tanpa Discord.
+            print(f"[shadow ] {e.get('profile')} {e['side']} -> {e['status']}")
+            continue
+        real = [x for x in entries if not x.get("shadow")]
+        stats_text = tracker.stats_line(tracker.summarize(real))
+        sh = tracker.summarize([x for x in entries if x.get("shadow")])
+        if sh["closed"]:
+            stats_text += (
+                f"\n🚧 Diblokir sentimen (bayangan): {sh['winrate_pct']}% "
+                f"({sh['wins']}W/{sh['losses']}L) — makin RENDAH makin bagus gate-nya"
+            )
         payload = notifier.format_outcome_embed(e, stats_text)
         sent = main._push_discord(payload)
         print(f"[resolve] {e.get('profile')} {e['side']} -> {e['status']} (dikirim={sent})")
@@ -96,7 +107,11 @@ def _new_signals(entries: list[dict]) -> None:
 
     for profile in profiles:
         label = signal_engine.PROFILES.get(profile, signal_engine.PROFILES["intraday"])["label"]
-        if any(e.get("status") == "open" and e.get("profile") == label for e in entries):
+        open_real = any(e.get("status") == "open" and e.get("profile") == label
+                        and not e.get("shadow") for e in entries)
+        open_shadow = any(e.get("status") == "open" and e.get("profile") == label
+                          and e.get("shadow") for e in entries)
+        if open_real:
             print(f"[{profile}] masih ada sinyal terbuka -> tunggu selesai")
             continue
         try:
@@ -109,6 +124,24 @@ def _new_signals(entries: list[dict]) -> None:
         sent_ok = sig.get("sentiment_available", False)
         print(f"[{profile}] {side} | sentimen tersedia={sent_ok} "
               f"({sig.get('sentiment_bias')}/{sig.get('sentiment_score')}) | {sig.get('reason')}")
+
+        # Sinyal diblokir sentimen -> catat sbg BAYANGAN (tidak dikirim),
+        # supaya nilai gate sentimen bisa diukur, bukan diasumsikan.
+        if (side == "none" and sig.get("shadow_side") and sig.get("sl") is not None
+                and not open_shadow):
+            entries.append({
+                "id": uuid.uuid4().hex[:8],
+                "profile": sig.get("profile"),
+                "side": sig["shadow_side"],
+                "entry": sig.get("entry"), "sl": sig.get("sl"), "tp": sig.get("tp"),
+                "rr": sig.get("rr", 3),
+                "risk_usd": sig.get("risk_per_001"), "reward_usd": sig.get("reward_per_001"),
+                "confidence": 0, "shadow": True,
+                "time_utc": sig.get("time_utc"),
+                "status": "open",
+            })
+            print(f"[{profile}] bayangan {sig['shadow_side'].upper()} dicatat (tidak dikirim)")
+            continue
 
         if side not in ("buy", "sell"):
             continue
@@ -138,7 +171,13 @@ def main_run() -> None:
     _resolve_open(entries)
     _new_signals(entries)
     _save_log(entries)
-    print("REKAP:", tracker.stats_line(tracker.summarize(entries)))
+    real = [e for e in entries if not e.get("shadow")]
+    shadow = [e for e in entries if e.get("shadow")]
+    print("REKAP sinyal :", tracker.stats_line(tracker.summarize(real)))
+    if shadow:
+        sh = tracker.summarize(shadow)
+        print(f"REKAP bayangan (diblokir sentimen): {sh['winrate_pct']}% "
+              f"({sh['wins']}W/{sh['losses']}L, {sh['open']} terbuka)")
 
 
 if __name__ == "__main__":
