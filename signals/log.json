@@ -748,5 +748,19 @@
   "shadow": true,
   "time_utc": "2026-07-14T18:05:26+00:00",
   "status": "open"
+ },
+ {
+  "id": "bda635d6",
+  "profile": "Harian",
+  "side": "sell",
+  "entry": 4051.04,
+  "sl": 4061.7,
+  "tp": 4029.73,
+  "rr": 2.0,
+  "risk_usd": 10.66,
+  "reward_usd": 21.31,
+  "confidence": 1,
+  "time_utc": "2026-07-14T19:41:02+00:00",
+  "status": "open"
  }
 ]
