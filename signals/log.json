@@ -717,5 +717,20 @@
   "time_utc": "2026-07-13T20:46:03+00:00",
   "status": "loss",
   "closed_utc": "2026-07-14T03:29:35+00:00"
+ },
+ {
+  "id": "96a01067",
+  "profile": "Harian",
+  "side": "sell",
+  "entry": 4024.63,
+  "sl": 4031.71,
+  "tp": 4010.47,
+  "rr": 2.0,
+  "risk_usd": 7.08,
+  "reward_usd": 14.16,
+  "confidence": 0,
+  "shadow": true,
+  "time_utc": "2026-07-14T07:43:49+00:00",
+  "status": "open"
  }
 ]
