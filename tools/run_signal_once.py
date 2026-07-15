@@ -118,7 +118,7 @@ def _resolve_open(entries: list[dict]) -> None:
         if sh["closed"]:
             stats_text += f"\n🚧 Diblokir sentimen (bayangan): {sh_txt}"
         payload = notifier.format_outcome_embed(e, stats_text)
-        sent = main._push_discord(payload)
+        sent = main._push_discord(payload, channel="report")
         print(f"[resolve] {e.get('profile')} {e['side']} -> {e['status']} (dikirim={sent})")
 
 
@@ -226,7 +226,7 @@ def _check_burst(meta: dict) -> None:
             "up" if move > 0 else "down", move, closes[-1],
             ctx.get("sentiment_bias", "flat"),
         )
-        sent = main._push_discord(payload)
+        sent = main._push_discord(payload, channel="alert")
         meta["last_burst_alert"] = now.isoformat(timespec="seconds")
         print(f"[burst  ] {move:+.1f} USD/jam terdeteksi (dikirim={sent})")
     except Exception as e:  # noqa: BLE001
@@ -259,11 +259,132 @@ def _daily_digest(entries: list[dict], meta: dict) -> None:
             "stats": v2_txt, "shadow_stats": sh_txt,
             "open_positions": ", ".join(opens) if opens else "tidak ada",
         })
-        sent = main._push_discord(payload)
+        sent = main._push_discord(payload, channel="analysis")
         meta["last_digest_date"] = today
         print(f"[digest ] ringkasan harian dikirim={sent}")
     except Exception as e:  # noqa: BLE001
         print("[digest ] ERROR:", e)
+
+
+def _feed_due(meta: dict, key: str, hours: float) -> bool:
+    last = meta.get(key)
+    if last and (datetime.now(timezone.utc) - tracker.parse_utc(last)) < timedelta(hours=hours):
+        return False
+    return True
+
+
+def _mark(meta: dict, key: str) -> None:
+    meta[key] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+
+def _market_feeds(meta: dict) -> None:
+    """Isi channel MARKET CENTER: harga, berita, kalender, dolar, prediksi."""
+    now = datetime.now(timezone.utc)
+    if not signal_engine.market_open(now):
+        return
+
+    # 👑 gold-price: tiap jam
+    if _feed_due(meta, "last_price", 1.0):
+        try:
+            bars = _m15_cached()
+            c = [b["close"] for b in bars]
+            payload = notifier.format_price_embed(
+                c[-1], c[-1] - c[-5], c[-1] - c[0],
+                max(b["high"] for b in bars), min(b["low"] for b in bars),
+            )
+            main._push_discord(payload, channel="price")
+            _mark(meta, "last_price")
+            print("[price  ] update harga dikirim")
+        except Exception as e:  # noqa: BLE001
+            print("[price  ] ERROR:", e)
+
+    # 🌎 market-news: tiap 2 jam, headline relevan ter-skor
+    if _feed_due(meta, "last_news", 2.0):
+        try:
+            from fetchers import sentiment as sen
+            heads, _src = sen.fetch_headlines_diag(main.settings.sentiment_feeds)
+            scored = []
+            seen_key = set(meta.get("sent_titles", []))
+            for h in sen._dedupe(heads):
+                t = h.lower()
+                if not sen._is_relevant(t):
+                    continue
+                sc = sen._score_one(t)
+                if sc == 0:
+                    continue
+                k = t[:60]
+                if k in seen_key:
+                    continue
+                scored.append((sc, h, k))
+            scored.sort(key=lambda x: -abs(x[0]))
+            if scored:
+                payload = notifier.format_news_embed([(s, h) for s, h, _ in scored])
+                main._push_discord(payload, channel="news")
+                keys = list(seen_key) + [k for _, _, k in scored[:6]]
+                meta["sent_titles"] = keys[-120:]   # ingat 120 judul terakhir
+                print(f"[news   ] {min(6, len(scored))} headline dikirim")
+            _mark(meta, "last_news")
+        except Exception as e:  # noqa: BLE001
+            print("[news   ] ERROR:", e)
+
+    # 📅 economic-calendar: 1x/hari pagi London
+    today = now.date().isoformat()
+    if now.hour >= DIGEST_HOUR_UTC and meta.get("last_calendar_date") != today:
+        try:
+            from fetchers import forexfactory as ff
+            events = main.get_or_set("ff_calendar", main.settings.cache_ttl_seconds,
+                                     ff.fetch_calendar)
+            todays = [ev for ev in events
+                      if str(ev.get("time_utc", "")).startswith(today)
+                      and ev.get("currency") == "USD"
+                      and ev.get("impact") in ("high", "medium")]
+            main._push_discord(notifier.format_calendar_embed(todays), channel="calendar")
+            meta["last_calendar_date"] = today
+            print(f"[calendr] {len(todays)} event USD dikirim")
+        except Exception as e:  # noqa: BLE001
+            print("[calendr] ERROR:", e)
+
+    # 💵 dollar-index (proxy): tiap 4 jam
+    if _feed_due(meta, "last_dollar", 4.0):
+        try:
+            key = main.settings.twelvedata_api_key
+            eur = signal_engine.fetch_series("EUR/USD", "1h", 5, key)
+            jpy = signal_engine.fetch_series("USD/JPY", "1h", 5, key)
+            payload = notifier.format_dollar_embed(
+                eur[-1]["close"], eur[-1]["close"] - eur[0]["close"],
+                jpy[-1]["close"], jpy[-1]["close"] - jpy[0]["close"],
+            )
+            main._push_discord(payload, channel="dollar")
+            _mark(meta, "last_dollar")
+            print("[dollar ] monitor dolar dikirim")
+        except Exception as e:  # noqa: BLE001
+            print("[dollar ] ERROR:", e)
+
+    # 👽 bot-prediction: hanya saat pandangan BERUBAH
+    try:
+        ctx = main.context("XAUUSD")  # type: ignore[arg-type]
+        h = main._signal_for("XAUUSD", EQUITY, "harian")
+        i = main._signal_for("XAUUSD", EQUITY, "intraday")
+        sent_d = ctx.get("sentiment") or {}
+        cot = (ctx.get("cot") or {}).get("bias", "flat")
+        state = f"{h.get('trend')}|{i.get('trend')}|{ctx.get('sentiment_bias')}|{cot}"
+        if state != meta.get("last_prediction_state"):
+            votes_up = [h.get("trend") == "up", i.get("trend") == "up",
+                        ctx.get("sentiment_bias") == "long", cot == "long"].count(True)
+            votes_dn = [h.get("trend") == "down", i.get("trend") == "down",
+                        ctx.get("sentiment_bias") == "short", cot == "short"].count(True)
+            verdict = (f"CENDERUNG NAIK ({votes_up}/4 faktor)" if votes_up > votes_dn
+                       else f"CENDERUNG TURUN ({votes_dn}/4 faktor)" if votes_dn > votes_up
+                       else "NETRAL / tunggu konfirmasi")
+            payload = notifier.format_prediction_embed(
+                h.get("trend"), i.get("trend"), ctx.get("sentiment_bias"),
+                sent_d.get("score"), cot, verdict,
+            )
+            main._push_discord(payload, channel="prediction")
+            meta["last_prediction_state"] = state
+            print(f"[predict] pandangan berubah -> {verdict}")
+    except Exception as e:  # noqa: BLE001
+        print("[predict] ERROR:", e)
 
 
 def main_run() -> None:
@@ -275,6 +396,7 @@ def main_run() -> None:
     _new_signals(entries)
     _check_burst(meta)
     _daily_digest(entries, meta)
+    _market_feeds(meta)
     _save_log(entries)
     _save_meta(meta)
     v2_txt, sh_txt = _stats_texts(entries)

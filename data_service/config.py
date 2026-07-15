@@ -43,6 +43,20 @@ class Settings(BaseSettings):
     # API key Twelve Data (GRATIS di twelvedata.com). Set via env TWELVEDATA_API_KEY.
     twelvedata_api_key: str = ""
 
+    # --- Routing channel Discord (ID channel bukan rahasia) ---------------
+    # Kosongkan salah satu utk fallback ke DISCORD_CHANNEL_ID.
+    discord_channels: dict[str, str] = {
+        "sinyal": "1511772387828564018",      # 💥sinyal-xauusd
+        "report": "1511771662100725861",      # 📑bot-report (hasil TP/SL)
+        "analysis": "1511771361326923936",    # 🧠bot-analysis (ringkasan harian)
+        "alert": "1511771061572735026",       # ⚡market-alert (burst berita)
+        "price": "1511770736518234282",       # 👑gold-price
+        "news": "1511770883633451260",        # 🌎market-news
+        "calendar": "1511770975564464310",    # 📅economic-calendar
+        "dollar": "1511771019868635176",      # 💵dollar-index
+        "prediction": "1511771296164348156",  # 👽bot-prediction
+    }
+
     # --- Notifikasi Discord (auto-push sinyal) ----------------------------
     # Pilih SALAH SATU: webhook (paling gampang) ATAU bot (token + channel id).
     # Kalau bot token & channel id diisi, itu yang dipakai; jika tidak, webhook.

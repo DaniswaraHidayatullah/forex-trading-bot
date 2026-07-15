@@ -236,10 +236,14 @@ def _discord_configured() -> bool:
     )
 
 
-def _push_discord(sig: dict) -> bool:
-    """Kirim sinyal ke Discord: pakai BOT bila token+channel ada, kalau tidak webhook."""
-    if settings.discord_bot_token and settings.discord_channel_id:
-        return notifier.send_bot(settings.discord_bot_token, settings.discord_channel_id, sig)
+def _push_discord(sig: dict, channel: str = "sinyal") -> bool:
+    """Kirim ke Discord. `channel` = kunci routing (sinyal/report/analysis/
+    alert/price/news/calendar/dollar/prediction); fallback DISCORD_CHANNEL_ID.
+    """
+    if settings.discord_bot_token:
+        chan_id = settings.discord_channels.get(channel) or settings.discord_channel_id
+        if chan_id:
+            return notifier.send_bot(settings.discord_bot_token, chan_id, sig)
     if settings.discord_webhook_url:
         return notifier.send_webhook(settings.discord_webhook_url, sig)
     return False

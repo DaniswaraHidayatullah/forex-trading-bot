@@ -125,6 +125,78 @@ def format_digest_embed(info: dict[str, Any]) -> dict[str, Any]:
                         "footer": {"text": "Ringkasan otomatis tiap buka sesi London"}}]}
 
 
+def _simple(title: str, desc: str, color: int, footer: str) -> dict[str, Any]:
+    return {"embeds": [{"title": title, "description": desc, "color": color,
+                        "footer": {"text": footer}}]}
+
+
+def format_price_embed(price: float, chg_1h: float, chg_24h: float,
+                       hi: float, lo: float) -> dict[str, Any]:
+    e = "📈" if chg_24h >= 0 else "📉"
+    desc = "\n".join([
+        f"# `${price:,.2f}`",
+        f"{e} 1 jam: **{chg_1h:+.2f}**  ·  24 jam: **{chg_24h:+.2f}**",
+        f"Rentang 24 jam: `{lo:,.2f}` – `{hi:,.2f}`",
+    ])
+    color = 3066993 if chg_24h >= 0 else 15158332
+    return _simple("👑 GOLD PRICE — XAU/USD", desc, color, "Update tiap jam · Twelve Data")
+
+
+def format_news_embed(items: list[tuple[float, str]]) -> dict[str, Any]:
+    lines = []
+    for sc, h in items[:6]:
+        tag = "🟢" if sc > 0 else "🔴" if sc < 0 else "⚪"
+        lines.append(f"{tag} {h[:150]}")
+    return _simple("🌎 MARKET NEWS — dampak ke EMAS",
+                   "\n\n".join(lines) + "\n\n🟢 bullish emas · 🔴 bearish emas",
+                   3447003, "Kurasi otomatis dari 5 sumber · tiap ~2 jam")
+
+
+def format_calendar_embed(events: list[dict[str, Any]]) -> dict[str, Any]:
+    if not events:
+        desc = "Tidak ada event USD berdampak tinggi/menengah hari ini. 🎉"
+    else:
+        rows = []
+        for ev in events[:10]:
+            imp = "🔴" if ev.get("impact") == "high" else "🟠"
+            t = str(ev.get("time_utc", ""))[11:16]
+            rows.append(f"{imp} `{t} UTC` **{ev.get('title')}** ({ev.get('currency')})")
+        desc = "\n".join(rows) + "\n\n⚠️ Bot pause entry ±30 mnt sekitar event 🔴"
+    return _simple("📅 KALENDER EKONOMI HARI INI", desc, 15105570,
+                   "ForexFactory · dikirim tiap pagi London")
+
+
+def format_dollar_embed(eur: float, eur_chg: float, jpy: float,
+                        jpy_chg: float) -> dict[str, Any]:
+    # EUR/USD turun & USD/JPY naik = dolar menguat = tekanan utk emas.
+    usd_up = (eur_chg < 0) + (jpy_chg > 0)
+    verdict = ("💪 Dolar MENGUAT → tekanan turun utk emas" if usd_up == 2 else
+               "😴 Dolar MELEMAH → dukungan naik utk emas" if usd_up == 0 else
+               "⚖️ Dolar campuran (sinyal tidak searah)")
+    desc = "\n".join([
+        f"EUR/USD: `{eur:.5f}` ({eur_chg:+.4f} /4j)",
+        f"USD/JPY: `{jpy:.3f}` ({jpy_chg:+.3f} /4j)",
+        "",
+        verdict,
+    ])
+    return _simple("💵 DOLLAR MONITOR (proxy DXY)", desc, 5763719,
+                   "EUR/USD+USD/JPY = komponen utama indeks dolar · tiap 4 jam")
+
+
+def format_prediction_embed(trend_h: str, trend_i: str, sent_bias: str,
+                            sent_score: float, cot: str, verdict: str) -> dict[str, Any]:
+    desc = "\n".join([
+        f"📊 Tren H1: **{trend_h}** · Tren H4: **{trend_i}**",
+        f"📰 Sentimen berita: **{sent_bias}** ({sent_score})",
+        f"🏦 COT mingguan: **{cot}**",
+        "",
+        f"🎯 Kesimpulan bot: **{verdict}**",
+        "_Update hanya saat pandangan berubah._",
+    ])
+    return _simple("👽 BOT PREDICTION — pandangan saat ini", desc, 10181046,
+                   "Gabungan teknikal+sentimen+COT · bukan kepastian")
+
+
 DISCORD_API = "https://discord.com/api/v10"
 
 
