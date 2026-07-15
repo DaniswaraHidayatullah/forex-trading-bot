@@ -298,7 +298,7 @@ def _market_feeds(meta: dict) -> None:
         except Exception as e:  # noqa: BLE001
             print("[price  ] ERROR:", e)
 
-    # 🌎 market-news: tiap 2 jam, headline relevan ter-skor
+    # 🥇 market-news-gold: headline khusus forex/gold/USD ter-skor (tiap 2 jam)
     if _feed_due(meta, "last_news", 2.0):
         try:
             from fetchers import sentiment as sen
@@ -317,12 +317,28 @@ def _market_feeds(meta: dict) -> None:
                     continue
                 scored.append((sc, h, k))
             scored.sort(key=lambda x: -abs(x[0]))
-            if scored:
+            if scored and main.settings.discord_channels.get("news_gold"):
                 payload = notifier.format_news_embed([(s, h) for s, h, _ in scored])
-                main._push_discord(payload, channel="news")
+                main._push_discord(payload, channel="news_gold")
                 keys = list(seen_key) + [k for _, _, k in scored[:6]]
                 meta["sent_titles"] = keys[-120:]   # ingat 120 judul terakhir
-                print(f"[news   ] {min(6, len(scored))} headline dikirim")
+                print(f"[newsGLD] {min(6, len(scored))} headline dikirim")
+
+            # 🌎 market-news: berita keuangan UMUM dari sumber diperluas
+            gheads, _gs = sen.fetch_headlines_diag(main.settings.news_feeds_general)
+            seen_g = set(meta.get("sent_titles_gen", []))
+            fresh = []
+            for h in sen._dedupe(gheads):
+                k = h.lower()[:60]
+                if k in seen_g:
+                    continue
+                fresh.append((h, k))
+            if fresh:
+                payload = notifier.format_general_news_embed([h for h, _ in fresh])
+                main._push_discord(payload, channel="news")
+                keys = list(seen_g) + [k for _, k in fresh[:6]]
+                meta["sent_titles_gen"] = keys[-200:]
+                print(f"[newsGEN] {min(6, len(fresh))} headline umum dikirim")
             _mark(meta, "last_news")
         except Exception as e:  # noqa: BLE001
             print("[news   ] ERROR:", e)

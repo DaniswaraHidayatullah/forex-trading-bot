@@ -34,6 +34,19 @@ class Settings(BaseSettings):
         "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
     ]
 
+    # Feed berita keuangan UMUM utk channel 🌎market-news (lebih luas: saham,
+    # ekonomi, dunia, crypto). Semua diuji hidup. Bot sinyal TIDAK memakai ini.
+    news_feeds_general: list[str] = [
+        "https://www.cnbc.com/id/100003114/device/rss/rss.html",   # top news
+        "https://www.cnbc.com/id/100727362/device/rss/rss.html",   # world
+        "https://www.cnbc.com/id/10000664/device/rss/rss.html",    # finance
+        "https://feeds.marketwatch.com/marketwatch/topstories/",
+        "https://feeds.a.dj.com/rss/RSSWorldNews.xml",
+        "https://finance.yahoo.com/news/rssindex",
+        "https://seekingalpha.com/market_currents.xml",
+        "https://www.coindesk.com/arc/outboundfeeds/rss/",
+    ]
+
     # --- Signal engine (sinyal untuk eksekusi manual) ---------------------
     signal_reward_ratio: float = 3.0     # RR 1:3
     signal_atr_mult: float = 1.5         # SL = ATR * ini
@@ -55,6 +68,9 @@ class Settings(BaseSettings):
         "calendar": "1511770975564464310",    # 📅economic-calendar
         "dollar": "1511771019868635176",      # 💵dollar-index
         "prediction": "1511771296164348156",  # 👽bot-prediction
+        # 🥇market-news-gold (khusus forex/gold/USD). Isi ID-nya via env
+        # DISCORD_CHANNELS_NEWS_GOLD atau langsung di sini setelah channel dibuat.
+        "news_gold": "",
     }
 
     # --- Notifikasi Discord (auto-push sinyal) ----------------------------

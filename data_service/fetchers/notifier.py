@@ -152,9 +152,16 @@ def format_news_embed(items: list[tuple[float, str]]) -> dict[str, Any]:
     for sc, h in items[:6]:
         tag = "🟢" if sc > 0 else "🔴" if sc < 0 else "⚪"
         lines.append(f"{tag} {h[:150]}")
-    return _simple("🌎 MARKET NEWS — dampak ke EMAS",
+    return _simple("🥇 NEWS FOREX · GOLD · USD",
                    "\n\n".join(lines) + "\n\n🟢 bullish emas · 🔴 bearish emas",
-                   3447003, "Kurasi otomatis dari 5 sumber · tiap ~2 jam")
+                   15844367, "Kurasi khusus penggerak emas/dolar · tiap ~2 jam")
+
+
+def format_general_news_embed(items: list[str]) -> dict[str, Any]:
+    lines = [f"📰 {str(h)[:150]}" for h in items[:6]]
+    return _simple("🌎 MARKET NEWS — keuangan & dunia",
+                   "\n\n".join(lines), 3447003,
+                   "CNBC · MarketWatch · WSJ · Yahoo · SeekingAlpha · CoinDesk · tiap ~2 jam")
 
 
 def format_calendar_embed(events: list[dict[str, Any]]) -> dict[str, Any]:
