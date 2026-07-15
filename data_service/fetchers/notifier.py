@@ -89,6 +89,42 @@ def format_outcome_embed(entry: dict[str, Any], stats_text: str) -> dict[str, An
                         "footer": {"text": "Rekap otomatis · eksekusi manual"}}]}
 
 
+def format_burst_embed(direction: str, move_usd: float, price: float,
+                       sentiment_bias: str, note: str = "") -> dict[str, Any]:
+    """Embed INFO pergerakan besar (kemungkinan berita). BUKAN sinyal entry."""
+    arrow = "🚀 NAIK" if direction == "up" else "⚠️ TURUN"
+    pips = abs(move_usd) * 10
+    desc = "\n".join([
+        f"**{arrow} {pips:.0f} pips dalam ~1 jam**  (${abs(move_usd):.0f})",
+        f"Harga sekarang: `{price}`  ·  Sentimen berita: {sentiment_bias}",
+        "",
+        "ℹ️ Ini **INFO**, bukan sinyal entry. Backtest menunjukkan mengejar "
+        "ledakan berita tidak menguntungkan (whipsaw). Sistem menunggu "
+        "pullback yang lebih aman." + (f"\n{note}" if note else ""),
+    ])
+    return {"embeds": [{"title": "⚡ PERGERAKAN BESAR TERDETEKSI — XAUUSD",
+                        "description": desc, "color": 16776960,
+                        "footer": {"text": "Deteksi berita otomatis · bukan saran finansial"}}]}
+
+
+def format_digest_embed(info: dict[str, Any]) -> dict[str, Any]:
+    """Ringkasan harian (dikirim 1x/hari saat sesi London buka)."""
+    desc = "\n".join([
+        f"💰 Emas: `{info.get('price')}`",
+        f"📊 Tren Harian(H1): {info.get('trend_harian')} · Intraday(H4): {info.get('trend_intraday')}",
+        f"📰 Sentimen: {info.get('sent_bias')} ({info.get('sent_score')}) "
+        f"dari {info.get('headlines')} berita",
+        f"🏦 COT: {info.get('cot_bias')}",
+        "",
+        f"📈 Performa v2: {info.get('stats')}",
+        f"🚧 Gate sentimen (bayangan): {info.get('shadow_stats')}",
+        f"📌 Posisi terbuka: {info.get('open_positions')}",
+    ])
+    return {"embeds": [{"title": "☀️ RINGKASAN HARIAN — XAUUSD Scalpers Boys",
+                        "description": desc, "color": 3447003,
+                        "footer": {"text": "Ringkasan otomatis tiap buka sesi London"}}]}
+
+
 DISCORD_API = "https://discord.com/api/v10"
 
 

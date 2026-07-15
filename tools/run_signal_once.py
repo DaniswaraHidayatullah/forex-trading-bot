@@ -22,9 +22,13 @@ import main  # noqa: E402
 from fetchers import notifier, signal_engine, tracker  # noqa: E402
 
 LOG_FILE = Path(os.getenv("SIGNAL_LOG", str(ROOT / "signals" / "log.json")))
+META_FILE = LOG_FILE.parent / "meta.json"
 EQUITY = float(os.getenv("EQUITY", "100"))
 EXPIRE_DAYS = {"Harian": 2, "Scalping": 1, "Intraday": 3, "Swing": 10}
 _LEVEL = {"none": 0, "medium": 2, "strong": 3}
+BURST_ATR_MULT = 3.0        # ledakan = gerak 1 jam >= 3x ATR(M15)
+BURST_COOLDOWN_H = 2        # jangan alert ledakan lagi dalam N jam
+DIGEST_HOUR_UTC = 7         # ringkasan harian saat London buka (~14:00 WIB)
 
 
 def _load_log() -> list[dict]:
@@ -39,6 +43,35 @@ def _load_log() -> list[dict]:
 def _save_log(entries: list[dict]) -> None:
     LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
     LOG_FILE.write_text(json.dumps(entries, indent=1), encoding="utf-8")
+
+
+def _load_meta() -> dict:
+    if META_FILE.exists():
+        try:
+            return json.loads(META_FILE.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            return {}
+    return {}
+
+
+def _save_meta(meta: dict) -> None:
+    META_FILE.parent.mkdir(parents=True, exist_ok=True)
+    META_FILE.write_text(json.dumps(meta, indent=1), encoding="utf-8")
+
+
+def _is_v2(e: dict) -> bool:
+    """Sinyal era sistem baru (bukan backfill lama, bukan bayangan)."""
+    return not e.get("legacy") and not e.get("shadow")
+
+
+def _stats_texts(entries: list[dict]) -> tuple[str, str]:
+    """(stats sinyal v2, stats bayangan) sebagai teks siap tampil."""
+    v2 = tracker.summarize([e for e in entries if _is_v2(e)])
+    sh = tracker.summarize([e for e in entries if e.get("shadow")])
+    v2_txt = f"{tracker.stats_line(v2)} (sejak 14 Jul, sistem v2)"
+    sh_txt = (f"{sh['winrate_pct']}% ({sh['wins']}W/{sh['losses']}L, "
+              f"{sh['open']} terbuka) — makin RENDAH makin bagus gate-nya")
+    return v2_txt, sh_txt
 
 
 def _resolve_open(entries: list[dict]) -> None:
@@ -79,14 +112,11 @@ def _resolve_open(entries: list[dict]) -> None:
             # Bayangan (diblokir sentimen): dilacak diam-diam, tanpa Discord.
             print(f"[shadow ] {e.get('profile')} {e['side']} -> {e['status']}")
             continue
-        real = [x for x in entries if not x.get("shadow")]
-        stats_text = tracker.stats_line(tracker.summarize(real))
+        v2_txt, sh_txt = _stats_texts(entries)
+        stats_text = v2_txt
         sh = tracker.summarize([x for x in entries if x.get("shadow")])
         if sh["closed"]:
-            stats_text += (
-                f"\n🚧 Diblokir sentimen (bayangan): {sh['winrate_pct']}% "
-                f"({sh['wins']}W/{sh['losses']}L) — makin RENDAH makin bagus gate-nya"
-            )
+            stats_text += f"\n🚧 Diblokir sentimen (bayangan): {sh_txt}"
         payload = notifier.format_outcome_embed(e, stats_text)
         sent = main._push_discord(payload)
         print(f"[resolve] {e.get('profile')} {e['side']} -> {e['status']} (dikirim={sent})")
@@ -164,20 +194,92 @@ def _new_signals(entries: list[dict]) -> None:
         print(f"[{profile}] SINYAL {side.upper()} dikirim={sent} @ {sig.get('entry')}")
 
 
+def _m15_cached() -> list[dict]:
+    sym = main.settings.signal_symbol
+    return main.get_or_set(
+        f"px_{sym}_15min", main._PRICE_TTL.get("15min", 600),
+        lambda: signal_engine.fetch_series(sym, "15min", 60,
+                                           main.settings.twelvedata_api_key),
+    )
+
+
+def _check_burst(meta: dict) -> None:
+    """Deteksi ledakan harga (kemungkinan berita) -> kirim INFO ke Discord.
+    Bukan sinyal entry (backtest: kejar-berita tidak profit)."""
+    now = datetime.now(timezone.utc)
+    last = meta.get("last_burst_alert")
+    if last and (now - tracker.parse_utc(last)) < timedelta(hours=BURST_COOLDOWN_H):
+        return
+    try:
+        bars = _m15_cached()
+        closes = [b["close"] for b in bars]
+        highs = [b["high"] for b in bars]
+        lows = [b["low"] for b in bars]
+        atr = signal_engine.atr_series(highs, lows, closes)[-2]
+        if atr is None or len(closes) < 6:
+            return
+        move = closes[-2] - closes[-6]          # pergerakan ~1 jam (4 bar closed)
+        if abs(move) < BURST_ATR_MULT * atr:
+            return
+        ctx = main.context("XAUUSD")  # type: ignore[arg-type]
+        payload = notifier.format_burst_embed(
+            "up" if move > 0 else "down", move, closes[-1],
+            ctx.get("sentiment_bias", "flat"),
+        )
+        sent = main._push_discord(payload)
+        meta["last_burst_alert"] = now.isoformat(timespec="seconds")
+        print(f"[burst  ] {move:+.1f} USD/jam terdeteksi (dikirim={sent})")
+    except Exception as e:  # noqa: BLE001
+        print("[burst  ] ERROR:", e)
+
+
+def _daily_digest(entries: list[dict], meta: dict) -> None:
+    """Ringkasan harian 1x saat sesi London buka -> tiap hari pasti ada kabar."""
+    now = datetime.now(timezone.utc)
+    today = now.date().isoformat()
+    if now.hour != DIGEST_HOUR_UTC or meta.get("last_digest_date") == today:
+        return
+    if not signal_engine.market_open(now):
+        return
+    try:
+        ctx = main.context("XAUUSD")  # type: ignore[arg-type]
+        sent_d = ctx.get("sentiment") or {}
+        bars = _m15_cached()
+        h = main._signal_for("XAUUSD", EQUITY, "harian")
+        i = main._signal_for("XAUUSD", EQUITY, "intraday")
+        v2_txt, sh_txt = _stats_texts(entries)
+        opens = [f"{e['profile']} {e['side'].upper()} @ {e['entry']}"
+                 for e in entries if e.get("status") == "open" and _is_v2(e)]
+        payload = notifier.format_digest_embed({
+            "price": bars[-1]["close"],
+            "trend_harian": h.get("trend"), "trend_intraday": i.get("trend"),
+            "sent_bias": ctx.get("sentiment_bias"), "sent_score": sent_d.get("score"),
+            "headlines": sent_d.get("headlines_total"),
+            "cot_bias": (ctx.get("cot") or {}).get("bias"),
+            "stats": v2_txt, "shadow_stats": sh_txt,
+            "open_positions": ", ".join(opens) if opens else "tidak ada",
+        })
+        sent = main._push_discord(payload)
+        meta["last_digest_date"] = today
+        print(f"[digest ] ringkasan harian dikirim={sent}")
+    except Exception as e:  # noqa: BLE001
+        print("[digest ] ERROR:", e)
+
+
 def main_run() -> None:
     if not main._discord_configured():
         print("PERINGATAN: Discord belum dikonfigurasi (Secrets).")
     entries = _load_log()
+    meta = _load_meta()
     _resolve_open(entries)
     _new_signals(entries)
+    _check_burst(meta)
+    _daily_digest(entries, meta)
     _save_log(entries)
-    real = [e for e in entries if not e.get("shadow")]
-    shadow = [e for e in entries if e.get("shadow")]
-    print("REKAP sinyal :", tracker.stats_line(tracker.summarize(real)))
-    if shadow:
-        sh = tracker.summarize(shadow)
-        print(f"REKAP bayangan (diblokir sentimen): {sh['winrate_pct']}% "
-              f"({sh['wins']}W/{sh['losses']}L, {sh['open']} terbuka)")
+    _save_meta(meta)
+    v2_txt, sh_txt = _stats_texts(entries)
+    print("REKAP v2     :", v2_txt)
+    print("REKAP bayangan:", sh_txt)
 
 
 if __name__ == "__main__":
