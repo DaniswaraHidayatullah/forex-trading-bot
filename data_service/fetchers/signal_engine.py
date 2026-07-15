@@ -313,7 +313,17 @@ def build_signal(
         base["reason"] = f"RSI {rsi_val:.0f} di luar zona pullback ({rsi_lo:.0f}-{rsi_hi:.0f})"
         return base
 
+    # ANTI-SPIKE: SL minimal di LUAR wick 8 bar terakhir + buffer 0.3 ATR,
+    # supaya tidak tersapu lonjakan sesaat (spike) sebelum harga jalan.
     sl_dist = atr_val * atr_mult
+    recent_hi = max(m_high[-9:-1])
+    recent_lo = min(m_low[-9:-1])
+    if trend == 1:   # BUY: SL di bawah low terakhir
+        wick_dist = (price - recent_lo) + 0.3 * atr_val
+    else:            # SELL: SL di atas high terakhir
+        wick_dist = (recent_hi - price) + 0.3 * atr_val
+    if wick_dist > sl_dist:
+        sl_dist = round(wick_dist, 2)
     tp_dist = sl_dist * rr
 
     # Batas risiko: di akun kecil, lot minimum 0.01 tidak bisa diperkecil.

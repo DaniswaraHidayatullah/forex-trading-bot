@@ -157,11 +157,47 @@ def format_news_embed(items: list[tuple[float, str]]) -> dict[str, Any]:
                    15844367, "Kurasi khusus penggerak emas/dolar · tiap ~2 jam")
 
 
-def format_general_news_embed(items: list[str]) -> dict[str, Any]:
-    lines = [f"📰 {str(h)[:150]}" for h in items[:6]]
-    return _simple("🌎 MARKET NEWS — keuangan & dunia",
-                   "\n\n".join(lines), 3447003,
-                   "CNBC · MarketWatch · WSJ · Yahoo · SeekingAlpha · CoinDesk · tiap ~2 jam")
+def format_rich_news(items: list[dict[str, Any]], color: int,
+                     tag_fn=None) -> dict[str, Any]:
+    """Tiap berita = embed sendiri (judul ber-link, gambar, sumber). Maks 5."""
+    embeds = []
+    for it in items[:5]:
+        prefix = tag_fn(it) if tag_fn else ""
+        e: dict[str, Any] = {
+            "title": (prefix + str(it.get("title", "")))[:250],
+            "color": color,
+            "footer": {"text": f"Sumber: {it.get('source', '?')}"},
+        }
+        if it.get("link"):
+            e["url"] = it["link"]
+        if it.get("image"):
+            e["image"] = {"url": it["image"]}
+        embeds.append(e)
+    return {"embeds": embeds}
+
+
+_FLAGS = {"EUR": "🇪🇺", "JPY": "🇯🇵", "GBP": "🇬🇧", "CHF": "🇨🇭", "AUD": "🇦🇺",
+          "NZD": "🇳🇿", "CAD": "🇨🇦", "CNY": "🇨🇳", "IDR": "🇮🇩", "INR": "🇮🇳",
+          "KRW": "🇰🇷", "SGD": "🇸🇬", "MYR": "🇲🇾", "THB": "🇹🇭", "PHP": "🇵🇭",
+          "MXN": "🇲🇽", "BRL": "🇧🇷", "ZAR": "🇿🇦", "TRY": "🇹🇷", "SEK": "🇸🇪"}
+
+
+def format_dollar20_embed(rows: list[tuple[str, float]], first: bool) -> dict[str, Any]:
+    """rows = [(kode_mata_uang, %perubahan kekuatan USD vs mata uang itu)]."""
+    if first:
+        desc = "Snapshot awal 20 mata uang direkam — perbandingan mulai update berikutnya."
+    else:
+        up = sum(1 for _, c in rows if c > 0)
+        lines = []
+        for cur, chg in sorted(rows, key=lambda x: -x[1]):
+            e = "🟢" if chg > 0 else "🔴" if chg < 0 else "⚪"
+            lines.append(f"{_FLAGS.get(cur, '🏳️')} **{cur}** {e} USD {chg:+.2f}%")
+        verdict = ("💪 USD MENGUAT luas → tekanan turun utk emas" if up >= 13 else
+                   "😴 USD MELEMAH luas → dukungan naik utk emas" if up <= 7 else
+                   "⚖️ USD campuran")
+        desc = "\n".join(lines[:20]) + f"\n\n**{verdict}**  ({up}/20 menguat)"
+    return _simple("💵 DOLLAR MONITOR — USD vs 20 mata uang", desc, 5763719,
+                   "Termasuk 🇮🇩 IDR · perubahan sejak update sebelumnya · 2x/hari")
 
 
 def format_calendar_embed(events: list[dict[str, Any]]) -> dict[str, Any]:

@@ -179,7 +179,10 @@ def _new_signals(entries: list[dict]) -> None:
             print(f"[{profile}] keyakinan < {main.settings.signal_min_confidence} -> tidak dikirim")
             continue
 
-        sent = main._push_discord(sig)
+        payload = notifier.format_embed(sig)
+        if sig.get("confidence_level", 0) >= 3:
+            payload["content"] = "@everyone ⭐⭐⭐ SINYAL KUAT — berita & teknikal searah!"
+        sent = main._push_discord(payload)
         entries.append({
             "id": uuid.uuid4().hex[:8],
             "profile": sig.get("profile"),
@@ -302,43 +305,42 @@ def _market_feeds(meta: dict) -> None:
     if _feed_due(meta, "last_news", 2.0):
         try:
             from fetchers import sentiment as sen
-            heads, _src = sen.fetch_headlines_diag(main.settings.sentiment_feeds)
-            scored = []
-            seen_key = set(meta.get("sent_titles", []))
-            for h in sen._dedupe(heads):
-                t = h.lower()
-                if not sen._is_relevant(t):
-                    continue
-                sc = sen._score_one(t)
-                if sc == 0:
-                    continue
+            # 🥇 rich items khusus gold/forex/USD (judul+link+gambar+sumber)
+            rich = sen.fetch_news_rich(main.settings.sentiment_feeds)
+            seen = set(meta.get("sent_titles", []))
+            gold_items = []
+            for it in rich:
+                t = it["title"].lower()
                 k = t[:60]
-                if k in seen_key:
+                if k in seen or not sen._is_relevant(t):
                     continue
-                scored.append((sc, h, k))
-            scored.sort(key=lambda x: -abs(x[0]))
-            if scored and main.settings.discord_channels.get("news_gold"):
-                payload = notifier.format_news_embed([(s, h) for s, h, _ in scored])
+                it["score"] = sen._score_one(t)
+                gold_items.append((it, k))
+            gold_items.sort(key=lambda x: -abs(x[0].get("score", 0)))
+            if gold_items and main.settings.discord_channels.get("news_gold"):
+                def tag(it):
+                    s = it.get("score", 0)
+                    return "🟢 " if s > 0 else "🔴 " if s < 0 else "⚪ "
+                payload = notifier.format_rich_news([i for i, _ in gold_items],
+                                                    15844367, tag)
                 main._push_discord(payload, channel="news_gold")
-                keys = list(seen_key) + [k for _, _, k in scored[:6]]
-                meta["sent_titles"] = keys[-120:]   # ingat 120 judul terakhir
-                print(f"[newsGLD] {min(6, len(scored))} headline dikirim")
+                meta["sent_titles"] = (list(seen) + [k for _, k in gold_items[:5]])[-150:]
+                print(f"[newsGLD] {min(5, len(gold_items))} berita gold dikirim")
 
-            # 🌎 market-news: berita keuangan UMUM dari sumber diperluas
-            gheads, _gs = sen.fetch_headlines_diag(main.settings.news_feeds_general)
+            # 🌎 market-news: berita keuangan UMUM (sumber diperluas)
+            grich = sen.fetch_news_rich(main.settings.news_feeds_general)
             seen_g = set(meta.get("sent_titles_gen", []))
             fresh = []
-            for h in sen._dedupe(gheads):
-                k = h.lower()[:60]
+            for it in grich:
+                k = it["title"].lower()[:60]
                 if k in seen_g:
                     continue
-                fresh.append((h, k))
+                fresh.append((it, k))
             if fresh:
-                payload = notifier.format_general_news_embed([h for h, _ in fresh])
+                payload = notifier.format_rich_news([i for i, _ in fresh], 3447003)
                 main._push_discord(payload, channel="news")
-                keys = list(seen_g) + [k for _, k in fresh[:6]]
-                meta["sent_titles_gen"] = keys[-200:]
-                print(f"[newsGEN] {min(6, len(fresh))} headline umum dikirim")
+                meta["sent_titles_gen"] = (list(seen_g) + [k for _, k in fresh[:5]])[-250:]
+                print(f"[newsGEN] {min(5, len(fresh))} berita umum dikirim")
             _mark(meta, "last_news")
         except Exception as e:  # noqa: BLE001
             print("[news   ] ERROR:", e)
@@ -360,19 +362,35 @@ def _market_feeds(meta: dict) -> None:
         except Exception as e:  # noqa: BLE001
             print("[calendr] ERROR:", e)
 
-    # 💵 dollar-index (proxy): tiap 4 jam
-    if _feed_due(meta, "last_dollar", 4.0):
+    # 💵 dollar-monitor: USD vs 20 mata uang (termasuk IDR), 2x/hari
+    if _feed_due(meta, "last_dollar", 12.0):
         try:
-            key = main.settings.twelvedata_api_key
-            eur = signal_engine.fetch_series("EUR/USD", "1h", 5, key)
-            jpy = signal_engine.fetch_series("USD/JPY", "1h", 5, key)
-            payload = notifier.format_dollar_embed(
-                eur[-1]["close"], eur[-1]["close"] - eur[0]["close"],
-                jpy[-1]["close"], jpy[-1]["close"] - jpy[0]["close"],
-            )
+            import httpx as _hx
+            pairs = main.settings.dollar_pairs
+            r = _hx.get("https://api.twelvedata.com/price",
+                        params={"symbol": ",".join(pairs),
+                                "apikey": main.settings.twelvedata_api_key},
+                        timeout=25)
+            data = r.json()
+            prices = {}
+            for p in pairs:
+                v = data.get(p, {})
+                if isinstance(v, dict) and v.get("price"):
+                    prices[p] = float(v["price"])
+            snap = meta.get("dollar_snap") or {}
+            rows = []
+            for p, px in prices.items():
+                cur = p.replace("USD", "").replace("/", "")
+                prev = snap.get(p)
+                if prev:
+                    pct = (px - prev) / prev * 100
+                    usd_chg = -pct if p.endswith("/USD") else pct
+                    rows.append((cur, round(usd_chg, 2)))
+            payload = notifier.format_dollar20_embed(rows, first=not snap)
             main._push_discord(payload, channel="dollar")
+            meta["dollar_snap"] = prices
             _mark(meta, "last_dollar")
-            print("[dollar ] monitor dolar dikirim")
+            print(f"[dollar ] monitor 20 mata uang dikirim ({len(prices)} pair)")
         except Exception as e:  # noqa: BLE001
             print("[dollar ] ERROR:", e)
 

@@ -204,6 +204,51 @@ def fetch_headlines(feeds: list[str] | None = None, timeout: float = 12.0) -> li
     return fetch_headlines_diag(feeds, timeout)[0]
 
 
+def _parse_feed_rich(xml_text: str, source: str) -> list[dict[str, str]]:
+    """Item RSS lengkap: judul, link, gambar (enclosure/media), sumber."""
+    items: list[dict[str, str]] = []
+    try:
+        root = ET.fromstring(xml_text)
+    except ET.ParseError:
+        return items
+    for elem in root.iter():
+        if _strip_ns(elem.tag) not in ("item", "entry"):
+            continue
+        title = link = image = ""
+        for child in elem:
+            name = _strip_ns(child.tag)
+            if name == "title" and child.text:
+                title = re.sub(r"\s+", " ", child.text).strip()
+            elif name == "link":
+                link = (child.text or child.attrib.get("href") or "").strip()
+            elif name in ("enclosure", "content", "thumbnail"):
+                url = child.attrib.get("url", "")
+                mime = child.attrib.get("type", "")
+                if url and ("image" in mime or name == "thumbnail" or
+                            url.lower().endswith((".jpg", ".jpeg", ".png", ".webp"))):
+                    image = image or url
+        if title:
+            items.append({"title": title, "link": link, "image": image,
+                          "source": source})
+    return items
+
+
+def fetch_news_rich(feeds: list[str], timeout: float = 12.0) -> list[dict[str, str]]:
+    """Berita kaya (judul+link+gambar+sumber) dari banyak feed; gagal dilewati."""
+    out: list[dict[str, str]] = []
+    with httpx.Client(timeout=timeout, headers={"User-Agent": _UA},
+                      follow_redirects=True) as client:
+        for url in feeds:
+            name = url.split("/")[2].replace("www.", "").replace("feeds.", "")
+            try:
+                resp = client.get(url)
+                resp.raise_for_status()
+                out.extend(_parse_feed_rich(resp.text, name))
+            except Exception:  # noqa: BLE001
+                continue
+    return out
+
+
 def _is_relevant(text: str) -> bool:
     return any(k in text for k in _RELEVANCE)
 

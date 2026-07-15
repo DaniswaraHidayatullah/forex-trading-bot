@@ -68,10 +68,16 @@ class Settings(BaseSettings):
         "calendar": "1511770975564464310",    # 📅economic-calendar
         "dollar": "1511771019868635176",      # 💵dollar-index
         "prediction": "1511771296164348156",  # 👽bot-prediction
-        # 🥇market-news-gold (khusus forex/gold/USD). Isi ID-nya via env
-        # DISCORD_CHANNELS_NEWS_GOLD atau langsung di sini setelah channel dibuat.
-        "news_gold": "",
+        "news_gold": "1526815834712965131",   # 🥇market-news-gold
     }
+
+    # 20 mata uang utk Dollar Monitor (fmt Twelve Data). XXX/USD = invers.
+    dollar_pairs: list[str] = [
+        "EUR/USD", "USD/JPY", "GBP/USD", "USD/CHF", "AUD/USD", "NZD/USD",
+        "USD/CAD", "USD/CNY", "USD/IDR", "USD/INR", "USD/KRW", "USD/SGD",
+        "USD/MYR", "USD/THB", "USD/PHP", "USD/MXN", "USD/BRL", "USD/ZAR",
+        "USD/TRY", "USD/SEK",
+    ]
 
     # --- Notifikasi Discord (auto-push sinyal) ----------------------------
     # Pilih SALAH SATU: webhook (paling gampang) ATAU bot (token + channel id).
