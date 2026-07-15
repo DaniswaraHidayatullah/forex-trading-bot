@@ -53,6 +53,11 @@ def format_embed(sig: dict[str, Any]) -> dict[str, Any]:
         f"⏳ Perkiraan tahan: {sig.get('hold')}",
         f"📊 Tren {arrow} · RSI {sig.get('rsi')} · {sent_txt}",
     ])
+    news = sig.get("top_news") or []
+    if news:
+        desc += "\n\n📰 **Berita penggerak:**"
+        for h in news[:2]:
+            desc += f"\n> {str(h)[:120]}"
 
     return {
         "embeds": [{

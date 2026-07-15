@@ -345,19 +345,25 @@ def build_signal(
             f"Sinyal fresh, valid ~{valid_minutes} mnt (sampai bar {entry_interval} berikutnya)."
         ),
     })
+    if sentiment_bias == "flat":
+        sent_txt = "berita netral saat ini"
+    else:
+        arah = "MENDUKUNG" if ((want_buy and sentiment_bias == "long")
+                               or (want_sell and sentiment_bias == "short")) else "melawan"
+        sent_txt = f"berita {arah} ({sentiment_bias} {sentiment_score:+.2f})"
     if want_buy:
         base.update({
             "signal": "buy",
             "sl": round(price - sl_dist, 2),
             "tp": round(price + tp_dist, 2),
-            "reason": f"Uptrend {trend_interval} + RSI pullback {rsi_val:.0f} + sentimen {sentiment_bias}",
+            "reason": f"Uptrend {trend_interval} + RSI pullback {rsi_val:.0f} · {sent_txt}",
         })
     else:
         base.update({
             "signal": "sell",
             "sl": round(price + sl_dist, 2),
             "tp": round(price - tp_dist, 2),
-            "reason": f"Downtrend {trend_interval} + RSI pullback {rsi_val:.0f} + sentimen {sentiment_bias}",
+            "reason": f"Downtrend {trend_interval} + RSI pullback {rsi_val:.0f} · {sent_txt}",
         })
 
     # Keyakinan: pakai keselarasan + kekuatan sentimen sbg booster.
@@ -367,11 +373,11 @@ def build_signal(
         or (side == "sell" and sentiment_bias == "short")
     )
     if aligned and abs(sentiment_score) >= SENT_STRONG:
-        level, label, stars = 3, "Kuat", "⭐⭐⭐"
+        level, label, stars = 3, "Kuat — berita & teknikal searah", "⭐⭐⭐"
     elif aligned:
-        level, label, stars = 2, "Sedang", "⭐⭐"
+        level, label, stars = 2, "Sedang — berita mendukung tipis", "⭐⭐"
     else:
-        level, label, stars = 1, "Lemah (teknikal saja)", "⭐"
+        level, label, stars = 1, "Standar — berita netral", "⭐"
     base.update({"confidence": label, "confidence_level": level, "confidence_stars": stars})
 
     # Gate sentimen: sinyal MELAWAN sentimen tidak dikirim, tapi tetap

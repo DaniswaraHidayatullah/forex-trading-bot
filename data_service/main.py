@@ -163,7 +163,7 @@ def _signal_for(symbol: str, equity: float, profile: str) -> dict:
         )
 
     def _produce() -> dict:
-        return signal_engine.build_signal(
+        sig = signal_engine.build_signal(
             sentiment_bias=bias,
             news_blocked=blocked,
             api_key=settings.twelvedata_api_key,
@@ -178,6 +178,9 @@ def _signal_for(symbol: str, equity: float, profile: str) -> dict:
             max_risk_usd=settings.signal_max_risk_usd,
             fetch_fn=_cached_fetch,
         )
+        # Lampirkan headline penggerak (dari sampel sentimen) ke kartu.
+        sig["top_news"] = list(sent.get("samples") or [])[:2]
+        return sig
 
     return get_or_set(
         f"signal_{symbol.upper()}_{profile}_{int(equity)}",
