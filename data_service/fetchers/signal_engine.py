@@ -313,15 +313,18 @@ def build_signal(
         base["reason"] = f"RSI {rsi_val:.0f} di luar zona pullback ({rsi_lo:.0f}-{rsi_hi:.0f})"
         return base
 
-    # ANTI-SPIKE: SL minimal di LUAR wick 8 bar terakhir + buffer 0.3 ATR,
-    # supaya tidak tersapu lonjakan sesaat (spike) sebelum harga jalan.
+    # ANTI-SPIKE: SL minimal di LUAR wick 12 bar terakhir + buffer 0.5 ATR
+    # + bantalan spread broker (SELL kena SL di harga ask; feed broker bisa
+    # wick lebih jauh dari feed data). Kasus 14 Jul: SL 4061.7 disapu wick
+    # broker 4062.11 sebelum harga jalan 200+ pips ke arah TP.
+    SPREAD_PAD = 0.6  # ~spread emas + selisih feed broker vs data
     sl_dist = atr_val * atr_mult
-    recent_hi = max(m_high[-9:-1])
-    recent_lo = min(m_low[-9:-1])
+    recent_hi = max(m_high[-13:-1])
+    recent_lo = min(m_low[-13:-1])
     if trend == 1:   # BUY: SL di bawah low terakhir
-        wick_dist = (price - recent_lo) + 0.3 * atr_val
+        wick_dist = (price - recent_lo) + 0.5 * atr_val + SPREAD_PAD
     else:            # SELL: SL di atas high terakhir
-        wick_dist = (recent_hi - price) + 0.3 * atr_val
+        wick_dist = (recent_hi - price) + 0.5 * atr_val + SPREAD_PAD
     if wick_dist > sl_dist:
         sl_dist = round(wick_dist, 2)
     tp_dist = sl_dist * rr
