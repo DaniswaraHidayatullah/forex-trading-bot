@@ -319,6 +319,7 @@ def build_signal(
     # broker 4062.11 sebelum harga jalan 200+ pips ke arah TP.
     SPREAD_PAD = 0.6  # ~spread emas + selisih feed broker vs data
     sl_dist = atr_val * atr_mult
+    tp_dist = sl_dist * rr           # TARGET TETAP di jarak teruji backtest
     recent_hi = max(m_high[-13:-1])
     recent_lo = min(m_low[-13:-1])
     if trend == 1:   # BUY: SL di bawah low terakhir
@@ -327,7 +328,16 @@ def build_signal(
         wick_dist = (recent_hi - price) + 0.5 * atr_val + SPREAD_PAD
     if wick_dist > sl_dist:
         sl_dist = round(wick_dist, 2)
-    tp_dist = sl_dist * rr
+    # RR mengambang (TP tak ikut melebar). Di bawah 1:1.5 = setup terlalu
+    # berisik (zona wick lebar) -> lebih baik tidak trading.
+    rr = round(tp_dist / sl_dist, 2)
+    base["rr"] = rr
+    if rr < 1.5:
+        base["reason"] = (
+            f"Zona wick terlalu lebar (RR tersisa 1:{rr:g} < 1:1.5) -> "
+            "setup berisik, skip demi kualitas"
+        )
+        return base
 
     # Batas risiko: di akun kecil, lot minimum 0.01 tidak bisa diperkecil.
     # Kalau jarak SL (=$ risiko per 0.01 lot) melebihi batas, JANGAN kirim
