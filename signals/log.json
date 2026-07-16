@@ -901,6 +901,7 @@
   "confidence": 0,
   "shadow": true,
   "time_utc": "2026-07-16T12:07:25+00:00",
-  "status": "open"
+  "status": "win",
+  "closed_utc": "2026-07-16T14:18:10+00:00"
  }
 ]
