@@ -869,7 +869,8 @@
   "confidence": 0,
   "shadow": true,
   "time_utc": "2026-07-16T08:30:55+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-07-16T12:07:21+00:00"
  },
  {
   "id": "300f3594",
@@ -884,6 +885,22 @@
   "confidence": 0,
   "shadow": true,
   "time_utc": "2026-07-16T10:32:55+00:00",
+  "status": "loss",
+  "closed_utc": "2026-07-16T12:07:21+00:00"
+ },
+ {
+  "id": "f94b4145",
+  "profile": "Harian",
+  "side": "sell",
+  "entry": 4039.42,
+  "sl": 4046.56,
+  "tp": 4025.14,
+  "rr": 2.0,
+  "risk_usd": 7.14,
+  "reward_usd": 14.28,
+  "confidence": 0,
+  "shadow": true,
+  "time_utc": "2026-07-16T12:07:25+00:00",
   "status": "open"
  }
 ]
