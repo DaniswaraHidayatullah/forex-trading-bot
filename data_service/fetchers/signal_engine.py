@@ -138,8 +138,8 @@ PROFILES: dict[str, dict[str, Any]] = {
     "harian": {
         "label": "Harian", "trend": "1h", "entry": "15min",
         "ema_fast": 21, "ema_slow": 50,
-        "atr_mult": 1.2, "rr": 2.0, "rsi_lo": 35.0, "rsi_hi": 65.0,
-        "session": (6, 20),  # jam UTC boleh entry (London+NY)
+        "atr_mult": 1.2, "rr": 2.0, "rsi_lo": 30.0, "rsi_hi": 70.0,
+        "session": (5, 21),  # jam UTC boleh entry (diperlebar)
         "hold": "~1 jam s/d 1 hari",
     },
     "scalp": {
@@ -395,10 +395,11 @@ def build_signal(
         level, label, stars = 1, "Standar — berita netral", "⭐"
     base.update({"confidence": label, "confidence_level": level, "confidence_stars": stars})
 
-    # Gate sentimen: sinyal MELAWAN sentimen tidak dikirim, tapi tetap
-    # dikembalikan sbg "bayangan" (shadow) lengkap dgn SL/TP -- supaya bisa
-    # dilacak: apakah blokiran sentimen menyelamatkan atau merugikan.
-    if use_sentiment and sentiment_bias in ("long", "short") and not aligned:
+    # Gate sentimen DILONGGARKAN: hanya blokir bila berita SANGAT kuat
+    # melawan (|skor| >= 0.85). Konflik ringan tetap dikirim dgn label ⭐
+    # (shadow tracking membuktikan gate ketat tidak menambah nilai: 50:50).
+    if (use_sentiment and sentiment_bias in ("long", "short") and not aligned
+            and abs(sentiment_score) >= 0.85):
         base["shadow_side"] = side
         base["signal"] = "none"
         base["reason"] = (

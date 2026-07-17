@@ -44,7 +44,7 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           SIGNAL_PROFILES: ${{ vars.SIGNAL_PROFILES || 'harian,intraday' }}
           SIGNAL_MIN_CONFIDENCE: ${{ vars.SIGNAL_MIN_CONFIDENCE || 'none' }}
-          SIGNAL_MAX_RISK_USD: ${{ vars.SIGNAL_MAX_RISK_USD || '12' }}
+          SIGNAL_MAX_RISK_USD: ${{ vars.SIGNAL_MAX_RISK_USD || '18' }}
         run: python tools/run_signal_once.py
 
       - name: Commit log sinyal

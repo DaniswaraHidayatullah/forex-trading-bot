@@ -95,8 +95,8 @@ class Settings(BaseSettings):
     # kartu tetap menampilkan status sentimen + bintang keyakinan.
     signal_min_confidence: str = "none"
     # Batas risiko $ per trade @0.01 lot (jarak SL). Sinyal dgn risiko lebih
-    # besar di-skip (akun kecil tak bisa memperkecil lot di bawah 0.01).
-    signal_max_risk_usd: float = 12.0
+    # besar di-skip. Dilonggarkan 12->18 (permintaan user; regime volatil).
+    signal_max_risk_usd: float = 18.0
 
     # Mata uang yang relevan per simbol -> dipakai untuk memfilter berita & COT
     symbol_currencies: dict[str, list[str]] = {

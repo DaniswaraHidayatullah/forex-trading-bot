@@ -264,17 +264,24 @@ def test_min_headlines_two_gives_bias():
 
 
 def test_sentiment_gate_creates_shadow():
-    # Tren naik (setup BUY) tapi sentimen SHORT -> diblokir, jadi bayangan
-    # LENGKAP dgn SL/TP supaya hasil "seandainya" bisa dilacak.
-    r = build_signal(
+    # Gate longgar: konflik ringan (skor -0.5) TETAP dikirim (label ⭐);
+    # hanya berita SANGAT kuat melawan (|skor|>=0.85) yang memblokir.
+    r_soft = build_signal(
         sentiment_bias="short", news_blocked=False, api_key="x",
         profile="harian", sentiment_score=-0.5, fetch_fn=_trend_up_fetch,
         now_utc=_WEEKDAY,
     )
-    assert r["signal"] == "none"
-    assert r["shadow_side"] == "buy"
-    assert r["sl"] is not None and r["tp"] is not None
-    assert "diblokir" in r["reason"]
+    assert r_soft["signal"] == "buy"
+    assert r_soft["confidence_level"] == 1
+
+    r_hard = build_signal(
+        sentiment_bias="short", news_blocked=False, api_key="x",
+        profile="harian", sentiment_score=-0.9, fetch_fn=_trend_up_fetch,
+        now_utc=_WEEKDAY,
+    )
+    assert r_hard["signal"] == "none"
+    assert r_hard["shadow_side"] == "buy"
+    assert r_hard["sl"] is not None and "diblokir" in r_hard["reason"]
 
 
 def test_harian_profile_rr_1_2():
