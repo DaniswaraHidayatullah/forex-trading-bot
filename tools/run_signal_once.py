@@ -321,8 +321,9 @@ def _market_feeds(meta: dict) -> None:
                 def tag(it):
                     s = it.get("score", 0)
                     return "🟢 " if s > 0 else "🔴 " if s < 0 else "⚪ "
-                payload = notifier.format_rich_news([i for i, _ in gold_items],
-                                                    15844367, tag)
+                top_g = [i for i, _ in gold_items[:5]]
+                sen.enrich_og(top_g)   # gambar+ringkasan ala preview link
+                payload = notifier.format_rich_news(top_g, 15844367, tag)
                 main._push_discord(payload, channel="news_gold")
                 meta["sent_titles"] = (list(seen) + [k for _, k in gold_items[:5]])[-150:]
                 print(f"[newsGLD] {min(5, len(gold_items))} berita gold dikirim")
@@ -337,7 +338,9 @@ def _market_feeds(meta: dict) -> None:
                     continue
                 fresh.append((it, k))
             if fresh:
-                payload = notifier.format_rich_news([i for i, _ in fresh], 3447003)
+                top_f = [i for i, _ in fresh[:5]]
+                sen.enrich_og(top_f)
+                payload = notifier.format_rich_news(top_f, 3447003)
                 main._push_discord(payload, channel="news")
                 meta["sent_titles_gen"] = (list(seen_g) + [k for _, k in fresh[:5]])[-250:]
                 print(f"[newsGEN] {min(5, len(fresh))} berita umum dikirim")

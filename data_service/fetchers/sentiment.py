@@ -214,13 +214,16 @@ def _parse_feed_rich(xml_text: str, source: str) -> list[dict[str, str]]:
     for elem in root.iter():
         if _strip_ns(elem.tag) not in ("item", "entry"):
             continue
-        title = link = image = ""
+        title = link = image = desc = ""
         for child in elem:
             name = _strip_ns(child.tag)
             if name == "title" and child.text:
                 title = re.sub(r"\s+", " ", child.text).strip()
             elif name == "link":
                 link = (child.text or child.attrib.get("href") or "").strip()
+            elif name in ("description", "summary") and child.text:
+                d = re.sub(r"<[^>]+>", " ", child.text)
+                desc = re.sub(r"\s+", " ", d).strip()[:280]
             elif name in ("enclosure", "content", "thumbnail"):
                 url = child.attrib.get("url", "")
                 mime = child.attrib.get("type", "")
@@ -229,8 +232,32 @@ def _parse_feed_rich(xml_text: str, source: str) -> list[dict[str, str]]:
                     image = image or url
         if title:
             items.append({"title": title, "link": link, "image": image,
-                          "source": source})
+                          "desc": desc, "source": source})
     return items
+
+
+def enrich_og(items: list[dict[str, str]], timeout: float = 8.0) -> None:
+    """Lengkapi gambar/ringkasan dari tag OpenGraph halaman artikel (in-place).
+    Dipanggil hanya utk item yang akan DIKIRIM (hemat request)."""
+    with httpx.Client(timeout=timeout, headers={"User-Agent": _UA},
+                      follow_redirects=True) as client:
+        for it in items:
+            if (it.get("image") and it.get("desc")) or not it.get("link"):
+                continue
+            try:
+                html = client.get(it["link"]).text[:60000]
+            except Exception:  # noqa: BLE001
+                continue
+            if not it.get("image"):
+                m = re.search(r'property=["\']og:image["\'][^>]*content=["\']([^"\']+)', html) \
+                    or re.search(r'content=["\']([^"\']+)["\'][^>]*property=["\']og:image', html)
+                if m:
+                    it["image"] = m.group(1)
+            if not it.get("desc"):
+                m = re.search(r'property=["\']og:description["\'][^>]*content=["\']([^"\']+)', html) \
+                    or re.search(r'name=["\']description["\'][^>]*content=["\']([^"\']+)', html)
+                if m:
+                    it["desc"] = m.group(1)[:280]
 
 
 def fetch_news_rich(feeds: list[str], timeout: float = 12.0) -> list[dict[str, str]]:

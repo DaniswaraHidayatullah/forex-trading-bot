@@ -168,6 +168,8 @@ def format_rich_news(items: list[dict[str, Any]], color: int,
             "color": color,
             "footer": {"text": f"Sumber: {it.get('source', '?')}"},
         }
+        if it.get("desc"):
+            e["description"] = str(it["desc"])[:250]
         if it.get("link"):
             e["url"] = it["link"]
         if it.get("image"):
