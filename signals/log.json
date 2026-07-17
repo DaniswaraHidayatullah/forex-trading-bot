@@ -919,5 +919,20 @@
   "time_utc": "2026-07-17T06:33:42+00:00",
   "status": "win",
   "closed_utc": "2026-07-17T12:58:51+00:00"
+ },
+ {
+  "id": "4def09aa",
+  "profile": "Harian",
+  "side": "sell",
+  "entry": 3997.92,
+  "sl": 4009.81,
+  "tp": 3974.15,
+  "rr": 2.0,
+  "risk_usd": 11.89,
+  "reward_usd": 23.77,
+  "confidence": 0,
+  "shadow": true,
+  "time_utc": "2026-07-17T14:42:45+00:00",
+  "status": "open"
  }
 ]
