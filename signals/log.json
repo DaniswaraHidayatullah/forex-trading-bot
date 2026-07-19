@@ -949,6 +949,7 @@
   "confidence": 0,
   "shadow": true,
   "time_utc": "2026-07-17T18:31:03+00:00",
-  "status": "open"
+  "status": "expired",
+  "closed_utc": "2026-07-19T18:35:18+00:00"
  }
 ]
