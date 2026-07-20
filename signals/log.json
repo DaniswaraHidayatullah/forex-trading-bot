@@ -966,5 +966,19 @@
   "time_utc": "2026-07-20T01:11:23+00:00",
   "status": "win",
   "closed_utc": "2026-07-20T04:50:04+00:00"
+ },
+ {
+  "id": "a9534995",
+  "profile": "Intraday",
+  "side": "sell",
+  "entry": 4017.52,
+  "sl": 4031.87,
+  "tp": 3974.47,
+  "rr": 3.0,
+  "risk_usd": 14.35,
+  "reward_usd": 43.05,
+  "confidence": 1,
+  "time_utc": "2026-07-20T07:50:05+00:00",
+  "status": "open"
  }
 ]
