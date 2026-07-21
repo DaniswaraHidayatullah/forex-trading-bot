@@ -1071,6 +1071,7 @@
   "reward_usd": 19.44,
   "confidence": 3,
   "time_utc": "2026-07-21T12:49:46+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-07-21T14:53:41+00:00"
  }
 ]
