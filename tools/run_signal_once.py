@@ -29,6 +29,8 @@ _LEVEL = {"none": 0, "medium": 2, "strong": 3}
 BURST_ATR_MULT = 3.0        # ledakan = gerak 1 jam >= 3x ATR(M15)
 BURST_COOLDOWN_H = 2        # jangan alert ledakan lagi dalam N jam
 DIGEST_HOUR_UTC = 7         # ringkasan harian saat London buka (~14:00 WIB)
+MAX_CONCURRENT = 2          # maks posisi terbuka per profil (opsi B)
+DEDUP_MIN = 14              # menit; cegah 2 sinyal di candle M15 yang sama
 
 
 def _load_log() -> list[dict]:
@@ -135,14 +137,21 @@ def _new_signals(entries: list[dict]) -> None:
     except Exception as e:  # noqa: BLE001
         print("[sentimen] ERROR:", e)
 
+    now = datetime.now(timezone.utc)
     for profile in profiles:
         label = signal_engine.PROFILES.get(profile, signal_engine.PROFILES["intraday"])["label"]
-        open_real = any(e.get("status") == "open" and e.get("profile") == label
-                        and not e.get("shadow") for e in entries)
-        open_shadow = any(e.get("status") == "open" and e.get("profile") == label
-                          and e.get("shadow") for e in entries)
-        if open_real:
-            print(f"[{profile}] masih ada sinyal terbuka -> tunggu selesai")
+        open_real = [e for e in entries if e.get("status") == "open"
+                     and e.get("profile") == label and not e.get("shadow")]
+        open_shadow_list = [e for e in entries if e.get("status") == "open"
+                            and e.get("profile") == label and e.get("shadow")]
+        open_shadow = len(open_shadow_list) >= MAX_CONCURRENT
+        # Dedup candle: jangan buka posisi baru bila ada posisi profil ini yang
+        # dibuka < DEDUP_MIN menit lalu (cegah dobel di candle M15 yang sama).
+        recent = any((now - tracker.parse_utc(e["time_utc"])) < timedelta(minutes=DEDUP_MIN)
+                     for e in open_real + open_shadow_list)
+        if len(open_real) >= MAX_CONCURRENT or recent:
+            print(f"[{profile}] {len(open_real)} posisi terbuka (maks {MAX_CONCURRENT})"
+                  f"{' / candle sama' if recent else ''} -> tunggu")
             continue
         try:
             sig = main._signal_for("XAUUSD", EQUITY, profile)
@@ -436,9 +445,13 @@ def main_run() -> None:
     _market_feeds(meta)
     _save_log(entries)
     _save_meta(meta)
+    # Opsi C: 3 kelompok evaluasi (spec) -> executed / blocked-shadow / all-technical.
     v2_txt, sh_txt = _stats_texts(entries)
-    print("REKAP v2     :", v2_txt)
-    print("REKAP bayangan:", sh_txt)
+    all_tech = tracker.summarize([e for e in entries if not e.get("legacy")])
+    print("REKAP executed (3-grup):", v2_txt)
+    print("REKAP blocked-shadow    :", sh_txt)
+    print("REKAP all-technical     :", tracker.stats_line(all_tech),
+          "(executed+shadow = winrate teknikal mentah)")
 
 
 if __name__ == "__main__":
