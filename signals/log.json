@@ -1222,7 +1222,8 @@
   "reward_usd": 17.56,
   "confidence": 3,
   "time_utc": "2026-07-23T09:33:10+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-07-23T12:59:45+00:00"
  },
  {
   "id": "a80aea10",
@@ -1236,6 +1237,7 @@
   "reward_usd": 16.1,
   "confidence": 3,
   "time_utc": "2026-07-23T11:29:50+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-07-23T12:59:45+00:00"
  }
 ]
