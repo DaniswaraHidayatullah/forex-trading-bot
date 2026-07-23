@@ -1164,5 +1164,19 @@
   "time_utc": "2026-07-22T18:54:21+00:00",
   "status": "loss",
   "closed_utc": "2026-07-22T22:30:56+00:00"
+ },
+ {
+  "id": "a29b5e58",
+  "profile": "Intraday",
+  "side": "sell",
+  "entry": 4132.23,
+  "sl": 4145.7,
+  "tp": 4091.81,
+  "rr": 3.0,
+  "risk_usd": 13.47,
+  "reward_usd": 40.42,
+  "confidence": 1,
+  "time_utc": "2026-07-23T01:09:33+00:00",
+  "status": "open"
  }
 ]
