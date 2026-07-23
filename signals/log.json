@@ -1178,5 +1178,19 @@
   "confidence": 1,
   "time_utc": "2026-07-23T01:09:33+00:00",
   "status": "open"
+ },
+ {
+  "id": "6311d9a8",
+  "profile": "Harian",
+  "side": "buy",
+  "entry": 4128.14,
+  "sl": 4116.13,
+  "tp": 4152.16,
+  "rr": 2.0,
+  "risk_usd": 12.01,
+  "reward_usd": 24.02,
+  "confidence": 3,
+  "time_utc": "2026-07-23T05:46:51+00:00",
+  "status": "open"
  }
 ]
