@@ -1,5 +1,5 @@
 {
- "last_price": "2026-07-23T19:42:08+00:00",
+ "last_price": "2026-07-23T21:41:01+00:00",
  "sent_titles": [
   "equities: mixed global performance following earnings \u2013 deut",
   "united states dollar index holds losses around 101.00 despit",
@@ -154,7 +154,7 @@
  ],
  "last_news": "2026-07-23T20:41:32+00:00",
  "last_dollar": "2026-07-23T16:43:23+00:00",
- "last_prediction_state": "down|down|long|long",
+ "last_prediction_state": "flat|down|long|long",
  "sent_titles_gen": [
   "japan exports and imports grow at fastest pace in june since",
   "eu antitrust regulators clear paramount-wbd merger as it fac",
@@ -411,5 +411,5 @@
  "last_burst_alert": "2026-07-22T01:04:28+00:00",
  "dollar_snap": {},
  "last_digest_date": "2026-07-23",
- "last_portfolio": "2026-07-23T08:57:03+00:00"
+ "last_portfolio": "2026-07-23T21:41:02+00:00"
 }
