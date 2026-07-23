@@ -69,7 +69,14 @@ class Settings(BaseSettings):
         "dollar": "1511771019868635176",      # 💵dollar-index
         "prediction": "1511771296164348156",  # 👽bot-prediction
         "news_gold": "1526815834712965131",   # 🥇market-news-gold
+        "portofolio": "1529772227774513242",   # 📊portofolio (dashboard)
+        "weekly": "1529772231402721350",       # 📅rekap-mingguan
     }
+
+    # --- Portofolio simulasi (dari hasil sinyal) --------------------------
+    portfolio_start: float = 100.0     # saldo awal simulasi ($)
+    portfolio_risk_usd: float = 2.0    # $ risiko per 1R (2% dari $100)
+    portfolio_target: float = 150.0    # target akun untuk progress bar
 
     # 20 mata uang utk Dollar Monitor (fmt Twelve Data). XXX/USD = invers.
     dollar_pairs: list[str] = [

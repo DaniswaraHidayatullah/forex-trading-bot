@@ -433,6 +433,122 @@ def _market_feeds(meta: dict) -> None:
         print("[predict] ERROR:", e)
 
 
+def _portfolio_stats(entries: list[dict]) -> dict:
+    """Hitung ekuitas simulasi dari sinyal executed v2 yang sudah selesai."""
+    tr = sorted([e for e in entries if _is_v2(e) and e["status"] in ("win", "loss")],
+                key=lambda e: e.get("time_utc", ""))
+    start = main.settings.portfolio_start
+    risk = main.settings.portfolio_risk_usd
+    cum = 0.0
+    eq = [start]
+    peak, dd = start, 0.0
+    cw = cl = mcw = mcl = wins = losses = 0
+    gp = gl = 0.0
+    per_trade = []
+    for e in tr:
+        rr = float(e.get("rr", 2))
+        r = rr if e["status"] == "win" else -1.0
+        cum += r
+        bal = start + cum * risk
+        eq.append(bal)
+        peak = max(peak, bal)
+        dd = min(dd, bal - peak)
+        per_trade.append((r, e))
+        if e["status"] == "win":
+            wins += 1
+            cw, cl = cw + 1, 0
+            mcw = max(mcw, cw)
+            gp += rr
+        else:
+            losses += 1
+            cl, cw = cl + 1, 0
+            mcl = max(mcl, cl)
+            gl += 1
+    n = wins + losses
+    open_n = sum(1 for e in entries if _is_v2(e) and e["status"] == "open")
+    step = max(1, len(eq) // 24)
+    return {
+        "start": start, "balance": eq[-1], "target": main.settings.portfolio_target,
+        "spark": notifier._sparkline(eq[::step]) if len(eq) > 2 else "—",
+        "net_r": cum, "wr": (wins / n * 100) if n else 0, "pf": (gp / gl) if gl else 0,
+        "wins": wins, "losses": losses, "dd_r": dd / risk, "dd_usd": dd,
+        "mcw": mcw, "mcl": mcl, "open": open_n, "per_trade": per_trade,
+    }
+
+
+def _portfolio_dashboard(entries: list[dict], meta: dict) -> None:
+    if not _feed_due(meta, "last_portfolio", 12.0):
+        return
+    p = _portfolio_stats(entries)
+    if p["wins"] + p["losses"] == 0:
+        return
+    main._push_discord(notifier.format_portfolio(p), channel="portofolio")
+    _mark(meta, "last_portfolio")
+    print(f"[portfol] dashboard dikirim (saldo ${p['balance']:.0f})")
+
+
+def _weekly_recap(entries: list[dict], meta: dict) -> None:
+    now = datetime.now(timezone.utc)
+    # Minggu malam (weekday 6) jam >= 20 UTC, 1x per minggu
+    wk = now.isocalendar()
+    key = f"{wk[0]}-W{wk[1]}"
+    if now.weekday() != 6 or now.hour < 20 or meta.get("last_weekly") == key:
+        return
+    start = now - timedelta(days=7)
+    wtr = [e for e in entries if _is_v2(e) and e["status"] in ("win", "loss")
+           and tracker.parse_utc(e["time_utc"]) >= start]
+    if not wtr:
+        meta["last_weekly"] = key
+        return
+    wins = sum(1 for e in wtr if e["status"] == "win")
+    losses = len(wtr) - wins
+    net_r = sum(float(e.get("rr", 2)) if e["status"] == "win" else -1.0 for e in wtr)
+    risk = main.settings.portfolio_risk_usd
+
+    def _lbl(e):
+        return f"{e['side'].upper()} @ {e['entry']}"
+    best = max(wtr, key=lambda e: float(e.get("rr", 2)) if e["status"] == "win" else -9)
+    worst = next((e for e in wtr if e["status"] == "loss"), wtr[0])
+    note = ("Net positif — pertahankan disiplin." if net_r > 0 else
+            "Net negatif — normal di sistem WR rendah, jangan ubah rencana.")
+    main._push_discord(notifier.format_weekly({
+        "period": f"{start.date()} .. {now.date()}",
+        "n": len(wtr), "wins": wins, "losses": losses,
+        "wr": wins / len(wtr) * 100, "net_r": net_r, "net_usd": net_r * risk,
+        "best": _lbl(best) + f" (+{float(best.get('rr', 2)):g}R)" if wins else "—",
+        "worst": _lbl(worst) + " (−1R)" if losses else "—",
+        "note": note,
+    }), channel="weekly")
+    meta["last_weekly"] = key
+    print("[weekly ] rekap mingguan dikirim")
+
+
+def _news_reminder(meta: dict) -> None:
+    """Ping ~30 mnt sebelum event USD high-impact (dari kalender)."""
+    try:
+        from fetchers import forexfactory as ff
+        events = main.get_or_set("ff_calendar", main.settings.cache_ttl_seconds, ff.fetch_calendar)
+    except Exception:  # noqa: BLE001
+        return
+    now = datetime.now(timezone.utc)
+    alerted = set(meta.get("news_alerted", []))
+    for ev in events:
+        if ev.get("currency") != "USD" or ev.get("impact") != "high":
+            continue
+        try:
+            et = tracker.parse_utc(str(ev.get("time_utc")))
+        except (ValueError, TypeError):
+            continue
+        mins = (et - now).total_seconds() / 60
+        key = f"{ev.get('title')}|{ev.get('time_utc')}"
+        if 20 <= mins <= 40 and key not in alerted:
+            main._push_discord(notifier.format_news_reminder(ev), channel="alert")
+            alerted.add(key)
+            meta["news_alerted"] = list(alerted)[-50:]
+            print(f"[remind ] {ev.get('title')} ~{mins:.0f} mnt lagi")
+            break
+
+
 def main_run() -> None:
     if not main._discord_configured():
         print("PERINGATAN: Discord belum dikonfigurasi (Secrets).")
@@ -443,6 +559,9 @@ def main_run() -> None:
     _check_burst(meta)
     _daily_digest(entries, meta)
     _market_feeds(meta)
+    _portfolio_dashboard(entries, meta)
+    _weekly_recap(entries, meta)
+    _news_reminder(meta)
     _save_log(entries)
     _save_meta(meta)
     # Opsi C: 3 kelompok evaluasi (spec) -> executed / blocked-shadow / all-technical.

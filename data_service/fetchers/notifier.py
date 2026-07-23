@@ -135,6 +135,70 @@ def _simple(title: str, desc: str, color: int, footer: str) -> dict[str, Any]:
                         "footer": {"text": footer}}]}
 
 
+_SPARK = "▁▂▃▄▅▆▇█"
+
+
+def _sparkline(vals: list[float]) -> str:
+    if len(vals) < 2:
+        return "—"
+    lo, hi = min(vals), max(vals)
+    rng = hi - lo or 1.0
+    return "".join(_SPARK[min(7, int((v - lo) / rng * 7))] for v in vals)
+
+
+def _bar(pct: float, width: int = 12) -> str:
+    fill = max(0, min(width, round(pct / 100 * width)))
+    return "█" * fill + "░" * (width - fill)
+
+
+def format_portfolio(p: dict[str, Any]) -> dict[str, Any]:
+    """Dashboard portofolio dari hasil sinyal (equity, WR, PF, DD, target)."""
+    bal, start = p["balance"], p["start"]
+    chg = (bal / start - 1) * 100
+    emo = "🟢" if chg >= 0 else "🔴"
+    tgt_pct = min(100, max(0, (bal - start) / (p["target"] - start) * 100)) if p["target"] > start else 0
+    desc = "\n".join([
+        f"# {emo} ${bal:,.2f}   ({chg:+.1f}% dari ${start:.0f})",
+        f"`{p['spark']}`",
+        "",
+        f"📈 **Net {p['net_r']:+.0f}R**  ·  Win rate **{p['wr']:.0f}%**  ·  PF **{p['pf']:.2f}**",
+        f"✅ {p['wins']}W / ❌ {p['losses']}L  ·  📉 Max DD **{p['dd_r']:.0f}R** (${p['dd_usd']:.0f})",
+        f"🔥 Streak terpanjang: {p['mcw']}W / {p['mcl']}L  ·  ⏳ {p['open']} posisi terbuka",
+        "",
+        f"🎯 **Target ${p['target']:.0f}:** `{_bar(tgt_pct)}` {tgt_pct:.0f}%",
+    ])
+    return _simple("📊 PORTOFOLIO — XAUUSD Scalpers Boys", desc, 3447003,
+                   "Simulasi dari sinyal (risiko $2/trade) · update harian · bukan saran finansial")
+
+
+def format_weekly(w: dict[str, Any]) -> dict[str, Any]:
+    desc = "\n".join([
+        f"**Periode:** {w['period']}",
+        "",
+        f"📊 Sinyal minggu ini: **{w['n']}**  ({w['wins']}W / {w['losses']}L, WR {w['wr']:.0f}%)",
+        f"💰 Net minggu ini: **{w['net_r']:+.0f}R**  (${w['net_usd']:+.0f})",
+        f"🏆 Terbaik: {w['best']}  ·  💥 Terburuk: {w['worst']}",
+        "",
+        f"🧠 Catatan: {w['note']}",
+    ])
+    return _simple("📅 REKAP MINGGUAN", desc, 10181046,
+                   "Ringkasan otomatis tiap Minggu malam")
+
+
+def format_news_reminder(ev: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "content": "@everyone ⏰ **BERITA HIGH-IMPACT ~30 MENIT LAGI**",
+        "embeds": [{
+            "title": f"🔴 {ev.get('title')} ({ev.get('currency')})",
+            "description": (f"Jadwal: `{str(ev.get('time_utc'))[11:16]} UTC`\n"
+                           "Volatilitas emas bisa melonjak. Bot pause entry di sekitar "
+                           "waktu ini — hati-hati kalau posisi terbuka."),
+            "color": 15158332,
+            "footer": {"text": "Pengingat kalender ekonomi"},
+        }],
+    }
+
+
 def format_price_embed(price: float, chg_1h: float, chg_24h: float,
                        hi: float, lo: float) -> dict[str, Any]:
     e = "📈" if chg_24h >= 0 else "📉"
