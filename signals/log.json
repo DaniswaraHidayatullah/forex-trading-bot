@@ -1356,5 +1356,19 @@
   "confidence": 1,
   "time_utc": "2026-07-24T11:21:56+00:00",
   "status": "open"
+ },
+ {
+  "id": "df07caeb",
+  "profile": "Harian",
+  "side": "sell",
+  "entry": 4054.66,
+  "sl": 4068.17,
+  "tp": 4027.64,
+  "rr": 2.0,
+  "risk_usd": 13.51,
+  "reward_usd": 27.02,
+  "confidence": 1,
+  "time_utc": "2026-07-24T12:52:07+00:00",
+  "status": "open"
  }
 ]
