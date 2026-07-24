@@ -1327,7 +1327,8 @@
   "reward_usd": 37.42,
   "confidence": 1,
   "time_utc": "2026-07-24T09:30:22+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-07-24T14:42:09+00:00"
  },
  {
   "id": "6ab24091",
@@ -1341,7 +1342,8 @@
   "reward_usd": 13.68,
   "confidence": 1,
   "time_utc": "2026-07-24T11:21:56+00:00",
-  "status": "open"
+  "status": "win",
+  "closed_utc": "2026-07-24T14:42:09+00:00"
  },
  {
   "id": "9e01e648",
@@ -1369,6 +1371,35 @@
   "reward_usd": 27.02,
   "confidence": 1,
   "time_utc": "2026-07-24T12:52:07+00:00",
+  "status": "loss",
+  "closed_utc": "2026-07-24T14:42:09+00:00"
+ },
+ {
+  "id": "49e6ac9f",
+  "profile": "Harian",
+  "side": "sell",
+  "entry": 4060.91,
+  "sl": 4073.97,
+  "tp": 4034.79,
+  "rr": 2.0,
+  "risk_usd": 13.06,
+  "reward_usd": 26.12,
+  "confidence": 1,
+  "time_utc": "2026-07-24T14:42:19+00:00",
+  "status": "open"
+ },
+ {
+  "id": "03c5bc17",
+  "profile": "Intraday",
+  "side": "sell",
+  "entry": 4060.91,
+  "sl": 4075.29,
+  "tp": 4017.8,
+  "rr": 3.0,
+  "risk_usd": 14.37,
+  "reward_usd": 43.12,
+  "confidence": 1,
+  "time_utc": "2026-07-24T14:42:20+00:00",
   "status": "open"
  }
 ]
