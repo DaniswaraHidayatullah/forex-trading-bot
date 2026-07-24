@@ -1252,7 +1252,8 @@
   "reward_usd": 22.08,
   "confidence": 1,
   "time_utc": "2026-07-23T19:42:07+00:00",
-  "status": "open"
+  "status": "win",
+  "closed_utc": "2026-07-24T04:28:35+00:00"
  },
  {
   "id": "a1b82e58",
@@ -1266,6 +1267,7 @@
   "reward_usd": 13.59,
   "confidence": 1,
   "time_utc": "2026-07-23T20:41:18+00:00",
-  "status": "open"
+  "status": "win",
+  "closed_utc": "2026-07-24T04:28:35+00:00"
  }
 ]
