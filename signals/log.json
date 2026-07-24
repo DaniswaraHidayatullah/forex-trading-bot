@@ -1357,7 +1357,8 @@
   "reward_usd": 35.76,
   "confidence": 1,
   "time_utc": "2026-07-24T11:21:56+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-07-24T17:48:05+00:00"
  },
  {
   "id": "df07caeb",
@@ -1386,7 +1387,8 @@
   "reward_usd": 26.12,
   "confidence": 1,
   "time_utc": "2026-07-24T14:42:19+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-07-24T17:48:05+00:00"
  },
  {
   "id": "03c5bc17",
@@ -1400,6 +1402,7 @@
   "reward_usd": 43.12,
   "confidence": 1,
   "time_utc": "2026-07-24T14:42:20+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-07-24T17:48:05+00:00"
  }
 ]
