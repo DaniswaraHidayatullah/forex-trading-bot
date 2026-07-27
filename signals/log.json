@@ -1461,6 +1461,21 @@
   "reward_usd": 17.79,
   "confidence": 3,
   "time_utc": "2026-07-27T14:24:13+00:00",
+  "status": "loss",
+  "closed_utc": "2026-07-27T16:36:46+00:00"
+ },
+ {
+  "id": "c2d12b5a",
+  "profile": "Intraday",
+  "side": "sell",
+  "entry": 4091.65,
+  "sl": 4109.4,
+  "tp": 4038.4,
+  "rr": 3.0,
+  "risk_usd": 17.75,
+  "reward_usd": 53.25,
+  "confidence": 1,
+  "time_utc": "2026-07-27T16:36:48+00:00",
   "status": "open"
  }
 ]
