@@ -1566,6 +1566,21 @@
   "reward_usd": 18.66,
   "confidence": 1,
   "time_utc": "2026-07-28T13:01:11+00:00",
+  "status": "loss",
+  "closed_utc": "2026-07-28T15:30:56+00:00"
+ },
+ {
+  "id": "19d45bbb",
+  "profile": "Harian",
+  "side": "sell",
+  "entry": 4036.0,
+  "sl": 4045.36,
+  "tp": 4017.28,
+  "rr": 2.0,
+  "risk_usd": 9.36,
+  "reward_usd": 18.73,
+  "confidence": 1,
+  "time_utc": "2026-07-28T15:31:06+00:00",
   "status": "open"
  }
 ]
