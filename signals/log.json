@@ -1581,6 +1581,35 @@
   "reward_usd": 18.73,
   "confidence": 1,
   "time_utc": "2026-07-28T15:31:06+00:00",
+  "status": "loss",
+  "closed_utc": "2026-07-28T17:07:07+00:00"
+ },
+ {
+  "id": "ab0ed429",
+  "profile": "Harian",
+  "side": "sell",
+  "entry": 4039.91,
+  "sl": 4050.78,
+  "tp": 4018.17,
+  "rr": 2.0,
+  "risk_usd": 10.87,
+  "reward_usd": 21.74,
+  "confidence": 1,
+  "time_utc": "2026-07-28T17:07:12+00:00",
+  "status": "open"
+ },
+ {
+  "id": "35b92380",
+  "profile": "Intraday",
+  "side": "sell",
+  "entry": 4039.91,
+  "sl": 4054.37,
+  "tp": 3996.54,
+  "rr": 3.0,
+  "risk_usd": 14.46,
+  "reward_usd": 43.38,
+  "confidence": 1,
+  "time_utc": "2026-07-28T17:07:13+00:00",
   "status": "open"
  }
 ]
