@@ -1490,7 +1490,8 @@
   "reward_usd": 23.76,
   "confidence": 3,
   "time_utc": "2026-07-27T18:11:35+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-07-28T00:15:22+00:00"
  },
  {
   "id": "6951b677",
@@ -1504,6 +1505,7 @@
   "reward_usd": 14.34,
   "confidence": 3,
   "time_utc": "2026-07-27T20:59:56+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-07-28T00:15:22+00:00"
  }
 ]
