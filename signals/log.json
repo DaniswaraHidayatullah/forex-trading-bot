@@ -1552,7 +1552,8 @@
   "reward_usd": 39.75,
   "confidence": 1,
   "time_utc": "2026-07-28T08:51:19+00:00",
-  "status": "open"
+  "status": "win",
+  "closed_utc": "2026-07-29T14:36:58+00:00"
  },
  {
   "id": "5b2638b4",
@@ -1611,7 +1612,8 @@
   "reward_usd": 43.38,
   "confidence": 1,
   "time_utc": "2026-07-28T17:07:13+00:00",
-  "status": "open"
+  "status": "win",
+  "closed_utc": "2026-07-29T14:36:58+00:00"
  },
  {
   "id": "8536b0df",
@@ -1640,7 +1642,8 @@
   "reward_usd": 34.64,
   "confidence": 1,
   "time_utc": "2026-07-29T10:02:55+00:00",
-  "status": "open"
+  "status": "win",
+  "closed_utc": "2026-07-29T14:36:58+00:00"
  },
  {
   "id": "32098f98",
@@ -1654,6 +1657,7 @@
   "reward_usd": 28.1,
   "confidence": 1,
   "time_utc": "2026-07-29T12:16:42+00:00",
-  "status": "open"
+  "status": "win",
+  "closed_utc": "2026-07-29T14:36:58+00:00"
  }
 ]
