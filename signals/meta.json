@@ -1,5 +1,5 @@
 {
- "last_price": "2026-07-30T20:53:36+00:00",
+ "last_price": "2026-07-30T21:57:32+00:00",
  "sent_titles": [
   "australian dollar: extended rba pause may weigh on aud \u2013 bbh",
   "japanese yen: fed and energy drivers outweigh boj \u2013 ing",
@@ -154,7 +154,7 @@
  ],
  "last_news": "2026-07-30T20:53:40+00:00",
  "last_dollar": "2026-07-30T16:56:33+00:00",
- "last_prediction_state": "up|down|long|long",
+ "last_prediction_state": "flat|down|long|long",
  "sent_titles_gen": [
   "sam altman to meet with white house's wiles this week ahead ",
   "anthropic in early talks with meta to acquire compute power",
@@ -411,7 +411,7 @@
  "last_burst_alert": "2026-07-26T22:38:51+00:00",
  "dollar_snap": {},
  "last_digest_date": "2026-07-30",
- "last_portfolio": "2026-07-30T09:38:31+00:00",
+ "last_portfolio": "2026-07-30T21:57:32+00:00",
  "last_weekly": "2026-W30",
  "news_alerted": [
   "Federal Funds Rate|2026-07-29T18:00:00+00:00"
