@@ -1688,5 +1688,19 @@
   "confidence": 3,
   "time_utc": "2026-07-30T20:53:33+00:00",
   "status": "open"
+ },
+ {
+  "id": "a5ae4a1b",
+  "profile": "Intraday",
+  "side": "sell",
+  "entry": 4109.81,
+  "sl": 4126.53,
+  "tp": 4059.67,
+  "rr": 3.0,
+  "risk_usd": 16.72,
+  "reward_usd": 50.15,
+  "confidence": 1,
+  "time_utc": "2026-07-30T22:59:22+00:00",
+  "status": "open"
  }
 ]
