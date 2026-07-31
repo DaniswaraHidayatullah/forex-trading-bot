@@ -1687,7 +1687,8 @@
   "reward_usd": 18.99,
   "confidence": 3,
   "time_utc": "2026-07-30T20:53:33+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-07-31T03:46:53+00:00"
  },
  {
   "id": "a5ae4a1b",
