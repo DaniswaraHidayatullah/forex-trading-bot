@@ -199,6 +199,9 @@ def build_signal(
     quote: float | None = None,
     max_risk_usd: float | None = None,
     now_utc: datetime | None = None,
+    pip_price: float = 0.10,
+    usd_per_pip: float = 0.10,
+    version: str = "v1",
     fetch_fn: Callable[[str, int], list[dict[str, float]]] | None = None,
 ) -> dict[str, Any]:
     """Bangun sinyal XAUUSD untuk satu profil (scalp/intraday/swing).
@@ -232,8 +235,9 @@ def build_signal(
         "risk_per_001": None, "reward_per_001": None,
         "atr": None, "trend": "flat", "rsi": None,
         "sentiment_bias": sentiment_bias, "sentiment_score": round(sentiment_score, 3),
-        "sentiment_available": sentiment_available,
+        "sentiment_available": sentiment_available, "version": version,
         "confidence": None, "confidence_level": 0, "confidence_stars": "",
+        "momentum": "flat",
         "news_blocked": news_blocked, "risk_pct": None,
         "suggested_lot": _lot_for_equity(equity),
         "price_source": "twelvedata:" + symbol,
@@ -346,12 +350,14 @@ def build_signal(
     zlow = round(price - zone, 2)
     zhigh = round(price + zone, 2)
     valid_minutes = _TF_MINUTES.get(entry_interval, 30)
+    sl_pips = sl_dist / pip_price
+    tp_pips = tp_dist / pip_price
     base.update({
-        "sl_pips": round(sl_dist / PIP),
-        "tp_pips": round(tp_dist / PIP),
-        "risk_per_001": round(sl_dist, 2),     # $ rugi per 0.01 lot bila kena SL
-        "reward_per_001": round(tp_dist, 2),   # $ untung per 0.01 lot bila kena TP
-        "risk_pct": round(sl_dist / equity * 100, 1),
+        "sl_pips": round(sl_pips),
+        "tp_pips": round(tp_pips),
+        "risk_per_001": round(sl_pips * usd_per_pip, 2),     # $ rugi (spesifik broker)
+        "reward_per_001": round(tp_pips * usd_per_pip, 2),   # $ untung (spesifik broker)
+        "risk_pct": round(sl_pips * usd_per_pip / equity * 100, 1),
         "entry_type": "market",
         "entry_zone_low": zlow, "entry_zone_high": zhigh,
         "valid_minutes": valid_minutes,
@@ -381,29 +387,43 @@ def build_signal(
             "reason": f"Downtrend {trend_interval} + RSI pullback {rsi_val:.0f} · {sent_txt}",
         })
 
-    # Keyakinan: pakai keselarasan + kekuatan sentimen sbg booster.
     side = base["signal"]
-    aligned = (
-        (side == "buy" and sentiment_bias == "long")
-        or (side == "sell" and sentiment_bias == "short")
-    )
-    if aligned and abs(sentiment_score) >= SENT_STRONG:
-        level, label, stars = 3, "Kuat — berita & teknikal searah", "⭐⭐⭐"
-    elif aligned:
-        level, label, stars = 2, "Sedang — berita mendukung tipis", "⭐⭐"
-    else:
-        level, label, stars = 1, "Standar — berita netral", "⭐"
-    base.update({"confidence": label, "confidence_level": level, "confidence_stars": stars})
+    side_dir = 1 if side == "buy" else -1
 
-    # Gate sentimen DILONGGARKAN: hanya blokir bila berita SANGAT kuat
-    # melawan (|skor| >= 0.85). Konflik ringan tetap dikirim dgn label ⭐
-    # (shadow tracking membuktikan gate ketat tidak menambah nilai: 50:50).
-    if (use_sentiment and sentiment_bias in ("long", "short") and not aligned
-            and abs(sentiment_score) >= 0.85):
-        base["shadow_side"] = side
-        base["signal"] = "none"
-        base["reason"] = (
-            f"Setup {side.upper()} tapi sentimen {sentiment_bias} -> diblokir "
-            f"(dicatat sbg bayangan utk uji akurasi gate)"
-        )
+    # v2 CONFIDENCE 3-LAPIS: teknikal (base) + sentimen + MOMENTUM harga.
+    # Momentum = arah bar entry ~1 jam terakhir (bar tertutup) -> mencegah
+    # kasus v1 "sentimen bullish tapi harga turun" naik jadi ⭐⭐⭐.
+    mom_ref = m_close[-6] if len(m_close) >= 6 else m_close[0]
+    mom_raw = m_close[-2] - mom_ref
+    mom_dir = 1 if mom_raw > 0 else -1 if mom_raw < 0 else 0
+    base["momentum"] = "up" if mom_dir == 1 else "down" if mom_dir == -1 else "flat"
+
+    sent_agree = ((side == "buy" and sentiment_bias == "long")
+                  or (side == "sell" and sentiment_bias == "short"))
+    sent_confirm = sent_agree and abs(sentiment_score) >= SENT_STRONG
+    mom_confirm = mom_dir == side_dir
+
+    if version == "v1":
+        # perilaku lama (sentimen sbg satu-satunya booster) -> untuk arsip
+        if sent_confirm:
+            level = 3
+        elif sent_agree:
+            level = 2
+        else:
+            level = 1
+    else:
+        # v2: butuh KONFIRMASI GANDA (sentimen kuat-searah + momentum searah)
+        level = 1 + (1 if sent_confirm else 0) + (1 if mom_confirm else 0)
+        level = min(3, level)
+
+    conf_map = {
+        3: ("⭐⭐⭐", "Kuat — teknikal + sentimen + momentum searah"),
+        2: ("⭐⭐", "Sedang — sebagian konfirmasi"),
+        1: ("⭐", "Standar — teknikal saja"),
+    }
+    stars, label = conf_map[level]
+    base.update({"confidence": label, "confidence_level": level,
+                 "confidence_stars": stars})
+    # v2 TIDAK memblokir arah berdasar sentimen (terbukti tak andal di v1);
+    # sentimen kini murni komponen keyakinan, bukan veto. Semua setup dikirim.
     return base

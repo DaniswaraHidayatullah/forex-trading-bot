@@ -200,10 +200,12 @@ def _new_signals(entries: list[dict]) -> None:
             "rr": sig.get("rr", 3),
             "risk_usd": sig.get("risk_per_001"), "reward_usd": sig.get("reward_per_001"),
             "confidence": sig.get("confidence_level"),
+            "version": sig.get("version", "v1"), "momentum": sig.get("momentum"),
             "time_utc": sig.get("time_utc"),
             "status": "open",
         })
-        print(f"[{profile}] SINYAL {side.upper()} dikirim={sent} @ {sig.get('entry')}")
+        print(f"[{profile}] SINYAL {side.upper()} {sig.get('confidence_stars')} "
+              f"dikirim={sent} @ {sig.get('entry')}")
 
 
 def _m15_cached() -> list[dict]:
@@ -564,13 +566,17 @@ def main_run() -> None:
     _news_reminder(meta)
     _save_log(entries)
     _save_meta(meta)
-    # Opsi C: 3 kelompok evaluasi (spec) -> executed / blocked-shadow / all-technical.
-    v2_txt, sh_txt = _stats_texts(entries)
-    all_tech = tracker.summarize([e for e in entries if not e.get("legacy")])
-    print("REKAP executed (3-grup):", v2_txt)
-    print("REKAP blocked-shadow    :", sh_txt)
-    print("REKAP all-technical     :", tracker.stats_line(all_tech),
-          "(executed+shadow = winrate teknikal mentah)")
+    # Rekap dipisah per VERSI strategi (v1 arsip vs v2 aktif).
+    ex_all = [e for e in entries if _is_v2(e)]
+    ex_v1 = [e for e in ex_all if e.get("version", "v1") == "v1"]
+    ex_v2 = [e for e in ex_all if e.get("version") == "v2"]
+    print("REKAP v1 (arsip)   :", tracker.stats_line(tracker.summarize(ex_v1)))
+    print("REKAP v2 (aktif)   :", tracker.stats_line(tracker.summarize(ex_v2)))
+    # per-bintang v2 (uji apakah ⭐⭐⭐ v2 sudah lepas dari efek arah)
+    for star in (3, 2, 1):
+        g = [e for e in ex_v2 if e.get("confidence") == star]
+        if g:
+            print(f"   v2 {star}*: {tracker.stats_line(tracker.summarize(g))}")
 
 
 if __name__ == "__main__":

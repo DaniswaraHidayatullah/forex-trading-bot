@@ -263,25 +263,25 @@ def test_min_headlines_two_gives_bias():
     assert res["bias"] == "long"
 
 
-def test_sentiment_gate_creates_shadow():
-    # Gate longgar: konflik ringan (skor -0.5) TETAP dikirim (label ⭐);
-    # hanya berita SANGAT kuat melawan (|skor|>=0.85) yang memblokir.
-    r_soft = build_signal(
-        sentiment_bias="short", news_blocked=False, api_key="x",
-        profile="harian", sentiment_score=-0.5, fetch_fn=_trend_up_fetch,
-        now_utc=_WEEKDAY,
+def test_v2_no_block_and_layered_confidence():
+    # v2: sentimen LAWAN arah TIDAK lagi memblokir (dulu jadi shadow).
+    r = build_signal(
+        sentiment_bias="short", news_blocked=False, api_key="x", profile="harian",
+        sentiment_score=-0.9, fetch_fn=_trend_up_fetch, now_utc=_WEEKDAY, version="v2",
     )
-    assert r_soft["signal"] == "buy"
-    assert r_soft["confidence_level"] == 1
+    assert r["signal"] == "buy"          # tetap dikirim, tidak diblokir
+    assert "shadow_side" not in r
 
-    r_hard = build_signal(
-        sentiment_bias="short", news_blocked=False, api_key="x",
-        profile="harian", sentiment_score=-0.9, fetch_fn=_trend_up_fetch,
-        now_utc=_WEEKDAY,
-    )
-    assert r_hard["signal"] == "none"
-    assert r_hard["shadow_side"] == "buy"
-    assert r_hard["sl"] is not None and "diblokir" in r_hard["reason"]
+    # Momentum flat (data osilasi) + sentimen searah-kuat:
+    #   v1 -> ⭐⭐⭐ (cukup sentimen);  v2 -> ⭐⭐ (momentum tak konfirmasi).
+    v1 = build_signal(sentiment_bias="long", news_blocked=False, api_key="x",
+                      profile="harian", sentiment_score=0.5, fetch_fn=_trend_up_fetch,
+                      now_utc=_WEEKDAY, version="v1")
+    v2 = build_signal(sentiment_bias="long", news_blocked=False, api_key="x",
+                      profile="harian", sentiment_score=0.5, fetch_fn=_trend_up_fetch,
+                      now_utc=_WEEKDAY, version="v2")
+    assert v1["confidence_level"] == 3
+    assert v2["confidence_level"] == 2
 
 
 def test_harian_profile_rr_1_2():

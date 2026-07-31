@@ -56,6 +56,20 @@ class Settings(BaseSettings):
     # API key Twelve Data (GRATIS di twelvedata.com). Set via env TWELVEDATA_API_KEY.
     twelvedata_api_key: str = ""
 
+    # Versi strategi ("v1" arsip / "v2" aktif) -> dipakai memisah statistik.
+    signal_version: str = "v2"
+
+    # --- Spesifikasi BROKER XAUUSD (tak di-hardcode; ganti sesuai akunmu) ---
+    # Default = Exness Standard (gold 2 desimal, 0.01 lot = 1 oz, 1 pip=$0.10).
+    # Untuk akun CENT, ganti usd_per_pip jadi ~0.001 (nilai ~100x lebih kecil).
+    broker_name: str = "Exness"
+    broker_account: str = "standard"     # standard | cent
+    pip_price: float = 0.10              # gerak harga utk 1 pip XAUUSD
+    usd_per_pip: float = 0.10            # $ P/L per 1 pip pada lot minimum
+    min_lot: float = 0.01
+    volume_step: float = 0.01
+    digits: int = 2
+
     # --- Routing channel Discord (ID channel bukan rahasia) ---------------
     # Kosongkan salah satu utk fallback ke DISCORD_CHANNEL_ID.
     discord_channels: dict[str, str] = {

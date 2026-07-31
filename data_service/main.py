@@ -176,6 +176,9 @@ def _signal_for(symbol: str, equity: float, profile: str) -> dict:
             sentiment_available=sent_available,
             quote=quote,
             max_risk_usd=settings.signal_max_risk_usd,
+            pip_price=settings.pip_price,
+            usd_per_pip=settings.usd_per_pip,
+            version=settings.signal_version,
             fetch_fn=_cached_fetch,
         )
         # Lampirkan headline penggerak (dari sampel sentimen) ke kartu.
