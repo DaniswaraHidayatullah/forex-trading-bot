@@ -1,5 +1,5 @@
 {
- "last_price": "2026-07-31T11:46:03+00:00",
+ "last_price": "2026-07-31T13:27:05+00:00",
  "sent_titles": [
   "iran warns ships it's 'unacceptable and dangerous' to transi",
   "japanese yen holds as markets await tokyo inflation data",
@@ -154,7 +154,7 @@
  ],
  "last_news": "2026-07-31T11:46:09+00:00",
  "last_dollar": "2026-07-31T06:35:24+00:00",
- "last_prediction_state": "up|down|long|long",
+ "last_prediction_state": "up|down|flat|long",
  "sent_titles_gen": [
   "ubs ceo says the ai pullback is healthy \u2014 but there\u2019s a bigg",
   "amazon on deck to report earnings after the bell with cloud,",
@@ -408,7 +408,7 @@
   "ibm ceo says quantum computing will have a 'measurable impac"
  ],
  "last_calendar_date": "2026-07-31",
- "last_burst_alert": "2026-07-26T22:38:51+00:00",
+ "last_burst_alert": "2026-07-31T13:27:05+00:00",
  "dollar_snap": {},
  "last_digest_date": "2026-07-30",
  "last_portfolio": "2026-07-31T11:46:09+00:00",
