@@ -1820,5 +1820,22 @@
   "confidence": 1,
   "time_utc": "2026-07-31T20:07:41+00:00",
   "status": "open"
+ },
+ {
+  "id": "82ddd639",
+  "symbol": "BTCUSD",
+  "profile": "BTC",
+  "side": "sell",
+  "entry": 62996.0,
+  "sl": 63451.66,
+  "tp": 62084.68,
+  "rr": 2.0,
+  "risk_usd": 4.56,
+  "reward_usd": 9.11,
+  "confidence": 1,
+  "version": "v2",
+  "momentum": "up",
+  "time_utc": "2026-08-01T03:48:39+00:00",
+  "status": "open"
  }
 ]
