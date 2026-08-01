@@ -159,18 +159,21 @@ def format_portfolio(p: dict[str, Any]) -> dict[str, Any]:
     chg = (bal / start - 1) * 100
     emo = "🟢" if chg >= 0 else "🔴"
     tgt_pct = min(100, max(0, (bal - start) / (p["target"] - start) * 100)) if p["target"] > start else 0
+    # Akun CENT: saldo di MT5 tampil dalam sen (1 USD = 100¢).
     desc = "\n".join([
         f"# {emo} ${bal:,.2f}   ({chg:+.1f}% dari ${start:.0f})",
+        f"### 🪙 = {bal * 100:,.0f}¢  (tampilan akun Cent di MT5)",
         f"`{p['spark']}`",
         "",
         f"📈 **Net {p['net_r']:+.0f}R**  ·  Win rate **{p['wr']:.0f}%**  ·  PF **{p['pf']:.2f}**",
-        f"✅ {p['wins']}W / ❌ {p['losses']}L  ·  📉 Max DD **{p['dd_r']:.0f}R** (${p['dd_usd']:.0f})",
+        f"✅ {p['wins']}W / ❌ {p['losses']}L  ·  📉 Max DD **{p['dd_r']:.0f}R** "
+        f"(${p['dd_usd']:.0f} / {p['dd_usd'] * 100:,.0f}¢)",
         f"🔥 Streak terpanjang: {p['mcw']}W / {p['mcl']}L  ·  ⏳ {p['open']} posisi terbuka",
         "",
-        f"🎯 **Target ${p['target']:.0f}:** `{_bar(tgt_pct)}` {tgt_pct:.0f}%",
+        f"🎯 **Target ${p['target']:.0f}** ({p['target'] * 100:,.0f}¢)**:** `{_bar(tgt_pct)}` {tgt_pct:.0f}%",
     ])
     return _simple("📊 PORTOFOLIO — XAUUSD Scalpers Boys", desc, 3447003,
-                   "Simulasi dari sinyal (risiko $2/trade) · update harian · bukan saran finansial")
+                   "Simulasi (risiko $2/R) · $ = nilai riil, ¢ = tampilan akun Cent · bukan saran finansial")
 
 
 def format_weekly(w: dict[str, Any]) -> dict[str, Any]:
