@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "data_service"))
 
 import main  # noqa: E402
-from fetchers import notifier, signal_engine, tracker  # noqa: E402
+from fetchers import journal, notifier, signal_engine, tracker  # noqa: E402
 
 LOG_FILE = Path(os.getenv("SIGNAL_LOG", str(ROOT / "signals" / "log.json")))
 META_FILE = LOG_FILE.parent / "meta.json"
@@ -64,6 +64,19 @@ def _save_meta(meta: dict) -> None:
 def _is_v2(e: dict) -> bool:
     """Sinyal era sistem baru (bukan backfill lama, bukan bayangan)."""
     return not e.get("legacy") and not e.get("shadow")
+
+
+def _journal_append(entry: dict, symbol: str, sig: dict) -> None:
+    """Tulis trade baru ke Google Sheets; simpan baris di entry (aman kalau gagal)."""
+    if not journal.enabled():
+        return
+    try:
+        row = journal.append_trade(symbol, sig)
+        if row:
+            entry["sheet_row"] = row
+            print(f"   [jurnal] {symbol} baris {row} ditulis")
+    except Exception as e:  # noqa: BLE001 - gagal sheet jangan jatuhkan bot
+        print("   [jurnal] gagal tulis:", repr(e)[:120])
 
 
 def _stats_texts(entries: list[dict]) -> tuple[str, str]:
@@ -126,6 +139,14 @@ def _resolve_open(entries: list[dict]) -> None:
         else:
             e["status"] = outcome
         e["closed_utc"] = now.isoformat(timespec="seconds")
+        if e.get("sheet_row"):
+            try:
+                exitp = (e.get("tp") if e["status"] == "win"
+                         else e.get("sl") if e["status"] == "loss" else e.get("entry"))
+                journal.close_trade(e.get("symbol", "XAUUSD"), e["sheet_row"],
+                                    e["status"], exitp)
+            except Exception as ex:  # noqa: BLE001
+                print("   [jurnal] gagal update:", repr(ex)[:120])
         if e.get("shadow"):
             # Bayangan (diblokir sentimen): dilacak diam-diam, tanpa Discord.
             print(f"[shadow ] {e.get('profile')} {e['side']} -> {e['status']}")
@@ -208,7 +229,7 @@ def _new_signals(entries: list[dict]) -> None:
         if sig.get("confidence_level", 0) >= 3:
             payload["content"] = "@everyone ⭐⭐⭐ SINYAL KUAT — berita & teknikal searah!"
         sent = main._push_discord(payload)
-        entries.append({
+        entry = {
             "id": uuid.uuid4().hex[:8],
             "symbol": "XAUUSD",
             "profile": sig.get("profile"),
@@ -220,7 +241,9 @@ def _new_signals(entries: list[dict]) -> None:
             "version": sig.get("version", "v1"), "momentum": sig.get("momentum"),
             "time_utc": sig.get("time_utc"),
             "status": "open",
-        })
+        }
+        _journal_append(entry, "XAUUSD", sig)
+        entries.append(entry)
         print(f"[{profile}] SINYAL {side.upper()} {sig.get('confidence_stars')} "
               f"dikirim={sent} @ {sig.get('entry')}")
 
@@ -261,7 +284,7 @@ def _new_btc_signals(entries: list[dict]) -> None:
         if sig.get("confidence_level", 0) >= 3:
             payload["content"] = "@everyone ⭐⭐⭐ SINYAL BTC KUAT — teknikal+sentimen+momentum searah!"
         sent = main._push_discord(payload, channel="btc_signal")
-        entries.append({
+        entry = {
             "id": uuid.uuid4().hex[:8],
             "symbol": "BTCUSD",
             "profile": sig.get("profile"),
@@ -273,7 +296,9 @@ def _new_btc_signals(entries: list[dict]) -> None:
             "version": sig.get("version", "v1"), "momentum": sig.get("momentum"),
             "time_utc": sig.get("time_utc"),
             "status": "open",
-        })
+        }
+        _journal_append(entry, "BTCUSD", sig)
+        entries.append(entry)
         print(f"[btc:{profile}] SINYAL {side.upper()} {sig.get('confidence_stars')} "
               f"dikirim={sent} @ {sig.get('entry')}")
 
