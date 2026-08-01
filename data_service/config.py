@@ -48,7 +48,7 @@ class Settings(BaseSettings):
     ]
 
     # --- Signal engine (sinyal untuk eksekusi manual) ---------------------
-    signal_reward_ratio: float = 3.0     # RR 1:3
+    signal_reward_ratio: float = 2.0     # RR 1:2 (semua profil, permintaan user)
     signal_atr_mult: float = 1.5         # SL = ATR * ini
     signal_use_sentiment: bool = True    # gate arah pakai sentimen
     signal_cache_ttl_seconds: int = 300  # cache sinyal (per ~bar M30)
@@ -59,13 +59,16 @@ class Settings(BaseSettings):
     # Versi strategi ("v1" arsip / "v2" aktif) -> dipakai memisah statistik.
     signal_version: str = "v2"
 
-    # --- Spesifikasi BROKER XAUUSD (tak di-hardcode; ganti sesuai akunmu) ---
-    # Default = Exness Standard (gold 2 desimal, 0.01 lot = 1 oz, 1 pip=$0.10).
-    # Untuk akun CENT, ganti usd_per_pip jadi ~0.001 (nilai ~100x lebih kecil).
+    # --- Spesifikasi BROKER XAUUSD — akun EXNESS CENT, lot 0.2 --------------
+    # CENT: 1 lot = 1 oz (100x lebih kecil dari Standard 100 oz). Di 0.2 lot =
+    # 0.2 oz -> gerak 1 pip ($0.10) = $0.02 P/L. Jadi SL 100 pips = $2 (2% dari
+    # $100). Semua $ di kartu = nilai NYATA pada lot 0.2 cent.
+    # (VERIFIKASI di terminal: buka 0.2 lot, cek $ risiko; kalau beda kabari.)
     broker_name: str = "Exness"
-    broker_account: str = "standard"     # standard | cent
+    broker_account: str = "cent"         # standard | cent
+    signal_lot: float = 0.2              # lot tetap dipakai (akun cent)
     pip_price: float = 0.10              # gerak harga utk 1 pip XAUUSD
-    usd_per_pip: float = 0.10            # $ P/L per 1 pip pada lot minimum
+    usd_per_pip: float = 0.02            # $ P/L per pip @ 0.2 lot cent (0.2 oz x $0.10)
     min_lot: float = 0.01
     volume_step: float = 0.01
     digits: int = 2
@@ -85,13 +88,14 @@ class Settings(BaseSettings):
         "https://decrypt.co/feed",
         "https://bitcoinmagazine.com/feed",
     ]
-    # Exness BTCUSD Standard: 1 lot = 1 BTC -> di 0.01 lot, gerak $1 = $0.01 P/L.
-    # (VERIFIKASI di kontrak akunmu; untuk CENT nilai ~100x lebih kecil.)
+    # Exness BTCUSD CENT: 1 lot = 0.01 BTC (100x lebih kecil dari Standard 1 BTC).
+    # Di 0.2 lot = 0.002 BTC -> gerak $1 = $0.002 P/L. SL ~$450 = ~$0.90 risiko.
+    # (VERIFIKASI di terminal; kalau beda kabari.)
     btc_pip_price: float = 1.0           # 1 "pip" BTC = gerak $1 harga
-    btc_usd_per_pip: float = 0.01        # $ P/L per $1 gerak pada 0.01 lot
-    # Batas risiko $/0.01 lot (standard-equiv). BTC ber-SL lebar; ATR bisa
-    # ribuan $ -> $30 = tolak setup dgn SL > $3000. Di CENT ini ~$0.30.
-    btc_max_risk_usd: float = 30.0
+    btc_usd_per_pip: float = 0.002       # $ P/L per $1 gerak @ 0.2 lot cent
+    # Batas risiko $ NYATA @0.2 lot cent. BTC ber-SL lebar (ATR ribuan $);
+    # $3 = tolak SL > ~$1500 (~2400 pips). Cukup longgar utk data.
+    btc_max_risk_usd: float = 3.0
 
     # --- Routing channel Discord (ID channel bukan rahasia) ---------------
     # Kosongkan salah satu utk fallback ke DISCORD_CHANNEL_ID.
@@ -139,9 +143,9 @@ class Settings(BaseSettings):
     # "none" = kirim juga sinyal teknikal-only (frekuensi harian, tidak ketat);
     # kartu tetap menampilkan status sentimen + bintang keyakinan.
     signal_min_confidence: str = "none"
-    # Batas risiko $ per trade @0.01 lot (jarak SL). Sinyal dgn risiko lebih
-    # besar di-skip. Dilonggarkan 12->18 (permintaan user; regime volatil).
-    signal_max_risk_usd: float = 18.0
+    # Batas risiko $ NYATA @0.2 lot cent (jarak SL). $6 = tolak SL > ~300 pips
+    # (=$30 gerak = 6% dari $100). Longgar biar sinyal tetap banyak utk data.
+    signal_max_risk_usd: float = 6.0
 
     # Mata uang yang relevan per simbol -> dipakai untuk memfilter berita & COT
     symbol_currencies: dict[str, list[str]] = {

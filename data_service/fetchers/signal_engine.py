@@ -218,6 +218,7 @@ def build_signal(
     now_utc: datetime | None = None,
     pip_price: float = 0.10,
     usd_per_pip: float = 0.10,
+    lot: float | None = None,
     version: str = "v1",
     display_symbol: str | None = None,
     market_type: str = "gold",
@@ -262,7 +263,7 @@ def build_signal(
         "confidence": None, "confidence_level": 0, "confidence_stars": "",
         "momentum": "flat",
         "news_blocked": news_blocked, "risk_pct": None,
-        "suggested_lot": _lot_for_equity(equity),
+        "suggested_lot": lot if lot is not None else _lot_for_equity(equity),
         "price_source": "twelvedata:" + symbol,
         "time_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
