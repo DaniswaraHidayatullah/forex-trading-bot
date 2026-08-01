@@ -806,7 +806,9 @@
   "confidence": 1,
   "time_utc": "2026-07-14T19:41:02+00:00",
   "status": "win",
-  "closed_utc": "2026-07-15T03:55:22+00:00"
+  "closed_utc": "2026-07-15T03:55:22+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 8
  },
  {
   "id": "7a68dd16",
@@ -965,7 +967,9 @@
   "confidence": 1,
   "time_utc": "2026-07-20T01:11:23+00:00",
   "status": "win",
-  "closed_utc": "2026-07-20T04:50:04+00:00"
+  "closed_utc": "2026-07-20T04:50:04+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 9
  },
  {
   "id": "a9534995",
@@ -980,7 +984,9 @@
   "confidence": 1,
   "time_utc": "2026-07-20T07:50:05+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-20T12:54:01+00:00"
+  "closed_utc": "2026-07-20T12:54:01+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 10
  },
  {
   "id": "cd45aa6a",
@@ -995,7 +1001,9 @@
   "confidence": 3,
   "time_utc": "2026-07-20T12:54:03+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-20T15:00:39+00:00"
+  "closed_utc": "2026-07-20T15:00:39+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 11
  },
  {
   "id": "c4a2c562",
@@ -1010,7 +1018,9 @@
   "confidence": 3,
   "time_utc": "2026-07-20T15:00:46+00:00",
   "status": "win",
-  "closed_utc": "2026-07-21T04:12:51+00:00"
+  "closed_utc": "2026-07-21T04:12:51+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 12
  },
  {
   "id": "ef5aade3",
@@ -1057,7 +1067,9 @@
   "confidence": 3,
   "time_utc": "2026-07-21T09:15:13+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-21T12:49:43+00:00"
+  "closed_utc": "2026-07-21T12:49:43+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 13
  },
  {
   "id": "a263cefe",
@@ -1072,7 +1084,9 @@
   "confidence": 3,
   "time_utc": "2026-07-21T12:49:46+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-21T14:53:41+00:00"
+  "closed_utc": "2026-07-21T14:53:41+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 14
  },
  {
   "id": "961e0cd4",
@@ -1087,7 +1101,9 @@
   "confidence": 3,
   "time_utc": "2026-07-21T17:44:50+00:00",
   "status": "win",
-  "closed_utc": "2026-07-21T18:55:39+00:00"
+  "closed_utc": "2026-07-21T18:55:39+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 15
  },
  {
   "id": "2fbe61fb",
@@ -1102,7 +1118,9 @@
   "confidence": 3,
   "time_utc": "2026-07-21T18:55:43+00:00",
   "status": "win",
-  "closed_utc": "2026-07-22T04:30:41+00:00"
+  "closed_utc": "2026-07-22T04:30:41+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 16
  },
  {
   "id": "de50e52f",
@@ -1133,7 +1151,9 @@
   "confidence": 3,
   "time_utc": "2026-07-22T07:18:37+00:00",
   "status": "win",
-  "closed_utc": "2026-07-22T15:02:27+00:00"
+  "closed_utc": "2026-07-22T15:02:27+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 17
  },
  {
   "id": "0879707f",
@@ -1148,7 +1168,9 @@
   "confidence": 3,
   "time_utc": "2026-07-22T17:52:44+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-22T18:54:17+00:00"
+  "closed_utc": "2026-07-22T18:54:17+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 18
  },
  {
   "id": "16649bef",
@@ -1163,7 +1185,9 @@
   "confidence": 3,
   "time_utc": "2026-07-22T18:54:21+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-22T22:30:56+00:00"
+  "closed_utc": "2026-07-22T22:30:56+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 19
  },
  {
   "id": "a29b5e58",
@@ -1178,7 +1202,9 @@
   "confidence": 1,
   "time_utc": "2026-07-23T01:09:33+00:00",
   "status": "win",
-  "closed_utc": "2026-07-23T08:56:55+00:00"
+  "closed_utc": "2026-07-23T08:56:55+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 20
  },
  {
   "id": "6311d9a8",
@@ -1193,7 +1219,9 @@
   "confidence": 3,
   "time_utc": "2026-07-23T05:46:51+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-23T07:05:34+00:00"
+  "closed_utc": "2026-07-23T07:05:34+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 21
  },
  {
   "id": "4889f297",
@@ -1208,7 +1236,9 @@
   "confidence": 3,
   "time_utc": "2026-07-23T07:05:41+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-23T08:56:55+00:00"
+  "closed_utc": "2026-07-23T08:56:55+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 22
  },
  {
   "id": "0eb659b6",
@@ -1223,7 +1253,9 @@
   "confidence": 3,
   "time_utc": "2026-07-23T09:33:10+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-23T12:59:45+00:00"
+  "closed_utc": "2026-07-23T12:59:45+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 23
  },
  {
   "id": "a80aea10",
@@ -1238,7 +1270,9 @@
   "confidence": 3,
   "time_utc": "2026-07-23T11:29:50+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-23T12:59:45+00:00"
+  "closed_utc": "2026-07-23T12:59:45+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 24
  },
  {
   "id": "e1156ae3",
@@ -1253,7 +1287,9 @@
   "confidence": 1,
   "time_utc": "2026-07-23T19:42:07+00:00",
   "status": "win",
-  "closed_utc": "2026-07-24T04:28:35+00:00"
+  "closed_utc": "2026-07-24T04:28:35+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 25
  },
  {
   "id": "a1b82e58",
@@ -1268,7 +1304,9 @@
   "confidence": 1,
   "time_utc": "2026-07-23T20:41:18+00:00",
   "status": "win",
-  "closed_utc": "2026-07-24T04:28:35+00:00"
+  "closed_utc": "2026-07-24T04:28:35+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 26
  },
  {
   "id": "dafb19a9",
@@ -1283,7 +1321,9 @@
   "confidence": 1,
   "time_utc": "2026-07-24T07:06:02+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-24T09:30:16+00:00"
+  "closed_utc": "2026-07-24T09:30:16+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 27
  },
  {
   "id": "d0b087ed",
@@ -1298,7 +1338,9 @@
   "confidence": 1,
   "time_utc": "2026-07-24T07:06:03+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-24T09:30:16+00:00"
+  "closed_utc": "2026-07-24T09:30:16+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 28
  },
  {
   "id": "9c59a91f",
@@ -1313,7 +1355,9 @@
   "confidence": 1,
   "time_utc": "2026-07-24T09:30:22+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-24T11:21:52+00:00"
+  "closed_utc": "2026-07-24T11:21:52+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 29
  },
  {
   "id": "56c8631d",
@@ -1328,7 +1372,9 @@
   "confidence": 1,
   "time_utc": "2026-07-24T09:30:22+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-24T14:42:09+00:00"
+  "closed_utc": "2026-07-24T14:42:09+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 30
  },
  {
   "id": "6ab24091",
@@ -1343,7 +1389,9 @@
   "confidence": 1,
   "time_utc": "2026-07-24T11:21:56+00:00",
   "status": "win",
-  "closed_utc": "2026-07-24T14:42:09+00:00"
+  "closed_utc": "2026-07-24T14:42:09+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 31
  },
  {
   "id": "9e01e648",
@@ -1358,7 +1406,9 @@
   "confidence": 1,
   "time_utc": "2026-07-24T11:21:56+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-24T17:48:05+00:00"
+  "closed_utc": "2026-07-24T17:48:05+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 32
  },
  {
   "id": "df07caeb",
@@ -1373,7 +1423,9 @@
   "confidence": 1,
   "time_utc": "2026-07-24T12:52:07+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-24T14:42:09+00:00"
+  "closed_utc": "2026-07-24T14:42:09+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 33
  },
  {
   "id": "49e6ac9f",
@@ -1388,7 +1440,9 @@
   "confidence": 1,
   "time_utc": "2026-07-24T14:42:19+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-24T17:48:05+00:00"
+  "closed_utc": "2026-07-24T17:48:05+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 34
  },
  {
   "id": "03c5bc17",
@@ -1403,7 +1457,9 @@
   "confidence": 1,
   "time_utc": "2026-07-24T14:42:20+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-24T17:48:05+00:00"
+  "closed_utc": "2026-07-24T17:48:05+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 35
  },
  {
   "id": "9972aa9b",
@@ -1418,7 +1474,9 @@
   "confidence": 3,
   "time_utc": "2026-07-27T05:00:49+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-27T14:24:11+00:00"
+  "closed_utc": "2026-07-27T14:24:11+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 36
  },
  {
   "id": "93d84ede",
@@ -1433,7 +1491,9 @@
   "confidence": 3,
   "time_utc": "2026-07-27T08:44:58+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-27T14:24:11+00:00"
+  "closed_utc": "2026-07-27T14:24:11+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 37
  },
  {
   "id": "f4bdce4c",
@@ -1448,7 +1508,9 @@
   "confidence": 1,
   "time_utc": "2026-07-27T11:58:08+00:00",
   "status": "win",
-  "closed_utc": "2026-07-28T03:43:40+00:00"
+  "closed_utc": "2026-07-28T03:43:40+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 38
  },
  {
   "id": "109ab61d",
@@ -1463,7 +1525,9 @@
   "confidence": 3,
   "time_utc": "2026-07-27T14:24:13+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-27T16:36:46+00:00"
+  "closed_utc": "2026-07-27T16:36:46+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 39
  },
  {
   "id": "c2d12b5a",
@@ -1478,7 +1542,9 @@
   "confidence": 1,
   "time_utc": "2026-07-27T16:36:48+00:00",
   "status": "win",
-  "closed_utc": "2026-07-28T06:14:16+00:00"
+  "closed_utc": "2026-07-28T06:14:16+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 40
  },
  {
   "id": "d03ba567",
@@ -1493,7 +1559,9 @@
   "confidence": 3,
   "time_utc": "2026-07-27T18:11:35+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-28T00:15:22+00:00"
+  "closed_utc": "2026-07-28T00:15:22+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 41
  },
  {
   "id": "6951b677",
@@ -1508,7 +1576,9 @@
   "confidence": 3,
   "time_utc": "2026-07-27T20:59:56+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-28T00:15:22+00:00"
+  "closed_utc": "2026-07-28T00:15:22+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 42
  },
  {
   "id": "72a5b66b",
@@ -1523,7 +1593,9 @@
   "confidence": 1,
   "time_utc": "2026-07-28T06:14:24+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-28T08:51:16+00:00"
+  "closed_utc": "2026-07-28T08:51:16+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 43
  },
  {
   "id": "942f4ddf",
@@ -1538,7 +1610,9 @@
   "confidence": 1,
   "time_utc": "2026-07-28T08:51:18+00:00",
   "status": "win",
-  "closed_utc": "2026-07-28T11:07:50+00:00"
+  "closed_utc": "2026-07-28T11:07:50+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 44
  },
  {
   "id": "4030f58e",
@@ -1553,7 +1627,9 @@
   "confidence": 1,
   "time_utc": "2026-07-28T08:51:19+00:00",
   "status": "win",
-  "closed_utc": "2026-07-29T14:36:58+00:00"
+  "closed_utc": "2026-07-29T14:36:58+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 45
  },
  {
   "id": "5b2638b4",
@@ -1568,7 +1644,9 @@
   "confidence": 1,
   "time_utc": "2026-07-28T13:01:11+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-28T15:30:56+00:00"
+  "closed_utc": "2026-07-28T15:30:56+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 46
  },
  {
   "id": "19d45bbb",
@@ -1583,7 +1661,9 @@
   "confidence": 1,
   "time_utc": "2026-07-28T15:31:06+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-28T17:07:07+00:00"
+  "closed_utc": "2026-07-28T17:07:07+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 47
  },
  {
   "id": "ab0ed429",
@@ -1598,7 +1678,9 @@
   "confidence": 1,
   "time_utc": "2026-07-28T17:07:12+00:00",
   "status": "win",
-  "closed_utc": "2026-07-28T22:30:30+00:00"
+  "closed_utc": "2026-07-28T22:30:30+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 48
  },
  {
   "id": "35b92380",
@@ -1613,7 +1695,9 @@
   "confidence": 1,
   "time_utc": "2026-07-28T17:07:13+00:00",
   "status": "win",
-  "closed_utc": "2026-07-29T14:36:58+00:00"
+  "closed_utc": "2026-07-29T14:36:58+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 49
  },
  {
   "id": "8536b0df",
@@ -1628,7 +1712,9 @@
   "confidence": 1,
   "time_utc": "2026-07-29T07:15:41+00:00",
   "status": "win",
-  "closed_utc": "2026-07-29T10:02:48+00:00"
+  "closed_utc": "2026-07-29T10:02:48+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 50
  },
  {
   "id": "15cf0285",
@@ -1643,7 +1729,9 @@
   "confidence": 1,
   "time_utc": "2026-07-29T10:02:55+00:00",
   "status": "win",
-  "closed_utc": "2026-07-29T14:36:58+00:00"
+  "closed_utc": "2026-07-29T14:36:58+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 51
  },
  {
   "id": "32098f98",
@@ -1658,7 +1746,9 @@
   "confidence": 1,
   "time_utc": "2026-07-29T12:16:42+00:00",
   "status": "win",
-  "closed_utc": "2026-07-29T14:36:58+00:00"
+  "closed_utc": "2026-07-29T14:36:58+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 52
  },
  {
   "id": "8eed43e4",
@@ -1673,7 +1763,9 @@
   "confidence": 2,
   "time_utc": "2026-07-30T13:12:57+00:00",
   "status": "win",
-  "closed_utc": "2026-07-30T15:22:16+00:00"
+  "closed_utc": "2026-07-30T15:22:16+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 53
  },
  {
   "id": "c7d329be",
@@ -1688,7 +1780,9 @@
   "confidence": 3,
   "time_utc": "2026-07-30T20:53:33+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-31T03:46:53+00:00"
+  "closed_utc": "2026-07-31T03:46:53+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 54
  },
  {
   "id": "a5ae4a1b",
@@ -1703,7 +1797,9 @@
   "confidence": 1,
   "time_utc": "2026-07-30T22:59:22+00:00",
   "status": "win",
-  "closed_utc": "2026-07-31T09:30:20+00:00"
+  "closed_utc": "2026-07-31T09:30:20+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 55
  },
  {
   "id": "f5317b8b",
@@ -1718,7 +1814,9 @@
   "confidence": 1,
   "time_utc": "2026-07-31T00:00:51+00:00",
   "status": "win",
-  "closed_utc": "2026-07-31T09:30:20+00:00"
+  "closed_utc": "2026-07-31T09:30:20+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 56
  },
  {
   "id": "87cbd74c",
@@ -1733,7 +1831,9 @@
   "confidence": 3,
   "time_utc": "2026-07-31T06:35:18+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-31T09:30:20+00:00"
+  "closed_utc": "2026-07-31T09:30:20+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 57
  },
  {
   "id": "a2a2d3ac",
@@ -1748,7 +1848,9 @@
   "confidence": 3,
   "time_utc": "2026-07-31T09:30:30+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-31T13:26:58+00:00"
+  "closed_utc": "2026-07-31T13:26:58+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 58
  },
  {
   "id": "9af2f11d",
@@ -1763,7 +1865,9 @@
   "confidence": 2,
   "time_utc": "2026-07-31T11:46:00+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-31T13:26:58+00:00"
+  "closed_utc": "2026-07-31T13:26:58+00:00",
+  "symbol": "XAUUSD",
+  "sheet_row": 59
  },
  {
   "id": "d0e19ae3",
@@ -1777,7 +1881,9 @@
   "reward_usd": 35.64,
   "confidence": 1,
   "time_utc": "2026-07-31T15:35:23+00:00",
-  "status": "open"
+  "status": "open",
+  "symbol": "XAUUSD",
+  "sheet_row": 60
  },
  {
   "id": "e0d66b93",
@@ -1791,7 +1897,9 @@
   "reward_usd": 25.98,
   "confidence": 1,
   "time_utc": "2026-07-31T17:10:03+00:00",
-  "status": "open"
+  "status": "open",
+  "symbol": "XAUUSD",
+  "sheet_row": 61
  },
  {
   "id": "aa74197f",
@@ -1805,7 +1913,9 @@
   "reward_usd": 42.15,
   "confidence": 1,
   "time_utc": "2026-07-31T18:42:33+00:00",
-  "status": "open"
+  "status": "open",
+  "symbol": "XAUUSD",
+  "sheet_row": 62
  },
  {
   "id": "b181694f",
@@ -1819,7 +1929,9 @@
   "reward_usd": 40.5,
   "confidence": 1,
   "time_utc": "2026-07-31T20:07:41+00:00",
-  "status": "open"
+  "status": "open",
+  "symbol": "XAUUSD",
+  "sheet_row": 63
  },
  {
   "id": "82ddd639",
@@ -1836,7 +1948,8 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-01T03:48:39+00:00",
-  "status": "open"
+  "status": "open",
+  "sheet_row": 8
  },
  {
   "id": "a1d9f910",
@@ -1853,6 +1966,7 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-01T04:32:56+00:00",
-  "status": "open"
+  "status": "open",
+  "sheet_row": 9
  }
 ]
