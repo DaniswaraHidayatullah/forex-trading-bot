@@ -151,11 +151,10 @@ def _resolve_open(entries: list[dict]) -> None:
             # Bayangan (diblokir sentimen): dilacak diam-diam, tanpa Discord.
             print(f"[shadow ] {e.get('profile')} {e['side']} -> {e['status']}")
             continue
-        v2_txt, sh_txt = _stats_texts(entries)
-        stats_text = v2_txt
-        sh = tracker.summarize([x for x in entries if x.get("shadow")])
-        if sh["closed"]:
-            stats_text += f"\n🚧 Diblokir sentimen (bayangan): {sh_txt}"
+        pf = _portfolio_stats(entries)
+        stats_text = (f"Akun Cent: **${pf['balance']:,.2f}** ({pf['wins']}W/{pf['losses']}L · "
+                      f"WR {pf['wr']:.0f}% · PF {pf['pf']:.2f} · Net "
+                      f"{'+' if pf['net_usd'] >= 0 else '−'}${abs(pf['net_usd']):,.2f})")
         payload = notifier.format_outcome_embed(e, stats_text)
         sent = main._push_discord(payload, channel="report")
         print(f"[resolve] {e.get('profile')} {e['side']} -> {e['status']} (dikirim={sent})")
@@ -530,46 +529,68 @@ def _market_feeds(meta: dict) -> None:
         print("[predict] ERROR:", e)
 
 
+def _lot_mult(e: dict) -> float:
+    """$ P/L per 1 unit gerak harga @lot 0.2 cent: emas 0.2, BTC 0.002."""
+    return 0.002 if e.get("symbol") == "BTCUSD" else 0.2
+
+
+def _trade_pnl(e: dict) -> float:
+    """P/L $ NYATA dari harga (skala cent 0.2): win=+jarak TP, loss=-jarak SL."""
+    en = float(e.get("entry") or 0)
+    m = _lot_mult(e)
+    if e["status"] == "win":
+        return abs(float(e.get("tp") or en) - en) * m
+    return -abs(en - float(e.get("sl") or en)) * m
+
+
+def _cent_era(e: dict) -> bool:
+    """Trade sejak era CENT (fresh start) — pra-cent tak dihitung."""
+    try:
+        return tracker.parse_utc(e["time_utc"]) >= tracker.parse_utc(main.settings.portfolio_since)
+    except (ValueError, TypeError, KeyError):
+        return False
+
+
 def _portfolio_stats(entries: list[dict]) -> dict:
-    """Hitung ekuitas simulasi dari sinyal executed v2 yang sudah selesai."""
-    tr = sorted([e for e in entries if _is_v2(e) and e["status"] in ("win", "loss")],
-                key=lambda e: e.get("time_utc", ""))
+    """Ekuitas akun CENT ($100) dari trade v2 era-cent, P/L $ nyata dari harga."""
+    tr = sorted([e for e in entries if _is_v2(e) and e["status"] in ("win", "loss")
+                 and _cent_era(e)], key=lambda e: e.get("time_utc", ""))
     start = main.settings.portfolio_start
-    risk = main.settings.portfolio_risk_usd
-    cum = 0.0
+    bal, peak, dd, net = start, start, 0.0, 0.0
     eq = [start]
-    peak, dd = start, 0.0
     cw = cl = mcw = mcl = wins = losses = 0
     gp = gl = 0.0
-    per_trade = []
+    per_sym: dict[str, list[int]] = {"XAUUSD": [0, 0], "BTCUSD": [0, 0]}
     for e in tr:
-        rr = float(e.get("rr", 2))
-        r = rr if e["status"] == "win" else -1.0
-        cum += r
-        bal = start + cum * risk
+        pnl = _trade_pnl(e)
+        net += pnl
+        bal += pnl
         eq.append(bal)
         peak = max(peak, bal)
         dd = min(dd, bal - peak)
-        per_trade.append((r, e))
+        sym = e.get("symbol", "XAUUSD")
+        per_sym.setdefault(sym, [0, 0])
         if e["status"] == "win":
             wins += 1
+            gp += pnl
             cw, cl = cw + 1, 0
             mcw = max(mcw, cw)
-            gp += rr
+            per_sym[sym][0] += 1
         else:
             losses += 1
+            gl += -pnl
             cl, cw = cl + 1, 0
             mcl = max(mcl, cl)
-            gl += 1
+            per_sym[sym][1] += 1
     n = wins + losses
-    open_n = sum(1 for e in entries if _is_v2(e) and e["status"] == "open")
+    open_n = sum(1 for e in entries if _is_v2(e) and e["status"] == "open" and _cent_era(e))
     step = max(1, len(eq) // 24)
     return {
-        "start": start, "balance": eq[-1], "target": main.settings.portfolio_target,
+        "start": start, "balance": bal, "target": main.settings.portfolio_target,
         "spark": notifier._sparkline(eq[::step]) if len(eq) > 2 else "—",
-        "net_r": cum, "wr": (wins / n * 100) if n else 0, "pf": (gp / gl) if gl else 0,
-        "wins": wins, "losses": losses, "dd_r": dd / risk, "dd_usd": dd,
-        "mcw": mcw, "mcl": mcl, "open": open_n, "per_trade": per_trade,
+        "net_usd": net, "wr": (wins / n * 100) if n else 0, "pf": (gp / gl) if gl else 0,
+        "wins": wins, "losses": losses, "dd_usd": dd,
+        "mcw": mcw, "mcl": mcl, "open": open_n, "per_sym": per_sym,
     }
 
 
@@ -593,27 +614,26 @@ def _weekly_recap(entries: list[dict], meta: dict) -> None:
         return
     start = now - timedelta(days=7)
     wtr = [e for e in entries if _is_v2(e) and e["status"] in ("win", "loss")
-           and tracker.parse_utc(e["time_utc"]) >= start]
+           and _cent_era(e) and tracker.parse_utc(e["time_utc"]) >= start]
     if not wtr:
         meta["last_weekly"] = key
         return
     wins = sum(1 for e in wtr if e["status"] == "win")
     losses = len(wtr) - wins
-    net_r = sum(float(e.get("rr", 2)) if e["status"] == "win" else -1.0 for e in wtr)
-    risk = main.settings.portfolio_risk_usd
+    net_usd = sum(_trade_pnl(e) for e in wtr)   # $ nyata era cent
 
     def _lbl(e):
-        return f"{e['side'].upper()} @ {e['entry']}"
-    best = max(wtr, key=lambda e: float(e.get("rr", 2)) if e["status"] == "win" else -9)
-    worst = next((e for e in wtr if e["status"] == "loss"), wtr[0])
-    note = ("Net positif — pertahankan disiplin." if net_r > 0 else
+        return f"{e.get('symbol', 'XAU')[:3]} {e['side'].upper()} @ {e['entry']}"
+    best = max(wtr, key=_trade_pnl)
+    worst = min(wtr, key=_trade_pnl)
+    note = ("Net positif — pertahankan disiplin." if net_usd > 0 else
             "Net negatif — normal di sistem WR rendah, jangan ubah rencana.")
     main._push_discord(notifier.format_weekly({
         "period": f"{start.date()} .. {now.date()}",
         "n": len(wtr), "wins": wins, "losses": losses,
-        "wr": wins / len(wtr) * 100, "net_r": net_r, "net_usd": net_r * risk,
-        "best": _lbl(best) + f" (+{float(best.get('rr', 2)):g}R)" if wins else "—",
-        "worst": _lbl(worst) + " (−1R)" if losses else "—",
+        "wr": wins / len(wtr) * 100, "net_usd": net_usd,
+        "best": _lbl(best) + f" (+${_trade_pnl(best):,.2f})" if wins else "—",
+        "worst": _lbl(worst) + f" (−${abs(_trade_pnl(worst)):,.2f})" if losses else "—",
         "note": note,
     }), channel="weekly")
     meta["last_weekly"] = key

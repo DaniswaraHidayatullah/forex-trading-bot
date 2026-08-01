@@ -117,9 +117,12 @@ class Settings(BaseSettings):
     }
 
     # --- Portofolio simulasi (dari hasil sinyal) --------------------------
-    portfolio_start: float = 100.0     # saldo awal simulasi ($)
-    portfolio_risk_usd: float = 2.0    # $ risiko per 1R (2% dari $100)
+    portfolio_start: float = 100.0     # saldo awal ($) akun cent
+    portfolio_risk_usd: float = 2.0    # (legacy) $ per 1R; v2 pakai $ nyata dari harga
     portfolio_target: float = 150.0    # target akun untuk progress bar
+    # Portofolio/report v2 HANYA hitung trade sejak era CENT (fresh start).
+    # Trade emas pra-cent (< tanggal ini) tak dihitung.
+    portfolio_since: str = "2026-08-01T00:00:00+00:00"
 
     # 20 mata uang utk Dollar Monitor (fmt Twelve Data). XXX/USD = invers.
     dollar_pairs: list[str] = [

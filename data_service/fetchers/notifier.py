@@ -78,14 +78,21 @@ def format_outcome_embed(entry: dict[str, Any], stats_text: str) -> dict[str, An
     prof = entry.get("profile", "")
     rr = entry.get("rr", 3)
     sym = entry.get("symbol", "XAUUSD")
+    # $ P/L NYATA skala cent (lot 0.2): jarak harga × 0.2(emas)/0.002(BTC).
+    mult = 0.002 if sym == "BTCUSD" else 0.2
+    en = float(entry.get("entry") or 0)
     if status == "win":
+        pnl = abs(float(entry.get("tp") or en) - en) * mult
         title = f"✅ TP TERCAPAI — {side} {sym}"
         color = 3066993
-        line = f"Entry `{entry.get('entry')}` → TP `{entry.get('tp')}`  (**+{rr}R**, +${entry.get('reward_usd', '')})"
+        line = (f"Entry `{entry.get('entry')}` → TP `{entry.get('tp')}`  "
+                f"(**+${pnl:,.2f}** / +{pnl * 100:,.0f}¢ · +{float(rr):g}R)")
     elif status == "loss":
+        pnl = abs(en - float(entry.get("sl") or en)) * mult
         title = f"❌ SL KENA — {side} {sym}"
         color = 15158332
-        line = f"Entry `{entry.get('entry')}` → SL `{entry.get('sl')}`  (**−1R**, −${entry.get('risk_usd', '')})"
+        line = (f"Entry `{entry.get('entry')}` → SL `{entry.get('sl')}`  "
+                f"(**−${pnl:,.2f}** / −{pnl * 100:,.0f}¢ · −1R)")
     else:
         title = f"⌛ KEDALUWARSA — {side} {sym}"
         color = 9807270
@@ -93,7 +100,7 @@ def format_outcome_embed(entry: dict[str, Any], stats_text: str) -> dict[str, An
     desc = "\n".join([f"**{prof}** · sinyal {entry.get('time_utc', '')[:16]} UTC", "", line,
                       "", f"📈 {stats_text}"])
     return {"embeds": [{"title": title, "description": desc, "color": color,
-                        "footer": {"text": "Rekap otomatis · eksekusi manual"}}]}
+                        "footer": {"text": "Rekap v2 · akun Cent $100 · eksekusi manual"}}]}
 
 
 def format_burst_embed(direction: str, move_usd: float, price: float,
@@ -159,21 +166,25 @@ def format_portfolio(p: dict[str, Any]) -> dict[str, Any]:
     chg = (bal / start - 1) * 100
     emo = "🟢" if chg >= 0 else "🔴"
     tgt_pct = min(100, max(0, (bal - start) / (p["target"] - start) * 100)) if p["target"] > start else 0
-    # Akun CENT: saldo di MT5 tampil dalam sen (1 USD = 100¢).
+    net = p["net_usd"]
+    dd = p["dd_usd"]
+    g = p.get("per_sym", {}).get("XAUUSD", [0, 0])
+    b = p.get("per_sym", {}).get("BTCUSD", [0, 0])
+    # Akun CENT: saldo di MT5 tampil dalam sen (1 USD = 100¢). $ = nilai riil.
     desc = "\n".join([
         f"# {emo} ${bal:,.2f}   ({chg:+.1f}% dari ${start:.0f})",
         f"### 🪙 = {bal * 100:,.0f}¢  (tampilan akun Cent di MT5)",
         f"`{p['spark']}`",
         "",
-        f"📈 **Net {p['net_r']:+.0f}R**  ·  Win rate **{p['wr']:.0f}%**  ·  PF **{p['pf']:.2f}**",
-        f"✅ {p['wins']}W / ❌ {p['losses']}L  ·  📉 Max DD **{p['dd_r']:.0f}R** "
-        f"(${p['dd_usd']:.0f} / {p['dd_usd'] * 100:,.0f}¢)",
+        f"💵 **Net {'+' if net >= 0 else '−'}${abs(net):,.2f}**  ·  Win rate **{p['wr']:.0f}%**  ·  PF **{p['pf']:.2f}**",
+        f"✅ {p['wins']}W / ❌ {p['losses']}L  ·  📉 Max DD **−${abs(dd):,.2f}** ({abs(dd) * 100:,.0f}¢)",
         f"🔥 Streak terpanjang: {p['mcw']}W / {p['mcl']}L  ·  ⏳ {p['open']} posisi terbuka",
+        f"🥇 XAU {g[0]}W/{g[1]}L    ·    🪙 BTC {b[0]}W/{b[1]}L",
         "",
         f"🎯 **Target ${p['target']:.0f}** ({p['target'] * 100:,.0f}¢)**:** `{_bar(tgt_pct)}` {tgt_pct:.0f}%",
     ])
-    return _simple("📊 PORTOFOLIO — XAUUSD Scalpers Boys", desc, 3447003,
-                   "Simulasi (risiko $2/R) · $ = nilai riil, ¢ = tampilan akun Cent · bukan saran finansial")
+    return _simple("📊 PORTOFOLIO v2 — Scalper's Boys (Cent $100)", desc, 3447003,
+                   "Akun Cent $100 · $ nyata @lot 0.2 · era cent · ¢ = tampilan MT5 · bukan saran finansial")
 
 
 def format_weekly(w: dict[str, Any]) -> dict[str, Any]:
@@ -181,7 +192,8 @@ def format_weekly(w: dict[str, Any]) -> dict[str, Any]:
         f"**Periode:** {w['period']}",
         "",
         f"📊 Sinyal minggu ini: **{w['n']}**  ({w['wins']}W / {w['losses']}L, WR {w['wr']:.0f}%)",
-        f"💰 Net minggu ini: **{w['net_r']:+.0f}R**  (${w['net_usd']:+.0f})",
+        f"💵 Net minggu ini: **{'+' if w['net_usd'] >= 0 else '−'}${abs(w['net_usd']):,.2f}**  "
+        f"({abs(w['net_usd']) * 100:,.0f}¢)",
         f"🏆 Terbaik: {w['best']}  ·  💥 Terburuk: {w['worst']}",
         "",
         f"🧠 Catatan: {w['note']}",
