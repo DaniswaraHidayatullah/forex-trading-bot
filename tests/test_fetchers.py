@@ -7,6 +7,9 @@ from datetime import datetime, timedelta, timezone
 from data_service.fetchers.cot import _net_bias
 from data_service.fetchers.forexfactory import _normalize_impact, upcoming_blackout
 from data_service.fetchers.sentiment import (
+    _BTC_BEARISH,
+    _BTC_BULLISH,
+    _BTC_RELEVANCE,
     _dedupe,
     _parse_feed,
     _score_one,
@@ -220,6 +223,21 @@ def test_btc_signal_separate_domain_weekend():
     # kalkulasi broker BTC (bukan skala emas): $ risiko = jarak SL x 0.01
     assert r["risk_per_001"] == round(r["sl_pips"] * 0.01, 2)
     assert r["rr"] == 2.0
+
+
+def _btc_score(heads):
+    return score_sentiment(heads, min_headlines=2, relevance=_BTC_RELEVANCE,
+                           bullish=_BTC_BULLISH, bearish=_BTC_BEARISH)
+
+
+def test_btc_sentiment_lexicon_directional():
+    bull = ["Bitcoin surges to all-time high as ETF inflows accelerate",
+            "BTC rallies on institutional adoption"]
+    assert _btc_score(bull)["bias"] == "long"
+
+    bear = ["Bitcoin crashes as SEC sues major exchange, liquidations spike",
+            "BTC plunges after hack drains exchange funds"]
+    assert _btc_score(bear)["bias"] == "short"
 
 
 def test_signal_news_blocked():

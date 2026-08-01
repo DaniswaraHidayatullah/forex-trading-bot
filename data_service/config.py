@@ -77,6 +77,14 @@ class Settings(BaseSettings):
     btc_enabled: bool = True
     btc_symbol: str = "BTC/USD"          # simbol Twelve Data
     btc_profiles: str = "btc"            # profil BTC (lihat BTC_PROFILES)
+    # Feed berita CRYPTO (dinilai leksikon crypto sendiri, bukan emas).
+    # (cryptoslate dibuang: 403 dari IP datacenter). 4 feed ini teruji hidup.
+    btc_sentiment_feeds: list[str] = [
+        "https://www.coindesk.com/arc/outboundfeeds/rss/",
+        "https://cointelegraph.com/rss",
+        "https://decrypt.co/feed",
+        "https://bitcoinmagazine.com/feed",
+    ]
     # Exness BTCUSD Standard: 1 lot = 1 BTC -> di 0.01 lot, gerak $1 = $0.01 P/L.
     # (VERIFIKASI di kontrak akunmu; untuk CENT nilai ~100x lebih kecil.)
     btc_pip_price: float = 1.0           # 1 "pip" BTC = gerak $1 harga

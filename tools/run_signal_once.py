@@ -252,11 +252,14 @@ def _new_btc_signals(entries: list[dict]) -> None:
             continue
 
         side = sig.get("signal", "none")
-        print(f"[btc:{profile}] {side} | {sig.get('reason')}")
+        print(f"[btc:{profile}] {side} | sentimen={sig.get('sentiment_bias')}"
+              f"/{sig.get('sentiment_score')} | {sig.get('reason')}")
         if side not in ("buy", "sell"):
             continue
 
         payload = notifier.format_embed(sig)
+        if sig.get("confidence_level", 0) >= 3:
+            payload["content"] = "@everyone ⭐⭐⭐ SINYAL BTC KUAT — teknikal+sentimen+momentum searah!"
         sent = main._push_discord(payload, channel="btc_signal")
         entries.append({
             "id": uuid.uuid4().hex[:8],

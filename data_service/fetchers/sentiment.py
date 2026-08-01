@@ -123,6 +123,54 @@ _BEARISH: dict[str, float] = {
     "gold downtrend": 1.2, "gold breakdown": 1.3, "outflows from gold": 1.1,
 }
 
+# ====================== LEKSIKON KHUSUS BITCOIN (BTC) ======================
+# Domain terpisah dari emas: crypto digerakkan ETF/adopsi/regulasi/likuidasi,
+# bukan safe-haven/yield. "rate cut"=risk-on -> bullish BTC (kebalikan emas
+# yg juga bullish tapi via jalur beda). Arah = untuk HARGA BTC langsung.
+_BTC_RELEVANCE = (
+    "bitcoin", "btc", "crypto", "cryptocurrency", "ethereum", "eth",
+    "coinbase", "binance", "etf", "sec", "halving", "blockchain",
+    "digital asset", "digital-asset", "stablecoin", "microstrategy",
+    "satoshi", "altcoin", "spot etf", "on-chain", "miner", "miners",
+)
+
+_BTC_BULLISH: dict[str, float] = {
+    "etf approval": 1.6, "etf approved": 1.6, "spot etf": 1.3, "etf inflows": 1.4,
+    "etf inflow": 1.4, "record inflows": 1.4, "halving": 1.1,
+    "adoption": 1.1, "institutional adoption": 1.4, "institutional demand": 1.3,
+    "institutional inflows": 1.4, "accumulation": 1.1, "whale buying": 1.2,
+    "whales accumulate": 1.2, "short squeeze": 1.2, "supply shock": 1.1,
+    "bitcoin surges": 1.5, "bitcoin jumps": 1.5, "bitcoin rallies": 1.5,
+    "bitcoin soars": 1.6, "bitcoin climbs": 1.4, "bitcoin gains": 1.4,
+    "bitcoin rises": 1.4, "bitcoin rebounds": 1.3, "btc surges": 1.5,
+    "btc rallies": 1.5, "bull run": 1.4, "bull market": 1.2, "breakout": 1.1,
+    "all-time high": 1.5, "record high": 1.3, "new high": 1.2,
+    "strategic reserve": 1.3, "bitcoin reserve": 1.3, "legal tender": 1.2,
+    "buy the dip": 1.0, "microstrategy buys": 1.3, "corporate treasury": 1.1,
+    "rate cut": 1.0, "rate cuts": 1.0, "dovish": 0.9, "risk-on": 1.0,
+    "risk appetite": 0.9, "soft landing": 0.8, "mainstream adoption": 1.3,
+    "spot bitcoin etf": 1.4, "inflows": 0.9, "bullish": 1.0,
+}
+
+_BTC_BEARISH: dict[str, float] = {
+    "crackdown": 1.4, "ban": 1.3, "bans": 1.3, "banned": 1.3, "sec sues": 1.5,
+    "sec charges": 1.4, "lawsuit": 1.1, "regulatory crackdown": 1.5,
+    "hack": 1.4, "hacked": 1.4, "exploit": 1.3, "exploited": 1.3, "breach": 1.2,
+    "stolen": 1.2, "etf outflows": 1.4, "etf outflow": 1.4, "outflows": 1.0,
+    "bitcoin falls": 1.5, "bitcoin drops": 1.5, "bitcoin plunges": 1.6,
+    "bitcoin crashes": 1.6, "bitcoin tumbles": 1.5, "bitcoin sinks": 1.5,
+    "bitcoin slides": 1.4, "bitcoin slips": 1.3, "btc plunges": 1.6,
+    "btc crashes": 1.6, "sell-off": 1.2, "selloff": 1.2, "sell off": 1.1,
+    "liquidations": 1.3, "long liquidations": 1.4, "liquidated": 1.2,
+    "capitulation": 1.4, "miner selling": 1.1, "miners sell": 1.1,
+    "bankruptcy": 1.4, "collapse": 1.4, "insolvency": 1.3, "contagion": 1.2,
+    "fud": 0.9, "bearish": 1.0, "crash": 1.2, "rate hike": 1.0,
+    "rate hikes": 1.0, "hawkish": 0.9, "risk-off": 1.0, "risk aversion": 1.0,
+    "crackdown fears": 1.3, "delisting": 1.2, "fraud": 1.3, "ponzi": 1.2,
+    "death cross": 1.1, "dump": 1.0, "whales sell": 1.2,
+}
+
+
 # Kata yang membalik arti frasa sesudahnya (negasi).
 _NEGATORS = {
     "no", "not", "non", "never", "without", "fails", "fail", "failed",
@@ -276,8 +324,8 @@ def fetch_news_rich(feeds: list[str], timeout: float = 12.0) -> list[dict[str, s
     return out
 
 
-def _is_relevant(text: str) -> bool:
-    return any(k in text for k in _RELEVANCE)
+def _is_relevant(text: str, relevance: tuple[str, ...] = _RELEVANCE) -> bool:
+    return any(k in text for k in relevance)
 
 
 def _dedupe(headlines: list[str]) -> list[str]:
@@ -320,14 +368,18 @@ def _phrase_indices(text: str, phrase: str) -> list[int]:
     return idxs
 
 
-def _score_one(text: str) -> float:
-    """Skor satu headline: bobot bullish - bearish, dgn negasi & intensifier."""
+def _score_one(text: str, bullish: dict[str, float] | None = None,
+               bearish: dict[str, float] | None = None) -> float:
+    """Skor satu headline: bobot bullish - bearish, dgn negasi & intensifier.
+    Default leksikon EMAS; oper bullish/bearish crypto untuk domain BTC."""
+    bullish = _BULLISH if bullish is None else bullish
+    bearish = _BEARISH if bearish is None else bearish
     score = 0.0
-    for phrase, w in _BULLISH.items():
+    for phrase, w in bullish.items():
         for idx in _phrase_indices(text, phrase):
             sign, mult = _context_adjust(text, idx)
             score += sign * mult * w
-    for phrase, w in _BEARISH.items():
+    for phrase, w in bearish.items():
         for idx in _phrase_indices(text, phrase):
             sign, mult = _context_adjust(text, idx)
             score -= sign * mult * w
@@ -338,8 +390,12 @@ def score_sentiment(
     headlines: list[str],
     threshold: float = 0.15,
     min_headlines: int = 3,
+    relevance: tuple[str, ...] = _RELEVANCE,
+    bullish: dict[str, float] | None = None,
+    bearish: dict[str, float] | None = None,
 ) -> dict[str, Any]:
-    """Agregasi sentimen dari banyak headline jadi satu bias arah emas (lexicon)."""
+    """Agregasi sentimen headline jadi satu bias arah (lexicon). Default EMAS;
+    untuk BTC oper relevance/bullish/bearish crypto (lihat fetch_btc_sentiment)."""
     headlines = _dedupe(headlines)
     total = len(headlines)
     pos_w = 0.0
@@ -349,9 +405,9 @@ def score_sentiment(
 
     for raw in headlines:
         text = raw.lower()
-        if not _is_relevant(text):
+        if not _is_relevant(text, relevance):
             continue
-        s = _score_one(text)
+        s = _score_one(text, bullish, bearish)
         if s == 0.0:
             continue
         scored += 1
@@ -515,4 +571,20 @@ def fetch_sentiment(
     result = score_texts(headlines, threshold=threshold, min_headlines=min_headlines,
                          backend=backend)
     result["sources"] = sources  # diagnostik: feed mana hidup/diblokir
+    return result
+
+
+def fetch_btc_sentiment(
+    feeds: list[str],
+    threshold: float = 0.15,
+    min_headlines: int = 2,
+) -> dict[str, Any]:
+    """Sentimen BITCOIN (domain terpisah): scrape feed crypto lalu skoring pakai
+    leksikon crypto (ETF/adopsi/regulasi/likuidasi), bukan leksikon emas."""
+    headlines, sources = fetch_headlines_diag(feeds)
+    result = score_sentiment(
+        headlines, threshold=threshold, min_headlines=min_headlines,
+        relevance=_BTC_RELEVANCE, bullish=_BTC_BULLISH, bearish=_BTC_BEARISH,
+    )
+    result["sources"] = sources
     return result

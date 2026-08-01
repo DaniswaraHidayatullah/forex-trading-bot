@@ -201,6 +201,19 @@ def _btc_signal_for(equity: float, profile: str) -> dict:
     if profile not in signal_engine.BTC_PROFILES:
         profile = next(iter(signal_engine.BTC_PROFILES))
 
+    # Sentimen CRYPTO (leksikon sendiri, feed crypto). Cache 15 mnt.
+    btc_sent = get_or_set(
+        "btc_sentiment", settings.sentiment_cache_ttl_seconds,
+        lambda: sentiment_fetcher.fetch_btc_sentiment(
+            feeds=settings.btc_sentiment_feeds,
+            threshold=settings.sentiment_threshold,
+            min_headlines=settings.sentiment_min_headlines,
+        ),
+    )
+    b_bias = btc_sent.get("bias", "flat")
+    b_score = float(btc_sent.get("score", 0.0) or 0.0)
+    b_available = int(btc_sent.get("headlines_scored", 0) or 0) > 0
+
     try:
         quote = get_or_set(
             f"quote_{sym}", 60,
@@ -219,15 +232,16 @@ def _btc_signal_for(equity: float, profile: str) -> dict:
         )
 
     def _produce() -> dict:
-        return signal_engine.build_signal(
-            sentiment_bias="flat",           # BTC: belum ada sentimen crypto
+        sig = signal_engine.build_signal(
+            sentiment_bias=b_bias,           # sentimen crypto (leksikon sendiri)
             news_blocked=False,
             api_key=settings.twelvedata_api_key,
             symbol=sym,
             equity=equity,
             profile=profile,
-            use_sentiment=False,
-            sentiment_available=False,
+            use_sentiment=True,
+            sentiment_score=b_score,
+            sentiment_available=b_available,
             quote=quote,
             max_risk_usd=settings.btc_max_risk_usd,
             pip_price=settings.btc_pip_price,
@@ -238,6 +252,8 @@ def _btc_signal_for(equity: float, profile: str) -> dict:
             profiles=signal_engine.BTC_PROFILES,
             fetch_fn=_cached_fetch,
         )
+        sig["top_news"] = list(btc_sent.get("samples") or [])[:2]
+        return sig
 
     return get_or_set(
         f"signal_BTCUSD_{profile}_{int(equity)}",

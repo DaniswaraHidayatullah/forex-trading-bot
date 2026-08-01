@@ -172,7 +172,7 @@ BTC_PROFILES: dict[str, dict[str, Any]] = {
 
 PIP = 0.10          # 1 pip emas = $0.10 gerak harga
 SENT_STRONG = 0.30  # |skor sentimen| >= ini dianggap kuat
-SPREAD_PAD = 0.6    # bantalan spread emas (default); profil bisa override
+SPREAD_PAD = 0.3    # spread XAUUSD Exness Standard (~0.3); profil bisa override
 
 
 def market_open(now: datetime | None = None, market_type: str = "gold") -> bool:
