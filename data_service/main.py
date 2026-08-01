@@ -192,6 +192,60 @@ def _signal_for(symbol: str, equity: float, profile: str) -> dict:
     )
 
 
+def _btc_signal_for(equity: float, profile: str) -> dict:
+    """Sinyal BTCUSD (domain terpisah). Teknikal-only: TANPA sentimen emas,
+    COT, atau news-blackout (leksikon/COT emas tak relevan untuk crypto).
+    24/7, profil & kalkulasi broker BTC sendiri.
+    """
+    sym = settings.btc_symbol
+    if profile not in signal_engine.BTC_PROFILES:
+        profile = next(iter(signal_engine.BTC_PROFILES))
+
+    try:
+        quote = get_or_set(
+            f"quote_{sym}", 60,
+            lambda: signal_engine.fetch_price(sym, settings.twelvedata_api_key),
+        )
+    except Exception:  # noqa: BLE001
+        quote = None
+
+    def _cached_fetch(interval: str, size: int) -> list[dict]:
+        return get_or_set(
+            f"px_{sym}_{interval}",
+            _PRICE_TTL.get(interval, 600),
+            lambda: signal_engine.fetch_series(
+                sym, interval, size, settings.twelvedata_api_key
+            ),
+        )
+
+    def _produce() -> dict:
+        return signal_engine.build_signal(
+            sentiment_bias="flat",           # BTC: belum ada sentimen crypto
+            news_blocked=False,
+            api_key=settings.twelvedata_api_key,
+            symbol=sym,
+            equity=equity,
+            profile=profile,
+            use_sentiment=False,
+            sentiment_available=False,
+            quote=quote,
+            max_risk_usd=settings.btc_max_risk_usd,
+            pip_price=settings.btc_pip_price,
+            usd_per_pip=settings.btc_usd_per_pip,
+            version=settings.signal_version,
+            display_symbol="BTCUSD",
+            market_type="crypto",
+            profiles=signal_engine.BTC_PROFILES,
+            fetch_fn=_cached_fetch,
+        )
+
+    return get_or_set(
+        f"signal_BTCUSD_{profile}_{int(equity)}",
+        settings.signal_cache_ttl_seconds,
+        _produce,
+    )
+
+
 @app.get("/signal", dependencies=[Depends(_auth)])
 def signal(
     symbol: str = Query("XAUUSD", min_length=6),

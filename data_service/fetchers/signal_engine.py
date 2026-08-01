@@ -156,14 +156,31 @@ PROFILES: dict[str, dict[str, Any]] = {
     },
 }
 
+# --- Profil BTCUSD (domain terpisah: 24/7, volatil, teknikal-only) -------
+# BTC bergerak ribuan $; SL/TP dalam $ langsung. RSI band lebih lebar (tren
+# kuat). spread_pad besar (spread crypto Exness bisa puluhan $). market="crypto"
+# -> tidak kena weekend guard emas. Tanpa sesi (24/7). Sentimen belum dipakai.
+BTC_PROFILES: dict[str, dict[str, Any]] = {
+    "btc": {
+        "label": "BTC", "trend": "4h", "entry": "1h",
+        "ema_fast": 21, "ema_slow": 50,
+        "atr_mult": 1.5, "rr": 2.0, "rsi_lo": 35.0, "rsi_hi": 65.0,
+        "spread_pad": 20.0, "market": "crypto",
+        "hold": "jam s/d beberapa hari",
+    },
+}
+
 PIP = 0.10          # 1 pip emas = $0.10 gerak harga
 SENT_STRONG = 0.30  # |skor sentimen| >= ini dianggap kuat
+SPREAD_PAD = 0.6    # bantalan spread emas (default); profil bisa override
 
 
-def market_open(now: datetime | None = None) -> bool:
-    """Pasar emas buka? Tutup: Jumat ~21:00 UTC s/d Minggu ~22:00 UTC.
-    Saat tutup, data harga jadi basi -> sinyal weekend = artefak (harus di-skip).
+def market_open(now: datetime | None = None, market_type: str = "gold") -> bool:
+    """Pasar buka? Crypto (BTC) = 24/7 selalu True. Emas/forex tutup:
+    Jumat ~21:00 UTC s/d Minggu ~22:00 UTC (saat tutup data basi -> skip).
     """
+    if market_type == "crypto":
+        return True
     now = now or datetime.now(timezone.utc)
     wd, hr = now.weekday(), now.hour  # Mon=0 .. Sun=6
     if wd == 5:
@@ -202,14 +219,20 @@ def build_signal(
     pip_price: float = 0.10,
     usd_per_pip: float = 0.10,
     version: str = "v1",
+    display_symbol: str | None = None,
+    market_type: str = "gold",
+    profiles: dict[str, dict[str, Any]] | None = None,
     fetch_fn: Callable[[str, int], list[dict[str, float]]] | None = None,
 ) -> dict[str, Any]:
-    """Bangun sinyal XAUUSD untuk satu profil (scalp/intraday/swing).
+    """Bangun sinyal untuk satu profil. Default domain EMAS; untuk BTC oper
+    profiles=BTC_PROFILES, market_type="crypto", display_symbol="BTCUSD".
 
     Selalu kembalikan dict (tidak pernah lempar). fetch_fn(interval, size)
     bisa di-inject untuk caching harga (hemat kuota API).
     """
-    prof = PROFILES.get(profile, PROFILES["intraday"])
+    registry = profiles or PROFILES
+    prof = registry.get(profile) or next(iter(registry.values()))
+    disp = display_symbol or symbol.replace("/", "")
     trend_interval = prof["trend"]
     entry_interval = prof["entry"]
     atr_mult = prof["atr_mult"]
@@ -222,7 +245,7 @@ def build_signal(
     session = prof.get("session")
 
     base: dict[str, Any] = {
-        "symbol": "XAUUSD",
+        "symbol": disp,
         "signal": "none",
         "reason": "",
         "profile": prof["label"],
@@ -244,8 +267,8 @@ def build_signal(
         "time_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
 
-    if not market_open(now_utc):
-        base["reason"] = "Pasar emas TUTUP (weekend) -> tidak ada sinyal"
+    if not market_open(now_utc, market_type):
+        base["reason"] = "Pasar TUTUP (weekend) -> tidak ada sinyal"
         return base
     if session:
         hr = (now_utc or datetime.now(timezone.utc)).hour
@@ -321,14 +344,14 @@ def build_signal(
     # + bantalan spread broker (SELL kena SL di harga ask; feed broker bisa
     # wick lebih jauh dari feed data). Kasus 14 Jul: SL 4061.7 disapu wick
     # broker 4062.11 sebelum harga jalan 200+ pips ke arah TP.
-    SPREAD_PAD = 0.6  # ~spread emas + selisih feed broker vs data
+    spread_pad = float(prof.get("spread_pad", SPREAD_PAD))  # emas 0.6; BTC ~20
     sl_dist = atr_val * atr_mult
     recent_hi = max(m_high[-13:-1])
     recent_lo = min(m_low[-13:-1])
     if trend == 1:   # BUY: SL di bawah low terakhir
-        wick_dist = (price - recent_lo) + 0.5 * atr_val + SPREAD_PAD
+        wick_dist = (price - recent_lo) + 0.5 * atr_val + spread_pad
     else:            # SELL: SL di atas high terakhir
-        wick_dist = (recent_hi - price) + 0.5 * atr_val + SPREAD_PAD
+        wick_dist = (recent_hi - price) + 0.5 * atr_val + spread_pad
     if wick_dist > sl_dist:
         sl_dist = round(wick_dist, 2)
     # RR tetap dihormati: TP selalu rr x SL (ikut melebar bersama SL
@@ -336,12 +359,14 @@ def build_signal(
     tp_dist = sl_dist * rr
 
     # Batas risiko: di akun kecil, lot minimum 0.01 tidak bisa diperkecil.
-    # Kalau jarak SL (=$ risiko per 0.01 lot) melebihi batas, JANGAN kirim
-    # sinyal -- lebih baik tidak trading daripada risiko tak masuk akal.
-    if max_risk_usd is not None and sl_dist > max_risk_usd:
-        base["risk_pct"] = round(sl_dist / equity * 100, 1)
+    # Bandingkan $ risiko TER-SKALA broker (jarak SL x $/unit), bukan jarak
+    # harga mentah -- penting utk BTC (jarak $ ratusan tapi $ risiko kecil).
+    # Emas: skala 1.0 -> risk_usd == sl_dist (perilaku lama tak berubah).
+    risk_usd = sl_dist / pip_price * usd_per_pip
+    if max_risk_usd is not None and risk_usd > max_risk_usd:
+        base["risk_pct"] = round(risk_usd / equity * 100, 1)
         base["reason"] = (
-            f"Volatilitas tinggi: risiko ${sl_dist:.0f}/trade (~{sl_dist/equity*100:.0f}% akun) "
+            f"Volatilitas tinggi: risiko ${risk_usd:.0f}/trade (~{risk_usd/equity*100:.0f}% akun) "
             f"> batas ${max_risk_usd:.0f} -> skip demi keamanan"
         )
         return base

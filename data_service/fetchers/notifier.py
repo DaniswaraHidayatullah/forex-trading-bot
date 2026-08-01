@@ -19,12 +19,13 @@ def format_embed(sig: dict[str, Any]) -> dict[str, Any]:
     prof = sig.get("profile", "")
     stars = sig.get("confidence_stars", "")
     conf = sig.get("confidence", "")
+    sym = sig.get("symbol", "XAUUSD")
 
     if side not in ("buy", "sell"):
         # Tidak ada sinyal -> kartu minimalis.
         desc = f"**{prof}**\n\n⚪ {sig.get('reason', 'Belum ada setup, tunggu.')}"
         return {"embeds": [{
-            "title": "⚪ XAUUSD — tunggu",
+            "title": f"⚪ {sym} — tunggu",
             "description": desc,
             "color": _COLORS["none"],
             "footer": {"text": "Eksekusi manual · bukan saran finansial"},
@@ -32,7 +33,7 @@ def format_embed(sig: dict[str, Any]) -> dict[str, Any]:
         }]}
 
     arrow = "↑" if side == "buy" else "↓"
-    title = "🟢 BUY XAUUSD" if side == "buy" else "🔴 SELL XAUUSD"
+    title = f"🟢 BUY {sym}" if side == "buy" else f"🔴 SELL {sym}"
 
     sent_txt = (
         f"Sentimen {sig.get('sentiment_bias')} ({sig.get('sentiment_score')})"
@@ -76,16 +77,17 @@ def format_outcome_embed(entry: dict[str, Any], stats_text: str) -> dict[str, An
     side = str(entry.get("side", "")).upper()
     prof = entry.get("profile", "")
     rr = entry.get("rr", 3)
+    sym = entry.get("symbol", "XAUUSD")
     if status == "win":
-        title = f"✅ TP TERCAPAI — {side} XAUUSD"
+        title = f"✅ TP TERCAPAI — {side} {sym}"
         color = 3066993
         line = f"Entry `{entry.get('entry')}` → TP `{entry.get('tp')}`  (**+{rr}R**, +${entry.get('reward_usd', '')})"
     elif status == "loss":
-        title = f"❌ SL KENA — {side} XAUUSD"
+        title = f"❌ SL KENA — {side} {sym}"
         color = 15158332
         line = f"Entry `{entry.get('entry')}` → SL `{entry.get('sl')}`  (**−1R**, −${entry.get('risk_usd', '')})"
     else:
-        title = f"⌛ KEDALUWARSA — {side} XAUUSD"
+        title = f"⌛ KEDALUWARSA — {side} {sym}"
         color = 9807270
         line = f"Entry `{entry.get('entry')}` tidak menyentuh TP/SL dalam batas waktu."
     desc = "\n".join([f"**{prof}** · sinyal {entry.get('time_utc', '')[:16]} UTC", "", line,

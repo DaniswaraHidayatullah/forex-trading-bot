@@ -70,6 +70,21 @@ class Settings(BaseSettings):
     volume_step: float = 0.01
     digits: int = 2
 
+    # --- BITCOIN (BTCUSD) — DOMAIN TERPISAH, kode/VPS sama ------------------
+    # BTC beda total dari emas: 24/7, volatilitas ribuan $, tanpa sentimen/COT
+    # (leksikon emas tak berlaku) -> BTC = TEKNIKAL-ONLY dulu (maks ⭐⭐ via
+    # momentum) sampai leksikon crypto dibangun. Profil & kalkulasi sendiri.
+    btc_enabled: bool = True
+    btc_symbol: str = "BTC/USD"          # simbol Twelve Data
+    btc_profiles: str = "btc"            # profil BTC (lihat BTC_PROFILES)
+    # Exness BTCUSD Standard: 1 lot = 1 BTC -> di 0.01 lot, gerak $1 = $0.01 P/L.
+    # (VERIFIKASI di kontrak akunmu; untuk CENT nilai ~100x lebih kecil.)
+    btc_pip_price: float = 1.0           # 1 "pip" BTC = gerak $1 harga
+    btc_usd_per_pip: float = 0.01        # $ P/L per $1 gerak pada 0.01 lot
+    # Batas risiko $/0.01 lot (standard-equiv). BTC ber-SL lebar; ATR bisa
+    # ribuan $ -> $30 = tolak setup dgn SL > $3000. Di CENT ini ~$0.30.
+    btc_max_risk_usd: float = 30.0
+
     # --- Routing channel Discord (ID channel bukan rahasia) ---------------
     # Kosongkan salah satu utk fallback ke DISCORD_CHANNEL_ID.
     discord_channels: dict[str, str] = {
@@ -85,6 +100,7 @@ class Settings(BaseSettings):
         "news_gold": "1526815834712965131",   # 🥇market-news-gold
         "portofolio": "1529772227774513242",   # 📊portofolio (dashboard)
         "weekly": "1529772231402721350",       # 📅rekap-mingguan
+        "btc_signal": "1532953796739596379",   # 🪙btc-signal (sinyal BTCUSD)
     }
 
     # --- Portofolio simulasi (dari hasil sinyal) --------------------------

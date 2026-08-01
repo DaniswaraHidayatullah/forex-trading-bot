@@ -24,7 +24,7 @@ from fetchers import notifier, signal_engine, tracker  # noqa: E402
 LOG_FILE = Path(os.getenv("SIGNAL_LOG", str(ROOT / "signals" / "log.json")))
 META_FILE = LOG_FILE.parent / "meta.json"
 EQUITY = float(os.getenv("EQUITY", "100"))
-EXPIRE_DAYS = {"Harian": 2, "Scalping": 1, "Intraday": 3, "Swing": 10}
+EXPIRE_DAYS = {"Harian": 2, "Scalping": 1, "Intraday": 3, "Swing": 10, "BTC": 3}
 _LEVEL = {"none": 0, "medium": 2, "strong": 3}
 BURST_ATR_MULT = 3.0        # ledakan = gerak 1 jam >= 3x ATR(M15)
 BURST_COOLDOWN_H = 2        # jangan alert ledakan lagi dalam N jam
@@ -76,8 +76,16 @@ def _stats_texts(entries: list[dict]) -> tuple[str, str]:
     return v2_txt, sh_txt
 
 
+def _td_symbol(e: dict) -> str:
+    """Simbol Twelve Data untuk sebuah entri (BTC vs emas)."""
+    if e.get("symbol") == "BTCUSD":
+        return main.settings.btc_symbol
+    return main.settings.signal_symbol
+
+
 def _resolve_open(entries: list[dict]) -> None:
-    """Cek sinyal terbuka: sudah kena TP/SL? Kirim rekap + update status."""
+    """Cek sinyal terbuka: sudah kena TP/SL? Kirim rekap + update status.
+    Di-fetch PER SIMBOL (emas & BTC beda deret harga)."""
     open_entries = [e for e in entries if e.get("status") == "open"]
     if not open_entries:
         return
@@ -86,18 +94,26 @@ def _resolve_open(entries: list[dict]) -> None:
         print("skip resolve: tidak ada TWELVEDATA_API_KEY")
         return
 
-    # Satu fetch M5 dipakai semua sinyal terbuka (hemat kredit).
-    oldest = min(tracker.parse_utc(e["time_utc"]) for e in open_entries)
-    minutes = (datetime.now(timezone.utc) - oldest).total_seconds() / 60
-    size = min(5000, max(50, int(minutes / 5) + 20))
-    try:
-        bars = signal_engine.fetch_series(main.settings.signal_symbol, "5min", size, api_key)
-    except Exception as e:  # noqa: BLE001
-        print("resolve: gagal ambil M5:", e)
-        return
-
     now = datetime.now(timezone.utc)
+    # Kelompokkan per simbol -> 1 fetch M5 per simbol (hemat kredit).
+    by_sym: dict[str, list[dict]] = {}
     for e in open_entries:
+        by_sym.setdefault(_td_symbol(e), []).append(e)
+
+    bars_by_sym: dict[str, list[dict]] = {}
+    for sym, grp in by_sym.items():
+        oldest = min(tracker.parse_utc(e["time_utc"]) for e in grp)
+        minutes = (now - oldest).total_seconds() / 60
+        size = min(5000, max(50, int(minutes / 5) + 20))
+        try:
+            bars_by_sym[sym] = signal_engine.fetch_series(sym, "5min", size, api_key)
+        except Exception as e:  # noqa: BLE001
+            print(f"resolve: gagal ambil M5 {sym}:", e)
+
+    for e in open_entries:
+        bars = bars_by_sym.get(_td_symbol(e))
+        if bars is None:
+            continue
         outcome = tracker.check_outcome(
             bars, e["side"], float(e["sl"]), float(e["tp"]), after_utc=e["time_utc"]
         )
@@ -194,6 +210,7 @@ def _new_signals(entries: list[dict]) -> None:
         sent = main._push_discord(payload)
         entries.append({
             "id": uuid.uuid4().hex[:8],
+            "symbol": "XAUUSD",
             "profile": sig.get("profile"),
             "side": side,
             "entry": sig.get("entry"), "sl": sig.get("sl"), "tp": sig.get("tp"),
@@ -205,6 +222,56 @@ def _new_signals(entries: list[dict]) -> None:
             "status": "open",
         })
         print(f"[{profile}] SINYAL {side.upper()} {sig.get('confidence_stars')} "
+              f"dikirim={sent} @ {sig.get('entry')}")
+
+
+def _new_btc_signals(entries: list[dict]) -> None:
+    """Sinyal BTCUSD (domain terpisah, 24/7). Teknikal-only -> maks ⭐⭐.
+    Log ke file yang sama dgn field symbol='BTCUSD' agar portofolio gabungan."""
+    if not main.settings.btc_enabled:
+        return
+    profiles = [p.strip() for p in main.settings.btc_profiles.split(",") if p.strip()]
+    now = datetime.now(timezone.utc)
+    for profile in profiles:
+        prof = signal_engine.BTC_PROFILES.get(profile)
+        if not prof:
+            continue
+        label = prof["label"]
+        open_btc = [e for e in entries if e.get("status") == "open"
+                    and e.get("symbol") == "BTCUSD" and e.get("profile") == label]
+        recent = any((now - tracker.parse_utc(e["time_utc"])) < timedelta(minutes=DEDUP_MIN)
+                     for e in open_btc)
+        if len(open_btc) >= MAX_CONCURRENT or recent:
+            print(f"[btc:{profile}] {len(open_btc)} posisi terbuka (maks {MAX_CONCURRENT})"
+                  f"{' / candle sama' if recent else ''} -> tunggu")
+            continue
+        try:
+            sig = main._btc_signal_for(EQUITY, profile)
+        except Exception as e:  # noqa: BLE001
+            print(f"[btc:{profile}] ERROR: {e}")
+            continue
+
+        side = sig.get("signal", "none")
+        print(f"[btc:{profile}] {side} | {sig.get('reason')}")
+        if side not in ("buy", "sell"):
+            continue
+
+        payload = notifier.format_embed(sig)
+        sent = main._push_discord(payload, channel="btc_signal")
+        entries.append({
+            "id": uuid.uuid4().hex[:8],
+            "symbol": "BTCUSD",
+            "profile": sig.get("profile"),
+            "side": side,
+            "entry": sig.get("entry"), "sl": sig.get("sl"), "tp": sig.get("tp"),
+            "rr": sig.get("rr", 2),
+            "risk_usd": sig.get("risk_per_001"), "reward_usd": sig.get("reward_per_001"),
+            "confidence": sig.get("confidence_level"),
+            "version": sig.get("version", "v1"), "momentum": sig.get("momentum"),
+            "time_utc": sig.get("time_utc"),
+            "status": "open",
+        })
+        print(f"[btc:{profile}] SINYAL {side.upper()} {sig.get('confidence_stars')} "
               f"dikirim={sent} @ {sig.get('entry')}")
 
 
@@ -558,6 +625,7 @@ def main_run() -> None:
     meta = _load_meta()
     _resolve_open(entries)
     _new_signals(entries)
+    _new_btc_signals(entries)
     _check_burst(meta)
     _daily_digest(entries, meta)
     _market_feeds(meta)
@@ -577,6 +645,11 @@ def main_run() -> None:
         g = [e for e in ex_v2 if e.get("confidence") == star]
         if g:
             print(f"   v2 {star}*: {tracker.stats_line(tracker.summarize(g))}")
+    # Pisah per SIMBOL (emas vs BTC) — domain terpisah, dinilai sendiri-sendiri.
+    gold = [e for e in ex_all if e.get("symbol", "XAUUSD") != "BTCUSD"]
+    btc = [e for e in ex_all if e.get("symbol") == "BTCUSD"]
+    print("REKAP emas (XAUUSD):", tracker.stats_line(tracker.summarize(gold)))
+    print("REKAP BTC  (BTCUSD):", tracker.stats_line(tracker.summarize(btc)))
 
 
 if __name__ == "__main__":

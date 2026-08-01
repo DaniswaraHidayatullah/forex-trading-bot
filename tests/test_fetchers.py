@@ -14,6 +14,7 @@ from data_service.fetchers.sentiment import (
     score_texts,
 )
 from data_service.fetchers.signal_engine import (
+    BTC_PROFILES,
     atr_series,
     build_signal,
     ema_series,
@@ -191,6 +192,34 @@ def _trend_up_fetch(interval, size):
         c = 2000 + (1 if i % 2 == 0 else -1)
         bars.append({"open": c, "high": c + 1, "low": c - 1, "close": c})
     return bars
+
+
+def _btc_fetch(interval, size):
+    # Skala harga BTC (~$62k). Tren 4h naik; entry 1h osilasi (RSI di band).
+    if interval == "4h":
+        return [{"open": 60000 + i * 10, "high": 60010 + i * 10,
+                 "low": 59990 + i * 10, "close": 60000 + i * 10} for i in range(size)]
+    bars = []
+    for i in range(size):
+        c = 62000 + (50 if i % 2 == 0 else -50)
+        bars.append({"open": c, "high": c + 30, "low": c - 30, "close": c})
+    return bars
+
+
+def test_btc_signal_separate_domain_weekend():
+    saturday = datetime(2026, 1, 10, 12, 0, tzinfo=timezone.utc)  # emas TUTUP
+    r = build_signal(
+        sentiment_bias="flat", news_blocked=False, api_key="x", symbol="BTC/USD",
+        profile="btc", use_sentiment=False, max_risk_usd=30.0,
+        pip_price=1.0, usd_per_pip=0.01, display_symbol="BTCUSD",
+        market_type="crypto", profiles=BTC_PROFILES, version="v2",
+        fetch_fn=_btc_fetch, now_utc=saturday,
+    )
+    assert r["symbol"] == "BTCUSD"          # domain BTC, bukan XAUUSD
+    assert r["signal"] == "buy"             # crypto 24/7: weekend tetap jalan
+    # kalkulasi broker BTC (bukan skala emas): $ risiko = jarak SL x 0.01
+    assert r["risk_per_001"] == round(r["sl_pips"] * 0.01, 2)
+    assert r["rr"] == 2.0
 
 
 def test_signal_news_blocked():
