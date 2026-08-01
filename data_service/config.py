@@ -113,6 +113,7 @@ class Settings(BaseSettings):
         "portofolio": "1529772227774513242",   # 📊portofolio (dashboard)
         "weekly": "1529772231402721350",       # 📅rekap-mingguan
         "btc_signal": "1532953796739596379",   # 🪙btc-signal (sinyal BTCUSD)
+        "news_prediction": "1532990504252477580",  # 🔮news-prediction (skenario pra-berita)
     }
 
     # --- Portofolio simulasi (dari hasil sinyal) --------------------------

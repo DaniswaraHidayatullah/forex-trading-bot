@@ -621,6 +621,64 @@ def _news_reminder(meta: dict) -> None:
             break
 
 
+NEWS_PRED_MIN = 25          # menit: batas bawah window prediksi pra-berita
+NEWS_PRED_MAX = 100         # menit: batas atas (lebar krn cron jarang jalan)
+
+
+def _news_prediction(meta: dict) -> None:
+    """Kirim skenario PRA-berita utk event USD high-impact yg akan rilis:
+    kondisi teknikal+sentimen SEKARANG + skenario arah emas (aktual vs forecast).
+    """
+    now = datetime.now(timezone.utc)
+    if not signal_engine.market_open(now):
+        return
+    try:
+        from fetchers import forexfactory as ff
+        from fetchers import news_predict as npd
+        events = main.get_or_set("ff_calendar", main.settings.cache_ttl_seconds,
+                                 ff.fetch_calendar)
+    except Exception:  # noqa: BLE001
+        return
+    predicted = set(meta.get("news_predicted", []))
+    tech: dict | None = None
+    for ev in events:
+        if ev.get("currency") != "USD" or ev.get("impact") != "high":
+            continue
+        try:
+            et = tracker.parse_utc(str(ev.get("time_utc")))
+        except (ValueError, TypeError):
+            continue
+        mins = (et - now).total_seconds() / 60
+        key = f"{ev.get('title')}|{ev.get('time_utc')}"
+        if not (NEWS_PRED_MIN <= mins <= NEWS_PRED_MAX) or key in predicted:
+            continue
+        try:
+            if tech is None:   # hitung sekali, dipakai semua event dekat
+                h = main._signal_for("XAUUSD", EQUITY, "harian")
+                i = main._signal_for("XAUUSD", EQUITY, "intraday")
+                ctx = main.context("XAUUSD")  # type: ignore[arg-type]
+                sent = ctx.get("sentiment") or {}
+                lean, ups, dns = npd.current_lean(
+                    h.get("trend"), i.get("trend"), h.get("momentum"),
+                    ctx.get("sentiment_bias"))
+                tech = {"h_trend": h.get("trend"), "i_trend": i.get("trend"),
+                        "momentum": h.get("momentum"),
+                        "sent_bias": ctx.get("sentiment_bias"),
+                        "sent_score": sent.get("score"),
+                        "lean": lean, "ups": ups, "dns": dns}
+            scen = npd.scenario(ev.get("title", ""))
+            info = {**tech, **scen, "mins": mins}
+            main._push_discord(notifier.format_news_prediction(ev, info),
+                               channel="news_prediction")
+            predicted.add(key)
+            meta["news_predicted"] = list(predicted)[-50:]
+            print(f"[predikB] {ev.get('title')} ~{mins:.0f}mnt -> lean {tech['lean']}")
+            break   # satu prediksi per siklus cukup
+        except Exception as e:  # noqa: BLE001
+            print("[predikB] ERROR:", e)
+            return
+
+
 def main_run() -> None:
     if not main._discord_configured():
         print("PERINGATAN: Discord belum dikonfigurasi (Secrets).")
@@ -635,6 +693,7 @@ def main_run() -> None:
     _portfolio_dashboard(entries, meta)
     _weekly_recap(entries, meta)
     _news_reminder(meta)
+    _news_prediction(meta)
     _save_log(entries)
     _save_meta(meta)
     # Rekap dipisah per VERSI strategi (v1 arsip vs v2 aktif).

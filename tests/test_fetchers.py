@@ -225,6 +225,28 @@ def test_btc_signal_separate_domain_weekend():
     assert r["rr"] == 2.0
 
 
+def test_news_predict_direction_and_lean():
+    from data_service.fetchers.news_predict import (
+        current_lean,
+        higher_actual_gold_dir,
+        scenario,
+    )
+    # data kuat (CPI/NFP tinggi) -> USD kuat -> emas turun bila aktual>forecast
+    assert higher_actual_gold_dir("US CPI m/m") == "down"
+    assert higher_actual_gold_dir("Non-Farm Employment Change") == "down"
+    # indikator inverse: pengangguran/klaim tinggi = lemah -> emas naik
+    assert higher_actual_gold_dir("Unemployment Rate") == "up"
+    assert higher_actual_gold_dir("Unemployment Claims") == "up"
+
+    scen = scenario("US CPI m/m")
+    assert scen == {"hot_dir": "down", "cool_dir": "up"}
+
+    lean, ups, dns = current_lean("down", "down", "down", "short")
+    assert lean == "down" and dns == 4
+    lean2, u2, d2 = current_lean("up", "down", "flat", "long")
+    assert lean2 == "up" and u2 == 2 and d2 == 1
+
+
 def _btc_score(heads):
     return score_sentiment(heads, min_headlines=2, relevance=_BTC_RELEVANCE,
                            bullish=_BTC_BULLISH, bearish=_BTC_BEARISH)

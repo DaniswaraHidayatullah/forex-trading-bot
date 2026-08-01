@@ -204,6 +204,44 @@ def format_news_reminder(ev: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+_DIR_WORD = {"up": "📈 NAIK", "down": "📉 TURUN", "flat": "➡️ NETRAL"}
+
+
+def format_news_prediction(ev: dict[str, Any], info: dict[str, Any]) -> dict[str, Any]:
+    """Kartu prediksi PRA-berita: kondisi teknikal+sentimen sekarang + skenario
+    arah emas saat rilis (aktual vs forecast). Bukan kepastian."""
+    lean = _DIR_WORD.get(info.get("lean", "flat"), "➡️ NETRAL")
+    hot = _DIR_WORD.get(info.get("hot_dir", "down"), "📉 TURUN")
+    cool = _DIR_WORD.get(info.get("cool_dir", "up"), "📈 NAIK")
+    fc = ev.get("forecast") or "—"
+    prev = ev.get("previous") or "—"
+    sc = info.get("sent_score")
+    sc_txt = f" ({sc:+.2f})" if isinstance(sc, (int, float)) else ""
+    desc = "\n".join([
+        f"🕐 Rilis: `{str(ev.get('time_utc'))[11:16]} UTC` (~{info.get('mins', 0):.0f} mnt lagi)",
+        f"📊 Forecast: **{fc}**  ·  Sebelumnya: **{prev}**",
+        "",
+        "**📈 Kondisi SEKARANG:**",
+        f"• Tren: H1 **{info.get('h_trend')}** · Intraday **{info.get('i_trend')}**",
+        f"• Momentum: **{info.get('momentum')}**  ·  Sentimen: **{info.get('sent_bias')}**{sc_txt}",
+        f"➡️ Bias teknikal+sentimen: **{lean}**  ({info.get('ups', 0)} vs {info.get('dns', 0)} faktor)",
+        "",
+        "**🎲 Skenario saat rilis:**",
+        f"• Aktual **> forecast** (lebih panas) → emas **{hot}**",
+        f"• Aktual **< forecast** (lebih dingin) → emas **{cool}**",
+        "• Sesuai forecast → gerak kecil, cenderung ikut tren",
+    ])
+    return {
+        "content": f"🔮 Prediksi pra-berita: **{ev.get('title')}** (~{info.get('mins', 0):.0f} mnt lagi)",
+        "embeds": [{
+            "title": f"🔮 {ev.get('title')} ({ev.get('currency')})",
+            "description": desc,
+            "color": 10181046,
+            "footer": {"text": "Skenario, BUKAN kepastian · volatil & spread melebar saat rilis · bukan saran finansial"},
+        }],
+    }
+
+
 def format_price_embed(price: float, chg_1h: float, chg_24h: float,
                        hi: float, lo: float) -> dict[str, Any]:
     e = "📈" if chg_24h >= 0 else "📉"

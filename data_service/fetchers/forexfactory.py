@@ -61,6 +61,10 @@ def fetch_calendar(timeout: float = 15.0) -> list[dict[str, Any]]:
                 "impact": _normalize_impact(row.get("impact", "")),
                 "title": row.get("title", ""),
                 "time_utc": dt.isoformat(),
+                # Nilai konsensus utk prediksi pra-berita (bisa kosong).
+                "forecast": (row.get("forecast") or "").strip(),
+                "previous": (row.get("previous") or "").strip(),
+                "actual": (row.get("actual") or "").strip(),
             }
         )
     return events
