@@ -1861,8 +1861,9 @@
   "reward_usd": 42.15,
   "confidence": 1,
   "time_utc": "2026-07-31T18:42:33+00:00",
-  "status": "open",
-  "symbol": "XAUUSD"
+  "status": "loss",
+  "symbol": "XAUUSD",
+  "closed_utc": "2026-08-02T22:35:38+00:00"
  },
  {
   "id": "b181694f",
@@ -1876,8 +1877,9 @@
   "reward_usd": 40.5,
   "confidence": 1,
   "time_utc": "2026-07-31T20:07:41+00:00",
-  "status": "open",
-  "symbol": "XAUUSD"
+  "status": "loss",
+  "symbol": "XAUUSD",
+  "closed_utc": "2026-08-02T22:35:38+00:00"
  },
  {
   "id": "82ddd639",
@@ -1949,6 +1951,24 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-02T07:15:25+00:00",
+  "status": "loss",
+  "closed_utc": "2026-08-02T22:35:38+00:00"
+ },
+ {
+  "id": "28db20d1",
+  "symbol": "BTCUSD",
+  "profile": "BTC",
+  "side": "sell",
+  "entry": 63437.52,
+  "sl": 63902.58,
+  "tp": 62507.4,
+  "rr": 2.0,
+  "risk_usd": 2.33,
+  "reward_usd": 4.65,
+  "confidence": 2,
+  "version": "v2",
+  "momentum": "up",
+  "time_utc": "2026-08-02T22:35:48+00:00",
   "status": "open"
  }
 ]
