@@ -96,8 +96,9 @@ class Settings(BaseSettings):
     btc_lot: float = 0.5                 # lot BTC (dipisah dari emas 0.2)
     btc_pip_price: float = 1.0           # 1 "pip" BTC = gerak $1 harga
     btc_usd_per_pip: float = 0.005       # $ P/L per $1 gerak @ 0.5 lot cent
-    # Batas risiko $ NYATA @0.5 lot cent. $8 = tolak SL > ~$1600 (~1600 pips).
-    btc_max_risk_usd: float = 8.0
+    # Batas risiko $ NYATA @0.5 lot cent = maks 6% dari $100 (samakan emas;
+    # marjin aman dari garis "judi" 10%). Tolak sinyal ber-SL sangat lebar.
+    btc_max_risk_usd: float = 6.0
 
     # --- Routing channel Discord (ID channel bukan rahasia) ---------------
     # Kosongkan salah satu utk fallback ke DISCORD_CHANNEL_ID.
