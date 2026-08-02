@@ -1892,8 +1892,9 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-01T03:48:39+00:00",
-  "status": "open",
-  "sheet_row": 8
+  "status": "loss",
+  "sheet_row": 8,
+  "closed_utc": "2026-08-02T04:36:06+00:00"
  },
  {
   "id": "a1d9f910",
@@ -1910,7 +1911,25 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-01T04:32:56+00:00",
-  "status": "open",
-  "sheet_row": 9
+  "status": "loss",
+  "sheet_row": 9,
+  "closed_utc": "2026-08-02T04:36:06+00:00"
+ },
+ {
+  "id": "c4f25639",
+  "symbol": "BTCUSD",
+  "profile": "BTC",
+  "side": "sell",
+  "entry": 63548.48,
+  "sl": 63854.43,
+  "tp": 62936.57,
+  "rr": 2.0,
+  "risk_usd": 0.61,
+  "reward_usd": 1.22,
+  "confidence": 2,
+  "version": "v2",
+  "momentum": "up",
+  "time_utc": "2026-08-02T04:36:09+00:00",
+  "status": "open"
  }
 ]
