@@ -222,7 +222,7 @@ def test_btc_signal_separate_domain_weekend():
     assert r["signal"] == "buy"             # crypto 24/7: weekend tetap jalan
     # kalkulasi broker BTC (bukan skala emas): $ risiko = jarak SL x 0.01
     assert r["risk_per_001"] == round(r["sl_pips"] * 0.01, 2)
-    assert r["rr"] == 2.0
+    assert r["rr"] == 1.5                   # BTC RR 1:1.5 (choppy)
 
 
 def test_news_predict_direction_and_lean():

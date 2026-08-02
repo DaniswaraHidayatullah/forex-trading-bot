@@ -155,7 +155,8 @@ def _resolve_open(entries: list[dict]) -> None:
         stats_text = (f"Akun Cent: **${pf['balance']:,.2f}** ({pf['wins']}W/{pf['losses']}L · "
                       f"WR {pf['wr']:.0f}% · PF {pf['pf']:.2f} · Net "
                       f"{'+' if pf['net_usd'] >= 0 else '−'}${abs(pf['net_usd']):,.2f})")
-        payload = notifier.format_outcome_embed(e, stats_text)
+        pnl = abs(_trade_pnl(e)) if e["status"] in ("win", "loss") else 0.0
+        payload = notifier.format_outcome_embed(e, stats_text, pnl)
         sent = main._push_discord(payload, channel="report")
         print(f"[resolve] {e.get('profile')} {e['side']} -> {e['status']} (dikirim={sent})")
 
@@ -530,8 +531,11 @@ def _market_feeds(meta: dict) -> None:
 
 
 def _lot_mult(e: dict) -> float:
-    """$ P/L per 1 unit gerak harga @lot 0.2 cent: emas 0.2, BTC 0.002."""
-    return 0.002 if e.get("symbol") == "BTCUSD" else 0.2
+    """$ P/L per 1 unit gerak harga (dari config; emas ~0.2, BTC ~0.005)."""
+    s = main.settings
+    if e.get("symbol") == "BTCUSD":
+        return s.btc_usd_per_pip / s.btc_pip_price
+    return s.usd_per_pip / s.pip_price
 
 
 def _trade_pnl(e: dict) -> float:

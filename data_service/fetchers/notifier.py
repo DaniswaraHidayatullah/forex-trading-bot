@@ -71,24 +71,22 @@ def format_embed(sig: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def format_outcome_embed(entry: dict[str, Any], stats_text: str) -> dict[str, Any]:
-    """Embed laporan hasil sinyal (kena TP / kena SL / kedaluwarsa)."""
+def format_outcome_embed(entry: dict[str, Any], stats_text: str,
+                         pnl_usd: float = 0.0) -> dict[str, Any]:
+    """Embed laporan hasil sinyal. pnl_usd = $ P/L NYATA (magnitude) dari runner
+    (config-derived per simbol/lot)."""
     status = entry.get("status")
     side = str(entry.get("side", "")).upper()
     prof = entry.get("profile", "")
     rr = entry.get("rr", 3)
     sym = entry.get("symbol", "XAUUSD")
-    # $ P/L NYATA skala cent (lot 0.2): jarak harga × 0.2(emas)/0.002(BTC).
-    mult = 0.002 if sym == "BTCUSD" else 0.2
-    en = float(entry.get("entry") or 0)
+    pnl = abs(pnl_usd)
     if status == "win":
-        pnl = abs(float(entry.get("tp") or en) - en) * mult
         title = f"✅ TP TERCAPAI — {side} {sym}"
         color = 3066993
         line = (f"Entry `{entry.get('entry')}` → TP `{entry.get('tp')}`  "
                 f"(**+${pnl:,.2f}** / +{pnl * 100:,.0f}¢ · +{float(rr):g}R)")
     elif status == "loss":
-        pnl = abs(en - float(entry.get("sl") or en)) * mult
         title = f"❌ SL KENA — {side} {sym}"
         color = 15158332
         line = (f"Entry `{entry.get('entry')}` → SL `{entry.get('sl')}`  "

@@ -247,7 +247,7 @@ def _btc_signal_for(equity: float, profile: str) -> dict:
             max_risk_usd=settings.btc_max_risk_usd,
             pip_price=settings.btc_pip_price,
             usd_per_pip=settings.btc_usd_per_pip,
-            lot=settings.signal_lot,
+            lot=settings.btc_lot,
             version=settings.signal_version,
             display_symbol="BTCUSD",
             market_type="crypto",

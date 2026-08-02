@@ -89,13 +89,15 @@ class Settings(BaseSettings):
         "https://bitcoinmagazine.com/feed",
     ]
     # Exness BTCUSD CENT: 1 lot = 0.01 BTC (100x lebih kecil dari Standard 1 BTC).
-    # Di 0.2 lot = 0.002 BTC -> gerak $1 = $0.002 P/L. SL ~$450 = ~$0.90 risiko.
+    # LOT BTC lebih besar dari emas (0.5 vs 0.2) supaya $ hasil SEPADAN: BTC
+    # geraknya "pips" ratusan tapi $/pip kecil, jadi dinaikin. Di 0.5 lot =
+    # 0.005 BTC -> gerak $1 = $0.005 P/L. SL ~$400 = ~$2 risiko (= emas).
     # (VERIFIKASI di terminal; kalau beda kabari.)
+    btc_lot: float = 0.5                 # lot BTC (dipisah dari emas 0.2)
     btc_pip_price: float = 1.0           # 1 "pip" BTC = gerak $1 harga
-    btc_usd_per_pip: float = 0.002       # $ P/L per $1 gerak @ 0.2 lot cent
-    # Batas risiko $ NYATA @0.2 lot cent. BTC ber-SL lebar (ATR ribuan $);
-    # $3 = tolak SL > ~$1500 (~2400 pips). Cukup longgar utk data.
-    btc_max_risk_usd: float = 3.0
+    btc_usd_per_pip: float = 0.005       # $ P/L per $1 gerak @ 0.5 lot cent
+    # Batas risiko $ NYATA @0.5 lot cent. $8 = tolak SL > ~$1600 (~1600 pips).
+    btc_max_risk_usd: float = 8.0
 
     # --- Routing channel Discord (ID channel bukan rahasia) ---------------
     # Kosongkan salah satu utk fallback ke DISCORD_CHANNEL_ID.
