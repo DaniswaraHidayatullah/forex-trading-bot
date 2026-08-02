@@ -164,9 +164,9 @@ BTC_PROFILES: dict[str, dict[str, Any]] = {
     "btc": {
         "label": "BTC", "trend": "4h", "entry": "1h",
         "ema_fast": 21, "ema_slow": 50,
-        # RR 1:1.5 (bukan 1:2 spt emas): BTC choppy/mean-revert, sering balik
-        # arah di zona 1.5-2R (MFE 2 trade pertama: 1.58R & 1.96R lalu balik ke SL).
-        "atr_mult": 1.5, "rr": 1.5, "rsi_lo": 35.0, "rsi_hi": 65.0,
+        # RR 1:2 (sama spt emas) @lot 0.5 -> risk ~2% / reward ~4% per trade.
+        # User pilih reward proporsional (1:2) ketimbang TP dekat.
+        "atr_mult": 1.5, "rr": 2.0, "rsi_lo": 35.0, "rsi_hi": 65.0,
         "spread_pad": 20.0, "market": "crypto",
         "hold": "jam s/d beberapa hari",
     },
