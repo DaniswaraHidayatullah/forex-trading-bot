@@ -1845,8 +1845,9 @@
   "reward_usd": 25.98,
   "confidence": 1,
   "time_utc": "2026-07-31T17:10:03+00:00",
-  "status": "open",
-  "symbol": "XAUUSD"
+  "status": "expired",
+  "symbol": "XAUUSD",
+  "closed_utc": "2026-08-02T17:41:41+00:00"
  },
  {
   "id": "aa74197f",
