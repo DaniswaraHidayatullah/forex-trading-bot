@@ -225,6 +225,26 @@ def test_btc_signal_separate_domain_weekend():
     assert r["rr"] == 2.0                   # BTC RR 1:2 (@lot 0.5, sepadan emas)
 
 
+def test_conflict_skips_timeframe():
+    import tools.run_signal_once as R
+    profs = ["harian", "intraday"]
+    # searah (dua-duanya buy) -> tak ada skip
+    same = {"harian": {"signal": "buy", "confidence_level": 1},
+            "intraday": {"signal": "buy", "confidence_level": 2}}
+    assert R._conflict_skips(same, profs) == set()
+    # konflik, intraday ⭐⭐ > harian ⭐ -> skip yg lemah (harian)
+    clash = {"harian": {"signal": "buy", "confidence_level": 1},
+             "intraday": {"signal": "sell", "confidence_level": 2}}
+    assert R._conflict_skips(clash, profs) == {"harian"}
+    # konflik seri (sama bintang) -> skip dua-duanya
+    tie = {"harian": {"signal": "buy", "confidence_level": 2},
+           "intraday": {"signal": "sell", "confidence_level": 2}}
+    assert R._conflict_skips(tie, profs) == {"harian", "intraday"}
+    # salah satu none -> bukan konflik
+    one = {"harian": {"signal": "none"}, "intraday": {"signal": "sell", "confidence_level": 2}}
+    assert R._conflict_skips(one, profs) == set()
+
+
 def test_news_predict_direction_and_lean():
     from data_service.fetchers.news_predict import (
         current_lean,

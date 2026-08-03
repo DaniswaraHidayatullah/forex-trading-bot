@@ -66,6 +66,18 @@ def _is_v2(e: dict) -> bool:
     return not e.get("legacy") and not e.get("shadow")
 
 
+def _conflict_skips(sigs: dict[str, dict], profiles: list[str]) -> set[str]:
+    """Profil yang di-skip krn konflik timeframe (ada BUY & SELL sekaligus).
+    Skip yang keyakinan lebih rendah; kalau seri -> skip semua yang konflik.
+    Cegah sinyal hedge (BUY+SELL barengan = bayar spread 2x, nol hasil)."""
+    clash = [p for p in profiles if sigs.get(p, {}).get("signal") in ("buy", "sell")]
+    if len({sigs[p]["signal"] for p in clash}) <= 1:
+        return set()   # searah semua / cuma satu arah -> tak ada konflik
+    maxlvl = max(sigs[p].get("confidence_level", 0) for p in clash)
+    winners = [p for p in clash if sigs[p].get("confidence_level", 0) == maxlvl]
+    return set(clash) if len(winners) != 1 else set(clash) - set(winners)
+
+
 def _journal_append(entry: dict, symbol: str, sig: dict) -> None:
     """Tulis trade baru ke Google Sheets; simpan baris di entry (aman kalau gagal)."""
     if not journal.enabled():
@@ -174,8 +186,24 @@ def _new_signals(entries: list[dict]) -> None:
     except Exception as e:  # noqa: BLE001
         print("[sentimen] ERROR:", e)
 
+    # KONFLIK TIMEFRAME (mis. Harian H1 naik vs Intraday H4 turun) -> pasar
+    # bimbang. Auto-skip yang keyakinannya lebih rendah; seri -> skip dua-duanya.
+    _sigs: dict[str, dict] = {}
+    for p in profiles:
+        try:
+            _sigs[p] = main._signal_for("XAUUSD", EQUITY, p)
+        except Exception:  # noqa: BLE001
+            _sigs[p] = {}
+    skip_profiles = _conflict_skips(_sigs, profiles)
+    if skip_profiles:
+        print(f"[konflik TF] { {p: _sigs[p].get('signal') for p in _sigs} } "
+              f"-> skip {sorted(skip_profiles)}")
+
     now = datetime.now(timezone.utc)
     for profile in profiles:
+        if profile in skip_profiles:
+            print(f"[{profile}] SKIP — konflik timeframe (pasar bimbang, cegah hedge)")
+            continue
         label = signal_engine.PROFILES.get(profile, signal_engine.PROFILES["intraday"])["label"]
         open_real = [e for e in entries if e.get("status") == "open"
                      and e.get("profile") == label and not e.get("shadow")]
