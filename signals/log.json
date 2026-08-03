@@ -2094,7 +2094,8 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-03T18:24:04+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-08-03T20:06:36+00:00"
  },
  {
   "id": "4bf88e71",
@@ -2111,6 +2112,23 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-03T18:24:07+00:00",
+  "status": "open"
+ },
+ {
+  "id": "e01ce50e",
+  "symbol": "XAUUSD",
+  "profile": "Harian",
+  "side": "buy",
+  "entry": 4051.7,
+  "sl": 4026.74,
+  "tp": 4101.62,
+  "rr": 2.0,
+  "risk_usd": 4.99,
+  "reward_usd": 9.98,
+  "confidence": 3,
+  "version": "v2",
+  "momentum": "up",
+  "time_utc": "2026-08-03T20:06:39+00:00",
   "status": "open"
  }
 ]
