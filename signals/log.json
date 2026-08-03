@@ -2023,7 +2023,8 @@
   "version": "v2",
   "momentum": "down",
   "time_utc": "2026-08-03T08:18:34+00:00",
-  "status": "open"
+  "status": "win",
+  "closed_utc": "2026-08-03T14:11:03+00:00"
  },
  {
   "id": "994f689d",
