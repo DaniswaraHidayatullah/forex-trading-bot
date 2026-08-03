@@ -1,5 +1,5 @@
 {
- "last_price": "2026-08-03T16:39:01+00:00",
+ "last_price": "2026-08-03T18:24:09+00:00",
  "sent_titles": [
   "chinese yuan: upside bias toward 6.7600 against us dollar \u2013 ",
   "the extra reward for owning stocks over bonds has disappeare",
@@ -154,7 +154,7 @@
  ],
  "last_news": "2026-08-03T16:39:04+00:00",
  "last_dollar": "2026-08-03T11:52:06+00:00",
- "last_prediction_state": "up|down|long|long",
+ "last_prediction_state": "down|down|long|long",
  "sent_titles_gen": [
   "oil prices slide, brent crude below $90 as pause to u.s.-ira",
   "alphabet stock pops on report it's developing a more efficie",
@@ -411,7 +411,7 @@
  "last_burst_alert": "2026-07-31T13:27:05+00:00",
  "dollar_snap": {},
  "last_digest_date": "2026-07-30",
- "last_portfolio": "2026-08-03T04:46:00+00:00",
+ "last_portfolio": "2026-08-03T18:24:09+00:00",
  "last_weekly": "2026-W31",
  "news_alerted": [
   "Federal Funds Rate|2026-07-29T18:00:00+00:00"
