@@ -1988,7 +1988,8 @@
   "version": "v2",
   "momentum": "down",
   "time_utc": "2026-08-03T04:45:54+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-08-03T16:38:56+00:00"
  },
  {
   "id": "deaccbd3",
@@ -2041,6 +2042,41 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-03T11:52:01+00:00",
+  "status": "loss",
+  "closed_utc": "2026-08-03T16:38:56+00:00"
+ },
+ {
+  "id": "9080af19",
+  "symbol": "XAUUSD",
+  "profile": "Harian",
+  "side": "buy",
+  "entry": 4037.47,
+  "sl": 4018.54,
+  "tp": 4075.33,
+  "rr": 2.0,
+  "risk_usd": 3.79,
+  "reward_usd": 7.57,
+  "confidence": 3,
+  "version": "v2",
+  "momentum": "up",
+  "time_utc": "2026-08-03T16:38:59+00:00",
+  "status": "open"
+ },
+ {
+  "id": "d0761829",
+  "symbol": "BTCUSD",
+  "profile": "BTC",
+  "side": "sell",
+  "entry": 63794.6,
+  "sl": 64288.83,
+  "tp": 62806.14,
+  "rr": 2.0,
+  "risk_usd": 2.47,
+  "reward_usd": 4.94,
+  "confidence": 2,
+  "version": "v2",
+  "momentum": "up",
+  "time_utc": "2026-08-03T16:39:01+00:00",
   "status": "open"
  }
 ]
