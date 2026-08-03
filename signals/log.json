@@ -1988,5 +1988,39 @@
   "momentum": "down",
   "time_utc": "2026-08-03T04:45:54+00:00",
   "status": "open"
+ },
+ {
+  "id": "deaccbd3",
+  "symbol": "XAUUSD",
+  "profile": "Harian",
+  "side": "buy",
+  "entry": 4060.09,
+  "sl": 4049.44,
+  "tp": 4081.39,
+  "rr": 2.0,
+  "risk_usd": 2.13,
+  "reward_usd": 4.26,
+  "confidence": 1,
+  "version": "v2",
+  "momentum": "down",
+  "time_utc": "2026-08-03T08:18:33+00:00",
+  "status": "open"
+ },
+ {
+  "id": "17667fd1",
+  "symbol": "XAUUSD",
+  "profile": "Intraday",
+  "side": "sell",
+  "entry": 4060.09,
+  "sl": 4076.16,
+  "tp": 4027.95,
+  "rr": 2.0,
+  "risk_usd": 3.21,
+  "reward_usd": 6.43,
+  "confidence": 2,
+  "version": "v2",
+  "momentum": "down",
+  "time_utc": "2026-08-03T08:18:34+00:00",
+  "status": "open"
  }
 ]
