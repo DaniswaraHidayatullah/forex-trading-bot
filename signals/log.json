@@ -2183,5 +2183,22 @@
   "momentum": "down",
   "time_utc": "2026-08-04T01:06:27+00:00",
   "status": "open"
+ },
+ {
+  "id": "02bc6a1c",
+  "symbol": "XAUUSD",
+  "profile": "Intraday",
+  "side": "sell",
+  "entry": 4059.76,
+  "sl": 4073.38,
+  "tp": 4032.52,
+  "rr": 2.0,
+  "risk_usd": 2.72,
+  "reward_usd": 5.45,
+  "confidence": 2,
+  "version": "v2",
+  "momentum": "down",
+  "time_utc": "2026-08-04T04:27:52+00:00",
+  "status": "open"
  }
 ]
