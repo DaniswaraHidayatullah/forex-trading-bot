@@ -2146,7 +2146,8 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-03T21:18:51+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-08-04T01:06:23+00:00"
  },
  {
   "id": "0eadbb61",
@@ -2163,6 +2164,24 @@
   "version": "v2",
   "momentum": "down",
   "time_utc": "2026-08-03T22:31:40+00:00",
+  "status": "loss",
+  "closed_utc": "2026-08-04T01:06:23+00:00"
+ },
+ {
+  "id": "99613363",
+  "symbol": "XAUUSD",
+  "profile": "Intraday",
+  "side": "sell",
+  "entry": 4045.96,
+  "sl": 4073.32,
+  "tp": 3991.24,
+  "rr": 2.0,
+  "risk_usd": 5.47,
+  "reward_usd": 10.94,
+  "confidence": 2,
+  "version": "v2",
+  "momentum": "down",
+  "time_utc": "2026-08-04T01:06:27+00:00",
   "status": "open"
  }
 ]
