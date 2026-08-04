@@ -24,7 +24,8 @@ from fetchers import journal, notifier, signal_engine, tracker  # noqa: E402
 LOG_FILE = Path(os.getenv("SIGNAL_LOG", str(ROOT / "signals" / "log.json")))
 META_FILE = LOG_FILE.parent / "meta.json"
 EQUITY = float(os.getenv("EQUITY", "100"))
-EXPIRE_DAYS = {"Harian": 2, "Scalping": 1, "Intraday": 3, "Swing": 10, "BTC": 3}
+EXPIRE_DAYS = {"Harian": 2, "Scalping": 1, "Intraday": 3, "Swing": 10,
+               "BTC": 3, "MeanRev": 2}
 _LEVEL = {"none": 0, "medium": 2, "strong": 3}
 BURST_ATR_MULT = 3.0        # ledakan = gerak 1 jam >= 3x ATR(M15)
 BURST_COOLDOWN_H = 2        # jangan alert ledakan lagi dalam N jam

@@ -142,6 +142,16 @@ PROFILES: dict[str, dict[str, Any]] = {
         "session": (5, 21),  # jam UTC boleh entry (diperlebar)
         "hold": "~1 jam s/d 1 hari",
     },
+    # MEAN-REVERSION (dipakai sekarang) — fade ekstrem RSI 30/70, RR 1:2.
+    # Backtest 52hr XAU: ~4-5 sinyal/hari (maks 2 posisi), WR 40%, +ekspektansi.
+    # filter_regime OFF utk frekuensi; ON kalau mau lebih aman di pasar trending.
+    "meanrev": {
+        "label": "MeanRev", "trend": "1h", "entry": "15min",
+        "ema_fast": 21, "ema_slow": 50,
+        "atr_mult": 1.2, "rr": 2.0, "rsi_lo": 30.0, "rsi_hi": 70.0,
+        "session": (5, 21), "mode": "meanrev", "regime_filter": False,
+        "hold": "~jam (fade ekstrem, RR 1:2)",
+    },
     "scalp": {
         "label": "Scalping", "trend": "30min", "entry": "5min",
         "atr_mult": 1.2, "hold": "menit s/d ~1 jam",
@@ -164,11 +174,12 @@ BTC_PROFILES: dict[str, dict[str, Any]] = {
     "btc": {
         "label": "BTC", "trend": "4h", "entry": "1h",
         "ema_fast": 21, "ema_slow": 50,
-        # RR 1:2 (sama spt emas) @lot 0.5 -> risk ~2% / reward ~4% per trade.
-        # User pilih reward proporsional (1:2) ketimbang TP dekat.
-        "atr_mult": 1.5, "rr": 2.0, "rsi_lo": 35.0, "rsi_hi": 65.0,
+        # MEAN-REVERSION (strategi sama spt emas), RR 1:2 @lot 0.5. Fade ekstrem
+        # RSI 30/70. (Belum di-backtest khusus BTC — ikut strategi seragam.)
+        "atr_mult": 1.5, "rr": 2.0, "rsi_lo": 30.0, "rsi_hi": 70.0,
+        "mode": "meanrev", "regime_filter": False,
         "spread_pad": 20.0, "market": "crypto",
-        "hold": "jam s/d beberapa hari",
+        "hold": "jam s/d beberapa hari (fade ekstrem)",
     },
 }
 
@@ -246,6 +257,8 @@ def build_signal(
     ema_fast = int(prof.get("ema_fast", ema_fast))
     ema_slow = int(prof.get("ema_slow", ema_slow))
     session = prof.get("session")
+    mode = prof.get("mode", "trend")   # "trend" (pullback) | "meanrev" (fade ekstrem)
+    regime_filter = bool(prof.get("regime_filter", False))
 
     base: dict[str, Any] = {
         "symbol": disp,
@@ -333,15 +346,27 @@ def build_signal(
     base["atr"] = round(atr_val, 2)
     base["entry"] = round(price, 2)
 
-    if trend == 0:
-        base["reason"] = f"Tren {trend_interval} flat (EMA50 ~ EMA200) -> tunggu"
-        return base
-
-    want_buy = trend == 1 and rsi_lo <= rsi_val <= rsi_hi
-    want_sell = trend == -1 and rsi_lo <= rsi_val <= rsi_hi
-    if not want_buy and not want_sell:
-        base["reason"] = f"RSI {rsi_val:.0f} di luar zona pullback ({rsi_lo:.0f}-{rsi_hi:.0f})"
-        return base
+    if mode == "meanrev":
+        # MEAN-REVERSION: fade ekstrem (RSI<=lo beli, RSI>=hi jual). Tak butuh
+        # tren; filter regime opsional (skip pas tren kuat = anti pisau jatuh).
+        if regime_filter and abs(ema_f - ema_s) > 1.5 * atr_val:
+            base["reason"] = "Tren kuat -> skip fade (filter regime mean-rev)"
+            return base
+        want_buy = rsi_val <= rsi_lo
+        want_sell = rsi_val >= rsi_hi
+        if not want_buy and not want_sell:
+            base["reason"] = (f"RSI {rsi_val:.0f} belum ekstrem "
+                              f"(butuh <={rsi_lo:.0f} atau >={rsi_hi:.0f})")
+            return base
+    else:
+        if trend == 0:
+            base["reason"] = f"Tren {trend_interval} flat (EMA50 ~ EMA200) -> tunggu"
+            return base
+        want_buy = trend == 1 and rsi_lo <= rsi_val <= rsi_hi
+        want_sell = trend == -1 and rsi_lo <= rsi_val <= rsi_hi
+        if not want_buy and not want_sell:
+            base["reason"] = f"RSI {rsi_val:.0f} di luar zona pullback ({rsi_lo:.0f}-{rsi_hi:.0f})"
+            return base
 
     # ANTI-SPIKE: SL minimal di LUAR wick 12 bar terakhir + buffer 0.5 ATR
     # + bantalan spread broker (SELL kena SL di harga ask; feed broker bisa
@@ -401,18 +426,22 @@ def build_signal(
                                or (want_sell and sentiment_bias == "short")) else "melawan"
         sent_txt = f"berita {arah} ({sentiment_bias} {sentiment_score:+.2f})"
     if want_buy:
+        why = (f"Oversold RSI {rsi_val:.0f} (fade balik naik)" if mode == "meanrev"
+               else f"Uptrend {trend_interval} + RSI pullback {rsi_val:.0f}")
         base.update({
             "signal": "buy",
             "sl": round(price - sl_dist, 2),
             "tp": round(price + tp_dist, 2),
-            "reason": f"Uptrend {trend_interval} + RSI pullback {rsi_val:.0f} · {sent_txt}",
+            "reason": f"{why} · {sent_txt}",
         })
     else:
+        why = (f"Overbought RSI {rsi_val:.0f} (fade balik turun)" if mode == "meanrev"
+               else f"Downtrend {trend_interval} + RSI pullback {rsi_val:.0f}")
         base.update({
             "signal": "sell",
             "sl": round(price + sl_dist, 2),
             "tp": round(price - tp_dist, 2),
-            "reason": f"Downtrend {trend_interval} + RSI pullback {rsi_val:.0f} · {sent_txt}",
+            "reason": f"{why} · {sent_txt}",
         })
 
     side = base["signal"]

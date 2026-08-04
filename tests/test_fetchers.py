@@ -198,14 +198,15 @@ def _trend_up_fetch(interval, size):
 
 
 def _btc_fetch(interval, size):
-    # Skala harga BTC (~$62k). Tren 4h naik; entry 1h osilasi (RSI di band).
+    # Skala harga BTC (~$62k). Entry 1h MENURUN tajam -> RSI oversold (<=30)
+    # -> mode mean-reversion memicu BUY (fade balik naik).
     if interval == "4h":
         return [{"open": 60000 + i * 10, "high": 60010 + i * 10,
                  "low": 59990 + i * 10, "close": 60000 + i * 10} for i in range(size)]
     bars = []
     for i in range(size):
-        c = 62000 + (50 if i % 2 == 0 else -50)
-        bars.append({"open": c, "high": c + 30, "low": c - 30, "close": c})
+        c = 63000 - i * 8
+        bars.append({"open": c, "high": c + 20, "low": c - 20, "close": c})
     return bars
 
 

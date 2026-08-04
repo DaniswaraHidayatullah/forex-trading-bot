@@ -27,10 +27,14 @@ input double InpRR           = 2.0;     // Reward:Risk (TP = SL x ini)
 input double InpAtrMult      = 1.2;     // SL = ATR x ini (sebelum anti-spike)
 input int    InpAtrPeriod    = 14;      // periode ATR (M15)
 input int    InpRsiPeriod    = 14;      // periode RSI (M15)
-input int    InpEntryMode    = 1;       // 0=trend-pullback, 1=MEAN-REVERSION (juara riset RR1:2)
-input bool   InpRegimeFilter = true;    // (mean-rev) skip pas tren KUAT (anti nangkep pisau jatuh)
-input double InpRsiLo        = 25.0;    // mean-rev: BUY kalau RSI<=ini | trend: batas bawah band
-input double InpRsiHi        = 75.0;    // mean-rev: SELL kalau RSI>=ini | trend: batas atas band
+input int    InpEntryMode    = 1;       // 0=trend-pullback, 1=MEAN-REVERSION (dipakai)
+// Config terpilih: RSI 30/70, maks 2 posisi -> ~4-5 sinyal/hari (backtest:
+// WR 40%, ekspektansi +0.15R, RR 1:2, drawdown ~36%). BE/trail OFF (terbukti
+// nurunin hasil). Filter tren OFF utk kejar frekuensi; nyalain kalau mau lebih
+// aman di pasar trending (tapi sinyal berkurang).
+input bool   InpRegimeFilter = false;   // (mean-rev) ON=skip tren kuat (aman, sinyal turun)
+input double InpRsiLo        = 30.0;    // mean-rev: BUY kalau RSI<=ini
+input double InpRsiHi        = 70.0;    // mean-rev: SELL kalau RSI>=ini
 input int    InpEmaFast      = 21;      // EMA cepat (H1)
 input int    InpEmaSlow      = 50;      // EMA lambat (H1)
 input double InpSpreadPad    = 0.30;    // bantalan anti-spike (dalam harga)
