@@ -27,8 +27,10 @@ input double InpRR           = 2.0;     // Reward:Risk (TP = SL x ini)
 input double InpAtrMult      = 1.2;     // SL = ATR x ini (sebelum anti-spike)
 input int    InpAtrPeriod    = 14;      // periode ATR (M15)
 input int    InpRsiPeriod    = 14;      // periode RSI (M15)
-input double InpRsiLo        = 30.0;    // zona pullback bawah
-input double InpRsiHi        = 70.0;    // zona pullback atas
+input int    InpEntryMode    = 1;       // 0=trend-pullback, 1=MEAN-REVERSION (juara riset RR1:2)
+input bool   InpRegimeFilter = true;    // (mean-rev) skip pas tren KUAT (anti nangkep pisau jatuh)
+input double InpRsiLo        = 25.0;    // mean-rev: BUY kalau RSI<=ini | trend: batas bawah band
+input double InpRsiHi        = 75.0;    // mean-rev: SELL kalau RSI>=ini | trend: batas atas band
 input int    InpEmaFast      = 21;      // EMA cepat (H1)
 input int    InpEmaSlow      = 50;      // EMA lambat (H1)
 input double InpSpreadPad    = 0.30;    // bantalan anti-spike (dalam harga)
@@ -184,10 +186,21 @@ void OnTick()
    if(emaF==EMPTY_VALUE || emaS==EMPTY_VALUE ||
       rsi==EMPTY_VALUE  || atr==EMPTY_VALUE  || atr<=0) return;
 
-   int trend = (emaF>emaS) ? 1 : ((emaF<emaS) ? -1 : 0);
-   if(trend == 0) return;
-   bool wantBuy  = (trend==1  && rsi>=InpRsiLo && rsi<=InpRsiHi);
-   bool wantSell = (trend==-1 && rsi>=InpRsiLo && rsi<=InpRsiHi);
+   bool wantBuy=false, wantSell=false;
+   if(InpEntryMode==1)   // MEAN-REVERSION: fade ekstrem (RSI<=lo beli, RSI>=hi jual)
+   {
+      // filter regime: kalau tren KUAT (EMA jauh), jangan fade -> skip
+      if(InpRegimeFilter && MathAbs(emaF-emaS) > 1.5*atr) return;
+      wantBuy  = (rsi <= InpRsiLo);
+      wantSell = (rsi >= InpRsiHi);
+   }
+   else                  // TREND-PULLBACK (lama): searah tren + RSI di band
+   {
+      int trend = (emaF>emaS) ? 1 : ((emaF<emaS) ? -1 : 0);
+      if(trend == 0) return;
+      wantBuy  = (trend==1  && rsi>=InpRsiLo && rsi<=InpRsiHi);
+      wantSell = (trend==-1 && rsi>=InpRsiLo && rsi<=InpRsiHi);
+   }
    if(!wantBuy && !wantSell) return;
 
    double ask = SymbolInfoDouble(_Symbol, SYMBOL_ASK);
