@@ -38,6 +38,13 @@ input int    InpSessEnd      = 21;      // jam GMT selesai entry
 input bool   InpWeekendGuard = true;    // skip weekend (emas). BTC: false
 input int    InpMaxPositions = 2;       // maks posisi terbuka (magic ini)
 input long   InpMagic        = 20260801;// pembeda posisi EA ini
+//--- Manajemen SL: BREAKEVEN + TRAILING (kunci profit) --------------
+input bool   InpBreakeven    = true;    // geser SL ke entry saat profit cukup
+input double InpBEatR        = 1.0;     // trigger breakeven (dalam R)
+input double InpBElockR       = 0.0;    // kunci berapa R saat BE (0 = pas entry)
+input bool   InpTrail        = true;    // trailing setelah profit lanjut
+input double InpTrailStart    = 1.5;    // mulai trailing di berapa R
+input double InpTrailGap      = 1.0;    // SL ketinggalan berapa R di belakang harga
 
 //--- Handle indikator ----------------------------------------------
 int      hEmaF, hEmaS, hRsi, hAtr;
@@ -114,9 +121,57 @@ bool InSession()
 }
 
 //+------------------------------------------------------------------+
+//| Kelola SL posisi terbuka: breakeven + trailing (dipanggil /tick) |
+//|   1R diturunkan dari jarak TP (tak berubah) / RR.                |
+//|   profit >= InpBEatR         -> SL ke entry (+InpBElockR).        |
+//|   profit >= InpTrailStart    -> SL seret, ketinggalan InpTrailGap.|
+//|   SL hanya digeser MAJU (tak pernah dilonggarkan).               |
+//+------------------------------------------------------------------+
+void ManageOpen()
+{
+   double bid = SymbolInfoDouble(_Symbol, SYMBOL_BID);
+   double ask = SymbolInfoDouble(_Symbol, SYMBOL_ASK);
+   int    dg  = (int)SymbolInfoInteger(_Symbol, SYMBOL_DIGITS);
+
+   for(int i = PositionsTotal()-1; i >= 0; i--)
+   {
+      ulong tk = PositionGetTicket(i);
+      if(tk == 0) continue;
+      if(PositionGetString(POSITION_SYMBOL)!=_Symbol ||
+         PositionGetInteger(POSITION_MAGIC)!=InpMagic) continue;
+
+      long   type  = PositionGetInteger(POSITION_TYPE);
+      double entry = PositionGetDouble(POSITION_PRICE_OPEN);
+      double sl    = PositionGetDouble(POSITION_SL);
+      double tp    = PositionGetDouble(POSITION_TP);
+      if(tp == 0) continue;
+
+      double oneR = MathAbs(tp-entry)/InpRR;      // 1R (dari TP, tak berubah)
+      if(oneR <= 0) continue;
+
+      double profitR, sign;
+      if(type==POSITION_TYPE_BUY) { profitR=(bid-entry)/oneR; sign=1.0;  }
+      else                        { profitR=(entry-ask)/oneR; sign=-1.0; }
+
+      double lockR = -9999.0;                     // -9999 = belum aktif
+      if(InpTrail && profitR >= InpTrailStart)
+         lockR = profitR - InpTrailGap;           // seret di belakang harga
+      else if(InpBreakeven && profitR >= InpBEatR)
+         lockR = InpBElockR;                       // breakeven
+      if(lockR <= -9999.0) continue;
+
+      double newSL = NormalizeDouble(entry + sign*lockR*oneR, dg);
+      bool better = (type==POSITION_TYPE_BUY) ? (sl==0 || newSL>sl)
+                                              : (sl==0 || newSL<sl);
+      if(better) trade.PositionModify(tk, newSL, tp);
+   }
+}
+
+//+------------------------------------------------------------------+
 void OnTick()
 {
-   if(!NewM15Bar()) return;                 // evaluasi 1x per bar M15 tertutup
+   ManageOpen();                            // kelola SL tiap tick (BE+trailing)
+   if(!NewM15Bar()) return;                 // entry: evaluasi 1x per bar M15
    if(!InSession()) return;
    if(CountMyPositions() >= InpMaxPositions) return;
 
