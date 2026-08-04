@@ -2397,8 +2397,9 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-04T11:53:27+00:00",
-  "status": "open",
+  "status": "loss",
   "legacy": true,
-  "archived_reason": "pra-meanrev (trend strategy)"
+  "archived_reason": "pra-meanrev (trend strategy)",
+  "closed_utc": "2026-08-04T14:19:43+00:00"
  }
 ]
