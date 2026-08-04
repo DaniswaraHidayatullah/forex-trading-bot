@@ -743,7 +743,9 @@
   "shadow": true,
   "time_utc": "2026-07-13T13:33:01+00:00",
   "status": "win",
-  "closed_utc": "2026-07-13T16:17:21+00:00"
+  "closed_utc": "2026-07-13T16:17:21+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "811ba352",
@@ -759,7 +761,9 @@
   "shadow": true,
   "time_utc": "2026-07-13T20:46:03+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-14T03:29:35+00:00"
+  "closed_utc": "2026-07-14T03:29:35+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "96a01067",
@@ -775,7 +779,9 @@
   "shadow": true,
   "time_utc": "2026-07-14T07:43:49+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-14T12:22:00+00:00"
+  "closed_utc": "2026-07-14T12:22:00+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "02e270b4",
@@ -791,7 +797,9 @@
   "shadow": true,
   "time_utc": "2026-07-14T18:05:26+00:00",
   "status": "win",
-  "closed_utc": "2026-07-15T03:55:22+00:00"
+  "closed_utc": "2026-07-15T03:55:22+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "bda635d6",
@@ -807,7 +815,9 @@
   "time_utc": "2026-07-14T19:41:02+00:00",
   "status": "win",
   "closed_utc": "2026-07-15T03:55:22+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "7a68dd16",
@@ -823,7 +833,9 @@
   "shadow": true,
   "time_utc": "2026-07-15T10:27:26+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-15T11:56:33+00:00"
+  "closed_utc": "2026-07-15T11:56:33+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "5df0e23e",
@@ -839,7 +851,9 @@
   "shadow": true,
   "time_utc": "2026-07-15T11:56:41+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-15T13:17:00+00:00"
+  "closed_utc": "2026-07-15T13:17:00+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "4d5275d2",
@@ -855,7 +869,9 @@
   "shadow": true,
   "time_utc": "2026-07-15T17:53:15+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-15T18:52:16+00:00"
+  "closed_utc": "2026-07-15T18:52:16+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "af1a7990",
@@ -871,7 +887,9 @@
   "shadow": true,
   "time_utc": "2026-07-16T08:30:55+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-16T12:07:21+00:00"
+  "closed_utc": "2026-07-16T12:07:21+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "300f3594",
@@ -887,7 +905,9 @@
   "shadow": true,
   "time_utc": "2026-07-16T10:32:55+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-16T12:07:21+00:00"
+  "closed_utc": "2026-07-16T12:07:21+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "f94b4145",
@@ -903,7 +923,9 @@
   "shadow": true,
   "time_utc": "2026-07-16T12:07:25+00:00",
   "status": "win",
-  "closed_utc": "2026-07-16T14:18:10+00:00"
+  "closed_utc": "2026-07-16T14:18:10+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "65f25c55",
@@ -919,7 +941,9 @@
   "shadow": true,
   "time_utc": "2026-07-17T06:33:42+00:00",
   "status": "win",
-  "closed_utc": "2026-07-17T12:58:51+00:00"
+  "closed_utc": "2026-07-17T12:58:51+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "4def09aa",
@@ -935,7 +959,9 @@
   "shadow": true,
   "time_utc": "2026-07-17T14:42:45+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-17T16:02:22+00:00"
+  "closed_utc": "2026-07-17T16:02:22+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "f87ee58b",
@@ -951,7 +977,9 @@
   "shadow": true,
   "time_utc": "2026-07-17T18:31:03+00:00",
   "status": "expired",
-  "closed_utc": "2026-07-19T18:35:18+00:00"
+  "closed_utc": "2026-07-19T18:35:18+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "4130e8f0",
@@ -967,7 +995,9 @@
   "time_utc": "2026-07-20T01:11:23+00:00",
   "status": "win",
   "closed_utc": "2026-07-20T04:50:04+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "a9534995",
@@ -983,7 +1013,9 @@
   "time_utc": "2026-07-20T07:50:05+00:00",
   "status": "loss",
   "closed_utc": "2026-07-20T12:54:01+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "cd45aa6a",
@@ -999,7 +1031,9 @@
   "time_utc": "2026-07-20T12:54:03+00:00",
   "status": "loss",
   "closed_utc": "2026-07-20T15:00:39+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "c4a2c562",
@@ -1015,7 +1049,9 @@
   "time_utc": "2026-07-20T15:00:46+00:00",
   "status": "win",
   "closed_utc": "2026-07-21T04:12:51+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "ef5aade3",
@@ -1031,7 +1067,9 @@
   "shadow": true,
   "time_utc": "2026-07-20T18:32:22+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-21T00:57:53+00:00"
+  "closed_utc": "2026-07-21T00:57:53+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "9f63f0a2",
@@ -1047,7 +1085,9 @@
   "shadow": true,
   "time_utc": "2026-07-21T00:58:00+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-21T04:12:51+00:00"
+  "closed_utc": "2026-07-21T04:12:51+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "319b352d",
@@ -1063,7 +1103,9 @@
   "time_utc": "2026-07-21T09:15:13+00:00",
   "status": "loss",
   "closed_utc": "2026-07-21T12:49:43+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "a263cefe",
@@ -1079,7 +1121,9 @@
   "time_utc": "2026-07-21T12:49:46+00:00",
   "status": "loss",
   "closed_utc": "2026-07-21T14:53:41+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "961e0cd4",
@@ -1095,7 +1139,9 @@
   "time_utc": "2026-07-21T17:44:50+00:00",
   "status": "win",
   "closed_utc": "2026-07-21T18:55:39+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "2fbe61fb",
@@ -1111,7 +1157,9 @@
   "time_utc": "2026-07-21T18:55:43+00:00",
   "status": "win",
   "closed_utc": "2026-07-22T04:30:41+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "de50e52f",
@@ -1127,7 +1175,9 @@
   "shadow": true,
   "time_utc": "2026-07-21T21:32:53+00:00",
   "status": "loss",
-  "closed_utc": "2026-07-22T01:04:22+00:00"
+  "closed_utc": "2026-07-22T01:04:22+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "33ab9c33",
@@ -1143,7 +1193,9 @@
   "time_utc": "2026-07-22T07:18:37+00:00",
   "status": "win",
   "closed_utc": "2026-07-22T15:02:27+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "0879707f",
@@ -1159,7 +1211,9 @@
   "time_utc": "2026-07-22T17:52:44+00:00",
   "status": "loss",
   "closed_utc": "2026-07-22T18:54:17+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "16649bef",
@@ -1175,7 +1229,9 @@
   "time_utc": "2026-07-22T18:54:21+00:00",
   "status": "loss",
   "closed_utc": "2026-07-22T22:30:56+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "a29b5e58",
@@ -1191,7 +1247,9 @@
   "time_utc": "2026-07-23T01:09:33+00:00",
   "status": "win",
   "closed_utc": "2026-07-23T08:56:55+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "6311d9a8",
@@ -1207,7 +1265,9 @@
   "time_utc": "2026-07-23T05:46:51+00:00",
   "status": "loss",
   "closed_utc": "2026-07-23T07:05:34+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "4889f297",
@@ -1223,7 +1283,9 @@
   "time_utc": "2026-07-23T07:05:41+00:00",
   "status": "loss",
   "closed_utc": "2026-07-23T08:56:55+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "0eb659b6",
@@ -1239,7 +1301,9 @@
   "time_utc": "2026-07-23T09:33:10+00:00",
   "status": "loss",
   "closed_utc": "2026-07-23T12:59:45+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "a80aea10",
@@ -1255,7 +1319,9 @@
   "time_utc": "2026-07-23T11:29:50+00:00",
   "status": "loss",
   "closed_utc": "2026-07-23T12:59:45+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "e1156ae3",
@@ -1271,7 +1337,9 @@
   "time_utc": "2026-07-23T19:42:07+00:00",
   "status": "win",
   "closed_utc": "2026-07-24T04:28:35+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "a1b82e58",
@@ -1287,7 +1355,9 @@
   "time_utc": "2026-07-23T20:41:18+00:00",
   "status": "win",
   "closed_utc": "2026-07-24T04:28:35+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "dafb19a9",
@@ -1303,7 +1373,9 @@
   "time_utc": "2026-07-24T07:06:02+00:00",
   "status": "loss",
   "closed_utc": "2026-07-24T09:30:16+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "d0b087ed",
@@ -1319,7 +1391,9 @@
   "time_utc": "2026-07-24T07:06:03+00:00",
   "status": "loss",
   "closed_utc": "2026-07-24T09:30:16+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "9c59a91f",
@@ -1335,7 +1409,9 @@
   "time_utc": "2026-07-24T09:30:22+00:00",
   "status": "loss",
   "closed_utc": "2026-07-24T11:21:52+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "56c8631d",
@@ -1351,7 +1427,9 @@
   "time_utc": "2026-07-24T09:30:22+00:00",
   "status": "loss",
   "closed_utc": "2026-07-24T14:42:09+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "6ab24091",
@@ -1367,7 +1445,9 @@
   "time_utc": "2026-07-24T11:21:56+00:00",
   "status": "win",
   "closed_utc": "2026-07-24T14:42:09+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "9e01e648",
@@ -1383,7 +1463,9 @@
   "time_utc": "2026-07-24T11:21:56+00:00",
   "status": "loss",
   "closed_utc": "2026-07-24T17:48:05+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "df07caeb",
@@ -1399,7 +1481,9 @@
   "time_utc": "2026-07-24T12:52:07+00:00",
   "status": "loss",
   "closed_utc": "2026-07-24T14:42:09+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "49e6ac9f",
@@ -1415,7 +1499,9 @@
   "time_utc": "2026-07-24T14:42:19+00:00",
   "status": "loss",
   "closed_utc": "2026-07-24T17:48:05+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "03c5bc17",
@@ -1431,7 +1517,9 @@
   "time_utc": "2026-07-24T14:42:20+00:00",
   "status": "loss",
   "closed_utc": "2026-07-24T17:48:05+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "9972aa9b",
@@ -1447,7 +1535,9 @@
   "time_utc": "2026-07-27T05:00:49+00:00",
   "status": "loss",
   "closed_utc": "2026-07-27T14:24:11+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "93d84ede",
@@ -1463,7 +1553,9 @@
   "time_utc": "2026-07-27T08:44:58+00:00",
   "status": "loss",
   "closed_utc": "2026-07-27T14:24:11+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "f4bdce4c",
@@ -1479,7 +1571,9 @@
   "time_utc": "2026-07-27T11:58:08+00:00",
   "status": "win",
   "closed_utc": "2026-07-28T03:43:40+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "109ab61d",
@@ -1495,7 +1589,9 @@
   "time_utc": "2026-07-27T14:24:13+00:00",
   "status": "loss",
   "closed_utc": "2026-07-27T16:36:46+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "c2d12b5a",
@@ -1511,7 +1607,9 @@
   "time_utc": "2026-07-27T16:36:48+00:00",
   "status": "win",
   "closed_utc": "2026-07-28T06:14:16+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "d03ba567",
@@ -1527,7 +1625,9 @@
   "time_utc": "2026-07-27T18:11:35+00:00",
   "status": "loss",
   "closed_utc": "2026-07-28T00:15:22+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "6951b677",
@@ -1543,7 +1643,9 @@
   "time_utc": "2026-07-27T20:59:56+00:00",
   "status": "loss",
   "closed_utc": "2026-07-28T00:15:22+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "72a5b66b",
@@ -1559,7 +1661,9 @@
   "time_utc": "2026-07-28T06:14:24+00:00",
   "status": "loss",
   "closed_utc": "2026-07-28T08:51:16+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "942f4ddf",
@@ -1575,7 +1679,9 @@
   "time_utc": "2026-07-28T08:51:18+00:00",
   "status": "win",
   "closed_utc": "2026-07-28T11:07:50+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "4030f58e",
@@ -1591,7 +1697,9 @@
   "time_utc": "2026-07-28T08:51:19+00:00",
   "status": "win",
   "closed_utc": "2026-07-29T14:36:58+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "5b2638b4",
@@ -1607,7 +1715,9 @@
   "time_utc": "2026-07-28T13:01:11+00:00",
   "status": "loss",
   "closed_utc": "2026-07-28T15:30:56+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "19d45bbb",
@@ -1623,7 +1733,9 @@
   "time_utc": "2026-07-28T15:31:06+00:00",
   "status": "loss",
   "closed_utc": "2026-07-28T17:07:07+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "ab0ed429",
@@ -1639,7 +1751,9 @@
   "time_utc": "2026-07-28T17:07:12+00:00",
   "status": "win",
   "closed_utc": "2026-07-28T22:30:30+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "35b92380",
@@ -1655,7 +1769,9 @@
   "time_utc": "2026-07-28T17:07:13+00:00",
   "status": "win",
   "closed_utc": "2026-07-29T14:36:58+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "8536b0df",
@@ -1671,7 +1787,9 @@
   "time_utc": "2026-07-29T07:15:41+00:00",
   "status": "win",
   "closed_utc": "2026-07-29T10:02:48+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "15cf0285",
@@ -1687,7 +1805,9 @@
   "time_utc": "2026-07-29T10:02:55+00:00",
   "status": "win",
   "closed_utc": "2026-07-29T14:36:58+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "32098f98",
@@ -1703,7 +1823,9 @@
   "time_utc": "2026-07-29T12:16:42+00:00",
   "status": "win",
   "closed_utc": "2026-07-29T14:36:58+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "8eed43e4",
@@ -1719,7 +1841,9 @@
   "time_utc": "2026-07-30T13:12:57+00:00",
   "status": "win",
   "closed_utc": "2026-07-30T15:22:16+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "c7d329be",
@@ -1735,7 +1859,9 @@
   "time_utc": "2026-07-30T20:53:33+00:00",
   "status": "loss",
   "closed_utc": "2026-07-31T03:46:53+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "a5ae4a1b",
@@ -1751,7 +1877,9 @@
   "time_utc": "2026-07-30T22:59:22+00:00",
   "status": "win",
   "closed_utc": "2026-07-31T09:30:20+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "f5317b8b",
@@ -1767,7 +1895,9 @@
   "time_utc": "2026-07-31T00:00:51+00:00",
   "status": "win",
   "closed_utc": "2026-07-31T09:30:20+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "87cbd74c",
@@ -1783,7 +1913,9 @@
   "time_utc": "2026-07-31T06:35:18+00:00",
   "status": "loss",
   "closed_utc": "2026-07-31T09:30:20+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "a2a2d3ac",
@@ -1799,7 +1931,9 @@
   "time_utc": "2026-07-31T09:30:30+00:00",
   "status": "loss",
   "closed_utc": "2026-07-31T13:26:58+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "9af2f11d",
@@ -1815,7 +1949,9 @@
   "time_utc": "2026-07-31T11:46:00+00:00",
   "status": "loss",
   "closed_utc": "2026-07-31T13:26:58+00:00",
-  "symbol": "XAUUSD"
+  "symbol": "XAUUSD",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "d0e19ae3",
@@ -1831,7 +1967,9 @@
   "time_utc": "2026-07-31T15:35:23+00:00",
   "status": "expired",
   "symbol": "XAUUSD",
-  "closed_utc": "2026-08-02T15:43:42+00:00"
+  "closed_utc": "2026-08-02T15:43:42+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "e0d66b93",
@@ -1847,7 +1985,9 @@
   "time_utc": "2026-07-31T17:10:03+00:00",
   "status": "expired",
   "symbol": "XAUUSD",
-  "closed_utc": "2026-08-02T17:41:41+00:00"
+  "closed_utc": "2026-08-02T17:41:41+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "aa74197f",
@@ -1863,7 +2003,9 @@
   "time_utc": "2026-07-31T18:42:33+00:00",
   "status": "loss",
   "symbol": "XAUUSD",
-  "closed_utc": "2026-08-02T22:35:38+00:00"
+  "closed_utc": "2026-08-02T22:35:38+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "b181694f",
@@ -1879,7 +2021,9 @@
   "time_utc": "2026-07-31T20:07:41+00:00",
   "status": "loss",
   "symbol": "XAUUSD",
-  "closed_utc": "2026-08-02T22:35:38+00:00"
+  "closed_utc": "2026-08-02T22:35:38+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "82ddd639",
@@ -1897,8 +2041,9 @@
   "momentum": "up",
   "time_utc": "2026-08-01T03:48:39+00:00",
   "status": "loss",
-  "sheet_row": 8,
-  "closed_utc": "2026-08-02T04:36:06+00:00"
+  "closed_utc": "2026-08-02T04:36:06+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "a1d9f910",
@@ -1916,8 +2061,9 @@
   "momentum": "up",
   "time_utc": "2026-08-01T04:32:56+00:00",
   "status": "loss",
-  "sheet_row": 9,
-  "closed_utc": "2026-08-02T04:36:06+00:00"
+  "closed_utc": "2026-08-02T04:36:06+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "c4f25639",
@@ -1935,7 +2081,9 @@
   "momentum": "up",
   "time_utc": "2026-08-02T04:36:09+00:00",
   "status": "win",
-  "closed_utc": "2026-08-03T04:45:48+00:00"
+  "closed_utc": "2026-08-03T04:45:48+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "5c0db640",
@@ -1953,7 +2101,9 @@
   "momentum": "up",
   "time_utc": "2026-08-02T07:15:25+00:00",
   "status": "loss",
-  "closed_utc": "2026-08-02T22:35:38+00:00"
+  "closed_utc": "2026-08-02T22:35:38+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "28db20d1",
@@ -1971,7 +2121,9 @@
   "momentum": "up",
   "time_utc": "2026-08-02T22:35:48+00:00",
   "status": "win",
-  "closed_utc": "2026-08-03T11:51:54+00:00"
+  "closed_utc": "2026-08-03T11:51:54+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "6632de9e",
@@ -1989,7 +2141,9 @@
   "momentum": "down",
   "time_utc": "2026-08-03T04:45:54+00:00",
   "status": "loss",
-  "closed_utc": "2026-08-03T16:38:56+00:00"
+  "closed_utc": "2026-08-03T16:38:56+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "deaccbd3",
@@ -2007,7 +2161,9 @@
   "momentum": "down",
   "time_utc": "2026-08-03T08:18:33+00:00",
   "status": "loss",
-  "closed_utc": "2026-08-03T11:51:54+00:00"
+  "closed_utc": "2026-08-03T11:51:54+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "17667fd1",
@@ -2025,7 +2181,9 @@
   "momentum": "down",
   "time_utc": "2026-08-03T08:18:34+00:00",
   "status": "win",
-  "closed_utc": "2026-08-03T14:11:03+00:00"
+  "closed_utc": "2026-08-03T14:11:03+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "994f689d",
@@ -2043,7 +2201,9 @@
   "momentum": "up",
   "time_utc": "2026-08-03T11:52:01+00:00",
   "status": "loss",
-  "closed_utc": "2026-08-03T16:38:56+00:00"
+  "closed_utc": "2026-08-03T16:38:56+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "9080af19",
@@ -2061,7 +2221,9 @@
   "momentum": "up",
   "time_utc": "2026-08-03T16:38:59+00:00",
   "status": "win",
-  "closed_utc": "2026-08-04T11:53:21+00:00"
+  "closed_utc": "2026-08-04T11:53:21+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "d0761829",
@@ -2078,7 +2240,9 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-03T16:39:01+00:00",
-  "status": "open"
+  "status": "open",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "223283cd",
@@ -2096,7 +2260,9 @@
   "momentum": "up",
   "time_utc": "2026-08-03T18:24:04+00:00",
   "status": "loss",
-  "closed_utc": "2026-08-03T20:06:36+00:00"
+  "closed_utc": "2026-08-03T20:06:36+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "4bf88e71",
@@ -2113,7 +2279,9 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-03T18:24:07+00:00",
-  "status": "open"
+  "status": "open",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "e01ce50e",
@@ -2130,7 +2298,9 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-03T20:06:39+00:00",
-  "status": "open"
+  "status": "open",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "bd7d03e9",
@@ -2148,7 +2318,9 @@
   "momentum": "up",
   "time_utc": "2026-08-03T21:18:51+00:00",
   "status": "loss",
-  "closed_utc": "2026-08-04T01:06:23+00:00"
+  "closed_utc": "2026-08-04T01:06:23+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "0eadbb61",
@@ -2166,7 +2338,9 @@
   "momentum": "down",
   "time_utc": "2026-08-03T22:31:40+00:00",
   "status": "loss",
-  "closed_utc": "2026-08-04T01:06:23+00:00"
+  "closed_utc": "2026-08-04T01:06:23+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "99613363",
@@ -2184,7 +2358,9 @@
   "momentum": "down",
   "time_utc": "2026-08-04T01:06:27+00:00",
   "status": "loss",
-  "closed_utc": "2026-08-04T11:53:21+00:00"
+  "closed_utc": "2026-08-04T11:53:21+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "02bc6a1c",
@@ -2202,7 +2378,9 @@
   "momentum": "down",
   "time_utc": "2026-08-04T04:27:52+00:00",
   "status": "loss",
-  "closed_utc": "2026-08-04T11:53:21+00:00"
+  "closed_utc": "2026-08-04T11:53:21+00:00",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  },
  {
   "id": "07fba7c3",
@@ -2219,6 +2397,8 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-04T11:53:27+00:00",
-  "status": "open"
+  "status": "open",
+  "legacy": true,
+  "archived_reason": "pra-meanrev (trend strategy)"
  }
 ]
