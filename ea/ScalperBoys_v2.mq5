@@ -39,10 +39,13 @@ input bool   InpWeekendGuard = true;    // skip weekend (emas). BTC: false
 input int    InpMaxPositions = 2;       // maks posisi terbuka (magic ini)
 input long   InpMagic        = 20260801;// pembeda posisi EA ini
 //--- Manajemen SL: BREAKEVEN + TRAILING (kunci profit) --------------
-input bool   InpBreakeven    = true;    // geser SL ke entry saat profit cukup
+// DEFAULT OFF: backtest 60hr XAU menunjukkan BE+trail malah menurunkan hasil
+// (-2.5R polos -> -4.5R) krn trailing mancung winner yg harusnya lari ke 2R.
+// Nyalain utk eksperimen (mungkin cocok utk aset yg sering near-miss spt BTC).
+input bool   InpBreakeven    = false;   // geser SL ke entry saat profit cukup
 input double InpBEatR        = 1.0;     // trigger breakeven (dalam R)
 input double InpBElockR       = 0.0;    // kunci berapa R saat BE (0 = pas entry)
-input bool   InpTrail        = true;    // trailing setelah profit lanjut
+input bool   InpTrail        = false;   // trailing setelah profit lanjut
 input double InpTrailStart    = 1.5;    // mulai trailing di berapa R
 input double InpTrailGap      = 1.0;    // SL ketinggalan berapa R di belakang harga
 
