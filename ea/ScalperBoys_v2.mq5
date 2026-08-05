@@ -44,6 +44,13 @@ input int    InpSessEnd      = 21;      // jam GMT selesai entry
 input bool   InpWeekendGuard = true;    // skip weekend (emas). BTC: false
 input int    InpMaxPositions = 2;       // maks posisi terbuka (magic ini)
 input long   InpMagic        = 20260801;// pembeda posisi EA ini
+//--- Filter BERITA (stop entry sekitar news high-impact) ------------
+// Pakai Economic Calendar bawaan MT5 (butuh calendar terisi; hanya LIVE/DEMO,
+// TIDAK jalan di Strategy Tester). Stop buka posisi baru di jendela berita.
+input bool   InpNewsFilter   = true;    // stop entry sekitar berita high-impact
+input int    InpNewsBeforeMin = 30;     // stop mulai berapa menit SEBELUM berita
+input int    InpNewsAfterMin  = 30;     // lanjut lagi berapa menit SETELAH berita
+input string InpNewsCurrency = "USD";   // mata uang berita yg dipantau (emas=USD)
 //--- Manajemen SL: BREAKEVEN + TRAILING (kunci profit) --------------
 // DEFAULT OFF: backtest 60hr XAU menunjukkan BE+trail malah menurunkan hasil
 // (-2.5R polos -> -4.5R) krn trailing mancung winner yg harusnya lari ke 2R.
@@ -129,6 +136,26 @@ bool InSession()
    return(true);
 }
 
+//--- Ada berita high-impact di jendela sekarang? (Economic Calendar) -
+//    Return true = lagi blackout berita -> jangan buka posisi baru.
+//    Hanya jalan LIVE/DEMO (calendar tak tersedia di Strategy Tester).
+bool IsNewsBlackout()
+{
+   if(!InpNewsFilter) return(false);
+   datetime now = TimeCurrent();
+   MqlCalendarValue values[];
+   int total = CalendarValueHistory(values, now - InpNewsAfterMin*60,
+                                    now + InpNewsBeforeMin*60, NULL, InpNewsCurrency);
+   for(int i = 0; i < total; i++)
+   {
+      MqlCalendarEvent ev;
+      if(!CalendarEventById(values[i].event_id, ev)) continue;
+      if(ev.importance == CALENDAR_IMPORTANCE_HIGH)
+         return(true);   // ada berita high-impact di window -> stop entry
+   }
+   return(false);
+}
+
 //+------------------------------------------------------------------+
 //| Kelola SL posisi terbuka: breakeven + trailing (dipanggil /tick) |
 //|   1R diturunkan dari jarak TP (tak berubah) / RR.                |
@@ -182,6 +209,7 @@ void OnTick()
    ManageOpen();                            // kelola SL tiap tick (BE+trailing)
    if(!NewM15Bar()) return;                 // entry: evaluasi 1x per bar M15
    if(!InSession()) return;
+   if(IsNewsBlackout()) return;             // stop entry sekitar berita high-impact
    if(CountMyPositions() >= InpMaxPositions) return;
 
    // indikator di bar TERTUTUP (shift 1)
