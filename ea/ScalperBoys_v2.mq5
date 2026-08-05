@@ -42,7 +42,8 @@ input bool   InpUseSession   = true;    // batasi jam (emas). BTC: false
 input int    InpSessStart    = 5;       // jam GMT mulai entry
 input int    InpSessEnd      = 21;      // jam GMT selesai entry
 input bool   InpWeekendGuard = true;    // skip weekend (emas). BTC: false
-input int    InpMaxPositions = 2;       // maks posisi terbuka (magic ini)
+input int    InpMaxPositions = 2;       // maks posisi TERBUKA barengan (magic ini)
+input int    InpMaxTradesDay = 6;       // maks TOTAL entry per hari (0=tanpa batas)
 input long   InpMagic        = 20260801;// pembeda posisi EA ini
 //--- Filter BERITA (stop entry sekitar news high-impact) ------------
 // Pakai Economic Calendar bawaan MT5 (butuh calendar terisi; hanya LIVE/DEMO,
@@ -119,6 +120,27 @@ int CountMyPositions()
          PositionGetInteger(POSITION_MAGIC) == InpMagic) n++;
    }
    return(n);
+}
+
+//--- berapa TOTAL entry (buka posisi) hari ini utk magic ini? -------
+int TradesOpenedToday()
+{
+   MqlDateTime dt; TimeToStruct(TimeGMT(), dt);
+   dt.hour = 0; dt.min = 0; dt.sec = 0;
+   datetime dayStart = StructToTime(dt);
+   int count = 0;
+   if(HistorySelect(dayStart, TimeCurrent()))
+   {
+      for(int i = HistoryDealsTotal()-1; i >= 0; i--)
+      {
+         ulong tk = HistoryDealGetTicket(i);
+         if(tk == 0) continue;
+         if(HistoryDealGetString(tk, DEAL_SYMBOL) == _Symbol &&
+            HistoryDealGetInteger(tk, DEAL_MAGIC) == InpMagic &&
+            HistoryDealGetInteger(tk, DEAL_ENTRY) == DEAL_ENTRY_IN) count++;
+      }
+   }
+   return(count);
 }
 
 //--- boleh entry sekarang? (sesi + weekend) -------------------------
@@ -210,6 +232,7 @@ void OnTick()
    if(!NewM15Bar()) return;                 // entry: evaluasi 1x per bar M15
    if(!InSession()) return;
    if(IsNewsBlackout()) return;             // stop entry sekitar berita high-impact
+   if(InpMaxTradesDay > 0 && TradesOpenedToday() >= InpMaxTradesDay) return; // batas harian
    if(CountMyPositions() >= InpMaxPositions) return;
 
    // indikator di bar TERTUTUP (shift 1)
