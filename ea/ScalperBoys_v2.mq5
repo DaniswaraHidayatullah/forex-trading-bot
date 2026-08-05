@@ -43,7 +43,9 @@ input int    InpSessStart    = 5;       // jam GMT mulai entry
 input int    InpSessEnd      = 21;      // jam GMT selesai entry
 input bool   InpWeekendGuard = true;    // skip weekend (emas). BTC: false
 input int    InpMaxPositions = 2;       // maks posisi TERBUKA barengan (magic ini)
-input int    InpMaxTradesDay = 6;       // maks TOTAL entry per hari (0=tanpa batas)
+input int    InpMaxTradesDay = 10;      // maks TOTAL entry per hari (0=tanpa batas).
+// Backtest: cap 6 motong trade profit di hari choppy (rame=bagus krn filter tren
+// sdh skip hari trending). Cap 10 = jarang kena (max ~9/hari) tapi kunci hari kalap.
 input long   InpMagic        = 20260801;// pembeda posisi EA ini
 //--- Filter BERITA (stop entry sekitar news high-impact) ------------
 // Pakai Economic Calendar bawaan MT5 (butuh calendar terisi; hanya LIVE/DEMO,
