@@ -2,20 +2,24 @@
 //|                                           ScalperBoys_v2.mq5      |
 //|   EA v2 STANDALONE (tanpa server) — mirror strategi Python v2.    |
 //|                                                                  |
-//|   Strategi (profil "Harian"):                                    |
-//|     * Tren  : H1 EMA21 vs EMA50                                   |
-//|     * Entry : pullback M15 RSI(14) di zona 30-70 searah tren      |
+//|   >>> VERSI 2.2 (config aktif) = MEAN-REVERSION + filter penuh <<<|
+//|     * Entry : fade ekstrem M15 RSI(14) -> BUY<=30, SELL>=70       |
+//|     * Filter: tren ON (skip tren kuat) + news ON + sesi 05-21 GMT |
 //|     * SL    : ATR(14 M15) x 1.2, DILEBARKAN anti-spike            |
 //|               (di luar wick 12 bar + 0.5 ATR + bantalan spread)   |
-//|     * TP    : SL x RR (default 1:2)                               |
-//|     * Sesi  : 05-21 GMT + skip weekend (emas). BTC: matikan sesi. |
+//|     * TP    : SL x RR (default 1:2) ; maks 10 entry/hari          |
+//|                                                                  |
+//|   Changelog:                                                     |
+//|     2.0  = trend-pullback (H1 EMA21/50) -> BACKTEST RUGI di regime|
+//|            choppy. Ditinggalin. (set InpEntryMode=0 utk balik.)   |
+//|     2.2  = mean-reversion + filter tren/news, cap harian 6->10.   |
+//|            Backtest WR 49%, +0.455R. INI YANG DIPAKAI.            |
 //|                                                                  |
 //|   Indikator dibaca di bar TERTUTUP (shift 1) -> anti look-ahead.  |
-//|   Cocok buat STRATEGY TESTER (nonton) / akun DEMO. Tanpa WebRequest|
-//|   /server. Default XAUUSD; buat BTCUSD set UseSession/Weekend=false|
+//|   Akun DEMO dulu. Default XAUUSD; BTCUSD set UseSession/Weekend=false|
 //+------------------------------------------------------------------+
 #property copyright "Scalper's Boys"
-#property version   "2.00"
+#property version   "2.20"
 #property strict
 
 #include <Trade\Trade.mqh>
