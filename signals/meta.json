@@ -154,7 +154,7 @@
  ],
  "last_news": "2026-08-10T14:49:11+00:00",
  "last_dollar": "2026-08-10T10:47:34+00:00",
- "last_prediction_state": "up|up|long|short",
+ "last_prediction_state": "up|flat|long|short",
  "sent_titles_gen": [
   "new details in the openai hugging face hack show how far age",
   "the future of wall street is here as startups and brokers bu",
@@ -411,7 +411,7 @@
  "last_burst_alert": "2026-08-07T13:34:46+00:00",
  "dollar_snap": {},
  "last_digest_date": "2026-08-07",
- "last_portfolio": "2026-08-04T07:10:06+00:00",
+ "last_portfolio": "2026-08-10T16:40:38+00:00",
  "last_weekly": "2026-W32",
  "news_alerted": [
   "Average Hourly Earnings m/m|2026-08-07T12:30:00+00:00",
