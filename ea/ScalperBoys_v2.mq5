@@ -2,24 +2,25 @@
 //|                                           ScalperBoys_v2.mq5      |
 //|   EA v2 STANDALONE (tanpa server) — mirror strategi Python v2.    |
 //|                                                                  |
-//|   >>> VERSI 2.2 (config aktif) = MEAN-REVERSION + filter penuh <<<|
-//|     * Entry : fade ekstrem M15 RSI(14) -> BUY<=30, SELL>=70       |
+//|   >>> VERSI 2.3 (config aktif) = MEAN-REVERSION + filter penuh <<<|
+//|     * Entry : fade ekstrem M15 RSI(14) -> BUY<=35, SELL>=65       |
 //|     * Filter: tren ON (skip tren kuat) + news ON + sesi 05-21 GMT |
 //|     * SL    : ATR(14 M15) x 1.2, DILEBARKAN anti-spike            |
 //|               (di luar wick 12 bar + 0.5 ATR + bantalan spread)   |
-//|     * TP    : SL x RR (default 1:2) ; maks 10 entry/hari          |
+//|     * TP    : SL x RR (1:2) ; TANPA batas harian (maks 2 posisi)  |
 //|                                                                  |
 //|   Changelog:                                                     |
 //|     2.0  = trend-pullback (H1 EMA21/50) -> BACKTEST RUGI di regime|
 //|            choppy. Ditinggalin. (set InpEntryMode=0 utk balik.)   |
-//|     2.2  = mean-reversion + filter tren/news, cap harian 6->10.   |
-//|            Backtest WR 49%, +0.455R. INI YANG DIPAKAI.            |
+//|     2.2  = mean-reversion RSI30/70 + filter tren/news, cap 6->10. |
+//|     2.3  = RSI 35/65 (2.9 sinyal/hr, WR49%, +$98/bln), cap harian |
+//|            DIHAPUS (tanpa batas). INI YANG DIPAKAI.               |
 //|                                                                  |
 //|   Indikator dibaca di bar TERTUTUP (shift 1) -> anti look-ahead.  |
 //|   Akun DEMO dulu. Default XAUUSD; BTCUSD set UseSession/Weekend=false|
 //+------------------------------------------------------------------+
 #property copyright "Scalper's Boys"
-#property version   "2.20"
+#property version   "2.30"
 #property strict
 
 #include <Trade\Trade.mqh>
@@ -47,9 +48,9 @@ input int    InpSessStart    = 5;       // jam GMT mulai entry
 input int    InpSessEnd      = 21;      // jam GMT selesai entry
 input bool   InpWeekendGuard = true;    // skip weekend (emas). BTC: false
 input int    InpMaxPositions = 2;       // maks posisi TERBUKA barengan (magic ini)
-input int    InpMaxTradesDay = 10;      // maks TOTAL entry per hari (0=tanpa batas).
-// Backtest: cap 6 motong trade profit di hari choppy (rame=bagus krn filter tren
-// sdh skip hari trending). Cap 10 = jarang kena (max ~9/hari) tapi kunci hari kalap.
+input int    InpMaxTradesDay = 0;       // maks TOTAL entry per hari (0=TANPA batas).
+// Backtest 35/65: tanpa batas +$98/bln vs cap-10 +$89 (DD sama ~$18, max 13/hari).
+// Resiko real-time tetap dijaga InpMaxPositions=2 (maks 2 posisi barengan).
 input long   InpMagic        = 20260801;// pembeda posisi EA ini
 //--- Filter BERITA (stop entry sekitar news high-impact) ------------
 // Pakai Economic Calendar bawaan MT5 (butuh calendar terisi; hanya LIVE/DEMO,
