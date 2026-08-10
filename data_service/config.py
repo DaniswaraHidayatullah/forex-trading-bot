@@ -143,8 +143,8 @@ class Settings(BaseSettings):
     discord_channel_id: str = ""         # set via env DISCORD_CHANNEL_ID
     signal_auto_push: bool = True        # auto kirim ke Discord saat ada sinyal
     signal_poll_seconds: int = 1800      # cek sinyal tiap N detik (default 30 mnt)
-    # Profil aktif: "meanrev" (mean-reversion, fade ekstrem RSI30/70, RR1:2,
-    # ~4-5 sinyal/hari @maks 2 posisi). Strategi seragam EA + bot sinyal.
+    # Profil aktif: "meanrev" (mean-reversion, fade ekstrem RSI35/65, RR1:2,
+    # regime_filter ON, ~2.9 sinyal/hari @maks 2 posisi). Sama persis EA.
     signal_profiles: str = "meanrev"
     # Minimal keyakinan untuk auto-push: none | medium | strong.
     # "none" = kirim juga sinyal teknikal-only (frekuensi harian, tidak ketat);

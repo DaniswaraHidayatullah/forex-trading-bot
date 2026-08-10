@@ -37,8 +37,8 @@ input int    InpEntryMode    = 1;       // 0=trend-pullback, 1=MEAN-REVERSION (d
 // ekspektansi +0.455R, drawdown ~16%. Filter tren nyegah fading tren kuat
 // (biang loss beruntun); BE/trail OFF (terbukti nurunin hasil).
 input bool   InpRegimeFilter = true;    // (mean-rev) ON=skip tren kuat (hindari fading tren)
-input double InpRsiLo        = 30.0;    // mean-rev: BUY kalau RSI<=ini
-input double InpRsiHi        = 70.0;    // mean-rev: SELL kalau RSI>=ini
+input double InpRsiLo        = 35.0;    // mean-rev: BUY kalau RSI<=ini (35: ~2.9 sinyal/hr, WR49%, +$98/bln backtest)
+input double InpRsiHi        = 65.0;    // mean-rev: SELL kalau RSI>=ini
 input int    InpEmaFast      = 21;      // EMA cepat (H1)
 input int    InpEmaSlow      = 50;      // EMA lambat (H1)
 input double InpSpreadPad    = 0.30;    // bantalan anti-spike (dalam harga)

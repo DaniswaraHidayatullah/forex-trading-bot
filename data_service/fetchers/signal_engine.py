@@ -142,14 +142,15 @@ PROFILES: dict[str, dict[str, Any]] = {
         "session": (5, 21),  # jam UTC boleh entry (diperlebar)
         "hold": "~1 jam s/d 1 hari",
     },
-    # MEAN-REVERSION (dipakai sekarang) — fade ekstrem RSI 30/70, RR 1:2.
-    # Backtest 52hr XAU: ~4-5 sinyal/hari (maks 2 posisi), WR 40%, +ekspektansi.
-    # filter_regime OFF utk frekuensi; ON kalau mau lebih aman di pasar trending.
+    # MEAN-REVERSION (dipakai sekarang) — fade ekstrem RSI 35/65, RR 1:2.
+    # DISAMAKAN dgn EA ScalperBoys_v2 (35/65 + regime_filter ON) biar sinyal
+    # Discord = cerminan EA. Backtest 52hr XAU: ~2.9 sinyal/hari, WR 49%,
+    # +0.432R, +$98/bln, DD ~$18 (IS/OOS +0.38/+0.49, robust).
     "meanrev": {
         "label": "MeanRev", "trend": "1h", "entry": "15min",
         "ema_fast": 21, "ema_slow": 50,
-        "atr_mult": 1.2, "rr": 2.0, "rsi_lo": 30.0, "rsi_hi": 70.0,
-        "session": (5, 21), "mode": "meanrev", "regime_filter": False,
+        "atr_mult": 1.2, "rr": 2.0, "rsi_lo": 35.0, "rsi_hi": 65.0,
+        "session": (5, 21), "mode": "meanrev", "regime_filter": True,
         "hold": "~jam (fade ekstrem, RR 1:2)",
     },
     "scalp": {
