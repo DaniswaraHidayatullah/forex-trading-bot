@@ -2493,5 +2493,22 @@
   "momentum": "up",
   "time_utc": "2026-08-11T11:26:59+00:00",
   "status": "open"
+ },
+ {
+  "id": "06e3aa68",
+  "symbol": "XAUUSD",
+  "profile": "Hybrid",
+  "side": "buy",
+  "entry": 4361.29,
+  "sl": 4351.51,
+  "tp": 4380.84,
+  "rr": 2.0,
+  "risk_usd": 1.95,
+  "reward_usd": 3.91,
+  "confidence": 2,
+  "version": "v2",
+  "momentum": "down",
+  "time_utc": "2026-08-11T18:31:38+00:00",
+  "status": "open"
  }
 ]
