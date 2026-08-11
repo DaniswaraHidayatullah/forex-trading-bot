@@ -142,16 +142,17 @@ PROFILES: dict[str, dict[str, Any]] = {
         "session": (5, 21),  # jam UTC boleh entry (diperlebar)
         "hold": "~1 jam s/d 1 hari",
     },
-    # MEAN-REVERSION (dipakai sekarang) — fade ekstrem RSI 35/65, RR 1:2.
-    # DISAMAKAN dgn EA ScalperBoys_v2 (35/65 + regime_filter ON) biar sinyal
-    # Discord = cerminan EA. Backtest 52hr XAU: ~2.9 sinyal/hari, WR 49%,
-    # +0.432R, +$98/bln, DD ~$18 (IS/OOS +0.38/+0.49, robust).
+    # HYBRID v4 (dipakai sekarang) — DISAMAKAN dgn EA ScalperBoys_v4:
+    #   choppy (gap EMA<=1.5xATR) = mean-rev fade RSI 35/65
+    #   tren kuat (gap>1.5xATR)   = trend-pullback, entry pas RSI silang pull_level(52)
+    # Backtest 52hr: WR 47%, +$115/bln, DD ~$29. Sinyal Discord = cerminan EA v4.
     "meanrev": {
-        "label": "MeanRev", "trend": "1h", "entry": "15min",
+        "label": "Hybrid", "trend": "1h", "entry": "15min",
         "ema_fast": 21, "ema_slow": 50,
         "atr_mult": 1.2, "rr": 2.0, "rsi_lo": 35.0, "rsi_hi": 65.0,
-        "session": (5, 21), "mode": "meanrev", "regime_filter": True,
-        "hold": "~jam (fade ekstrem, RR 1:2)",
+        "pull_level": 52.0,
+        "session": (5, 21), "mode": "hybrid", "regime_filter": True,
+        "hold": "~jam (hybrid: fade choppy / pullback tren)",
     },
     "scalp": {
         "label": "Scalping", "trend": "30min", "entry": "5min",
@@ -325,9 +326,12 @@ def build_signal(
     m_close = [b["close"] for b in m30]
     m_high = [b["high"] for b in m30]
     m_low = [b["low"] for b in m30]
-    rsi_val = rsi_series(m_close)[-2]
+    _rsi_all = rsi_series(m_close)
+    rsi_val = _rsi_all[-2]
+    rsi_prev = _rsi_all[-3] if len(_rsi_all) >= 3 else None   # utk deteksi silang (hybrid)
     atr_val = atr_series(m_high, m_low, m_close)[-2]
     price = m_close[-1]
+    hy_pullback = False   # True kalau entry hybrid dari leg trend-pullback (bukan fade)
 
     if rsi_val is None or atr_val is None:
         base["reason"] = "Indikator belum siap (data kurang)"
@@ -359,6 +363,29 @@ def build_signal(
             base["reason"] = (f"RSI {rsi_val:.0f} belum ekstrem "
                               f"(butuh <={rsi_lo:.0f} atau >={rsi_hi:.0f})")
             return base
+    elif mode == "hybrid":
+        # HYBRID v4 (samain EA): choppy=mean-rev fade ; tren-kuat=trend-pullback silang
+        if abs(ema_f - ema_s) <= 1.5 * atr_val:          # CHOPPY -> mean-rev fade
+            want_buy = rsi_val <= rsi_lo
+            want_sell = rsi_val >= rsi_hi
+            if not want_buy and not want_sell:
+                base["reason"] = (f"(hybrid choppy) RSI {rsi_val:.0f} belum ekstrem "
+                                  f"(<={rsi_lo:.0f}/>={rsi_hi:.0f})")
+                return base
+        else:                                            # TREN KUAT -> trend-pullback
+            pull = float(prof.get("pull_level", 52.0))
+            if trend == 0 or rsi_prev is None:
+                base["reason"] = "(hybrid) tren flat / data kurang -> tunggu"
+                return base
+            cross_up = rsi_prev < pull and rsi_val >= pull
+            cross_down = rsi_prev > (100.0 - pull) and rsi_val <= (100.0 - pull)
+            want_buy = trend == 1 and cross_up
+            want_sell = trend == -1 and cross_down
+            hy_pullback = True
+            if not want_buy and not want_sell:
+                base["reason"] = (f"(hybrid tren-kuat) RSI {rsi_val:.0f} belum silang "
+                                  f"{pull:.0f} searah tren")
+                return base
     else:
         if trend == 0:
             base["reason"] = f"Tren {trend_interval} flat (EMA50 ~ EMA200) -> tunggu"
@@ -377,7 +404,7 @@ def build_signal(
     sl_dist = atr_val * atr_mult
     recent_hi = max(m_high[-13:-1])
     recent_lo = min(m_low[-13:-1])
-    if trend == 1:   # BUY: SL di bawah low terakhir
+    if want_buy:     # BUY: SL di bawah low terakhir (arah trade, bukan arah tren)
         wick_dist = (price - recent_lo) + 0.5 * atr_val + spread_pad
     else:            # SELL: SL di atas high terakhir
         wick_dist = (recent_hi - price) + 0.5 * atr_val + spread_pad
@@ -427,8 +454,12 @@ def build_signal(
                                or (want_sell and sentiment_bias == "short")) else "melawan"
         sent_txt = f"berita {arah} ({sentiment_bias} {sentiment_score:+.2f})"
     if want_buy:
-        why = (f"Oversold RSI {rsi_val:.0f} (fade balik naik)" if mode == "meanrev"
-               else f"Uptrend {trend_interval} + RSI pullback {rsi_val:.0f}")
+        if mode == "meanrev" or (mode == "hybrid" and not hy_pullback):
+            why = f"Oversold RSI {rsi_val:.0f} (fade balik naik)"
+        elif mode == "hybrid":
+            why = f"Trend-pullback: RSI silang naik ({rsi_val:.0f}) searah uptrend"
+        else:
+            why = f"Uptrend {trend_interval} + RSI pullback {rsi_val:.0f}"
         base.update({
             "signal": "buy",
             "sl": round(price - sl_dist, 2),
@@ -436,8 +467,12 @@ def build_signal(
             "reason": f"{why} · {sent_txt}",
         })
     else:
-        why = (f"Overbought RSI {rsi_val:.0f} (fade balik turun)" if mode == "meanrev"
-               else f"Downtrend {trend_interval} + RSI pullback {rsi_val:.0f}")
+        if mode == "meanrev" or (mode == "hybrid" and not hy_pullback):
+            why = f"Overbought RSI {rsi_val:.0f} (fade balik turun)"
+        elif mode == "hybrid":
+            why = f"Trend-pullback: RSI silang turun ({rsi_val:.0f}) searah downtrend"
+        else:
+            why = f"Downtrend {trend_interval} + RSI pullback {rsi_val:.0f}"
         base.update({
             "signal": "sell",
             "sl": round(price + sl_dist, 2),
