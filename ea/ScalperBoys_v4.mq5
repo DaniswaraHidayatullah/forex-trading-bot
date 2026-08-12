@@ -22,7 +22,7 @@
 //|   Akun DEMO dulu. Default XAUUSD; BTCUSD set UseSession/Weekend=false|
 //+------------------------------------------------------------------+
 #property copyright "Scalper's Boys"
-#property version   "4.00"
+#property version   "4.10"
 #property strict
 
 #include <Trade\Trade.mqh>
@@ -50,10 +50,12 @@ input bool   InpUseSession   = true;    // batasi jam (emas). BTC: false
 input int    InpSessStart    = 5;       // jam GMT mulai entry
 input int    InpSessEnd      = 21;      // jam GMT selesai entry
 input bool   InpWeekendGuard = true;    // skip weekend (emas). BTC: false
-input int    InpMaxPositions = 2;       // maks posisi TERBUKA barengan (magic ini)
+input int    InpMaxPositions = 4;       // maks posisi TOTAL barengan (safety cap global = 2+2)
+input int    InpMaxPosPerLeg = 2;       // maks posisi PER-LEG (mean-rev & trend jatah sendiri)
 input int    InpMaxTradesDay = 0;       // maks TOTAL entry per hari (0=TANPA batas).
-// Backtest 35/65: tanpa batas +$98/bln vs cap-10 +$89 (DD sama ~$18, max 13/hari).
-// Resiko real-time tetap dijaga InpMaxPositions=2 (maks 2 posisi barengan).
+// Budget TERPISAH (ide user): 2 mean-rev + 2 trend. Backtest: +$91/bln, DD $17
+// (SAMA kayak global-2!), Prof/DD 5.2 (tertinggi). Posisi nyangkut 1 leg tak
+// ngejegal leg lain. Kedua leg jarang barengan (regime beda) -> DD tetap rendah.
 input long   InpMagic        = 20260801;// pembeda posisi EA ini
 //--- Filter BERITA (stop entry sekitar news high-impact) ------------
 // Pakai Economic Calendar bawaan MT5 (butuh calendar terisi; hanya LIVE/DEMO,
@@ -128,6 +130,21 @@ int CountMyPositions()
       if(PositionGetTicket(i) == 0) continue;
       if(PositionGetString(POSITION_SYMBOL) == _Symbol &&
          PositionGetInteger(POSITION_MAGIC) == InpMagic) n++;
+   }
+   return(n);
+}
+
+//--- jumlah posisi terbuka per-LEG (via tag di komentar order) -------
+//    "MR" = mean-rev, "TR" = trend-pullback. Budget terpisah tiap leg.
+int CountLegPositions(string legTag)
+{
+   int n = 0;
+   for(int i = PositionsTotal()-1; i >= 0; i--)
+   {
+      if(PositionGetTicket(i) == 0) continue;
+      if(PositionGetString(POSITION_SYMBOL) == _Symbol &&
+         PositionGetInteger(POSITION_MAGIC) == InpMagic &&
+         StringFind(PositionGetString(POSITION_COMMENT), legTag) >= 0) n++;
    }
    return(n);
 }
@@ -252,6 +269,7 @@ void OnTick()
       rsi==EMPTY_VALUE  || atr==EMPTY_VALUE  || atr<=0) return;
 
    bool wantBuy=false, wantSell=false;
+   string legTag = "MR";                    // tag leg utk budget terpisah (MR=mean-rev / TR=trend)
    if(InpEntryMode==1)   // MEAN-REVERSION: fade ekstrem (RSI<=lo beli, RSI>=hi jual)
    {
       // filter regime: kalau tren KUAT (EMA jauh), jangan fade -> skip
@@ -264,6 +282,7 @@ void OnTick()
       double rsiPrev = Val(hRsi,2);          // butuh RSI bar sebelumnya utk deteksi silang
       if(rsiPrev==EMPTY_VALUE) return;
       bool strong = (MathAbs(emaF-emaS) > 1.5*atr);
+      legTag = strong ? "TR" : "MR";        // choppy=mean-rev leg, tren kuat=trend leg
       if(!strong)          // CHOPPY -> mean-rev (fade 35/65)
       {
          wantBuy  = (rsi <= InpRsiLo);
@@ -281,12 +300,14 @@ void OnTick()
    }
    else                  // TREND-PULLBACK (lama): searah tren + RSI di band
    {
+      legTag = "TR";
       int trend = (emaF>emaS) ? 1 : ((emaF<emaS) ? -1 : 0);
       if(trend == 0) return;
       wantBuy  = (trend==1  && rsi>=InpRsiLo && rsi<=InpRsiHi);
       wantSell = (trend==-1 && rsi>=InpRsiLo && rsi<=InpRsiHi);
    }
    if(!wantBuy && !wantSell) return;
+   if(InpMaxPosPerLeg > 0 && CountLegPositions(legTag) >= InpMaxPosPerLeg) return; // jatah per-leg (2 MR + 2 TR)
 
    double ask = SymbolInfoDouble(_Symbol, SYMBOL_ASK);
    double bid = SymbolInfoDouble(_Symbol, SYMBOL_BID);
@@ -317,13 +338,13 @@ void OnTick()
    {
       sl = NormalizeDouble(price - slDist, digits);
       tp = NormalizeDouble(price + tpDist, digits);
-      ok = trade.Buy(lot, _Symbol, ask, sl, tp, "SB v2");
+      ok = trade.Buy(lot, _Symbol, ask, sl, tp, "SBv4-"+legTag);
    }
    else
    {
       sl = NormalizeDouble(price + slDist, digits);
       tp = NormalizeDouble(price - tpDist, digits);
-      ok = trade.Sell(lot, _Symbol, bid, sl, tp, "SB v2");
+      ok = trade.Sell(lot, _Symbol, bid, sl, tp, "SBv4-"+legTag);
    }
    PrintFormat("%s %s @ %.*f SL %.*f TP %.*f (RSI %.0f, ATR %.2f) ok=%d",
                _Symbol, wantBuy?"BUY":"SELL", digits, price, digits, sl,
