@@ -142,17 +142,16 @@ PROFILES: dict[str, dict[str, Any]] = {
         "session": (5, 21),  # jam UTC boleh entry (diperlebar)
         "hold": "~1 jam s/d 1 hari",
     },
-    # HYBRID v4 (dipakai sekarang) — DISAMAKAN dgn EA ScalperBoys_v4:
-    #   choppy (gap EMA<=1.5xATR) = mean-rev fade RSI 35/65
-    #   tren kuat (gap>1.5xATR)   = trend-pullback, entry pas RSI silang pull_level(52)
-    # Backtest 52hr: WR 47%, +$115/bln, DD ~$29. Sinyal Discord = cerminan EA v4.
+    # MEAN-REV murni (dipakai sekarang) — DISAMAKAN dgn EA (InpEntryMode=1):
+    #   fade ekstrem RSI 35/65, skip tren kuat (regime_filter ON). Balik dari
+    #   hybrid krn di regime parabolik hybrid rugi; mean-rev murni +$10 Agustus.
+    #   Backtest ~1.7 bln: WR 48-49%, +$83-98/bln, DD ~14%, Prof/DD 5.9 (paling aman).
     "meanrev": {
-        "label": "Hybrid", "trend": "1h", "entry": "15min",
+        "label": "MeanRev", "trend": "1h", "entry": "15min",
         "ema_fast": 21, "ema_slow": 50,
         "atr_mult": 1.2, "rr": 2.0, "rsi_lo": 35.0, "rsi_hi": 65.0,
-        "pull_level": 52.0,
-        "session": (5, 21), "mode": "hybrid", "regime_filter": True,
-        "hold": "~jam (hybrid: fade choppy / pullback tren)",
+        "session": (5, 21), "mode": "meanrev", "regime_filter": True,
+        "hold": "~jam (fade ekstrem, RR 1:2)",
     },
     "scalp": {
         "label": "Scalping", "trend": "30min", "entry": "5min",
