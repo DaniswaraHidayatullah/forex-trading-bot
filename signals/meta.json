@@ -1,5 +1,5 @@
 {
- "last_price": "2026-08-13T10:33:07+00:00",
+ "last_price": "2026-08-13T12:05:34+00:00",
  "sent_titles": [
   "australia q2 ppi +3.6% vs +3.0% prior",
   "gold climbs as buyers defend $4,000, hawkish fed expectation",
@@ -154,7 +154,7 @@
  ],
  "last_news": "2026-08-13T11:26:02+00:00",
  "last_dollar": "2026-08-13T00:57:16+00:00",
- "last_prediction_state": "up|up|flat|short",
+ "last_prediction_state": "flat|flat|flat|short",
  "sent_titles_gen": [
   "gao finds elon musk's doge inflated claims of $110 billion i",
   "bank of america spends $250 million a year on glp-1 drugs fo",
@@ -414,9 +414,10 @@
  "last_portfolio": "2026-08-13T08:05:38+00:00",
  "last_weekly": "2026-W32",
  "news_alerted": [
-  "Federal Funds Rate|2026-07-29T18:00:00+00:00",
+  "Average Hourly Earnings m/m|2026-08-07T12:30:00+00:00",
   "Core CPI m/m|2026-08-12T12:30:00+00:00",
-  "Average Hourly Earnings m/m|2026-08-07T12:30:00+00:00"
+  "Core PPI m/m|2026-08-13T12:30:00+00:00",
+  "Federal Funds Rate|2026-07-29T18:00:00+00:00"
  ],
  "news_predicted": [
   "Average Hourly Earnings m/m|2026-08-07T12:30:00+00:00",
