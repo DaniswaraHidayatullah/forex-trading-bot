@@ -2563,6 +2563,7 @@
   "version": "v2",
   "momentum": "down",
   "time_utc": "2026-08-13T08:05:35+00:00",
-  "status": "open"
+  "status": "win",
+  "closed_utc": "2026-08-13T10:33:03+00:00"
  }
 ]
