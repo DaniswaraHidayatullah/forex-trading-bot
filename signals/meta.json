@@ -1,5 +1,5 @@
 {
- "last_price": "2026-08-14T02:41:57+00:00",
+ "last_price": "2026-08-14T04:27:28+00:00",
  "sent_titles": [
   "canadian dollar steadies, caught between risk aversion, rebo",
   "the dow jones industrial average kept what payrolls lost",
@@ -154,7 +154,7 @@
  ],
  "last_news": "2026-08-14T02:42:04+00:00",
  "last_dollar": "2026-08-14T02:42:05+00:00",
- "last_prediction_state": "flat|flat|long|short",
+ "last_prediction_state": "flat|up|long|short",
  "sent_titles_gen": [
   "u.s. economy unexpectedly lost 23,000 jobs in july",
   "openai loses revenue chief denise dresser, second major exec",
