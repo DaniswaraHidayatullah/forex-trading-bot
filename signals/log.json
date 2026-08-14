@@ -2600,5 +2600,39 @@
   "momentum": "down",
   "time_utc": "2026-08-14T14:36:21+00:00",
   "status": "open"
+ },
+ {
+  "id": "19a351a8",
+  "symbol": "XAUUSD",
+  "profile": "MeanRev",
+  "side": "sell",
+  "entry": 4380.39,
+  "sl": 4401.03,
+  "tp": 4339.11,
+  "rr": 2.0,
+  "risk_usd": 4.13,
+  "reward_usd": 8.26,
+  "confidence": 1,
+  "version": "v2",
+  "momentum": "up",
+  "time_utc": "2026-08-14T15:27:43+00:00",
+  "status": "open"
+ },
+ {
+  "id": "6ea38c3f",
+  "symbol": "BTCUSD",
+  "profile": "BTC",
+  "side": "buy",
+  "entry": 62754.07,
+  "sl": 62404.4,
+  "tp": 63453.41,
+  "rr": 2.0,
+  "risk_usd": 1.75,
+  "reward_usd": 3.5,
+  "confidence": 1,
+  "version": "v2",
+  "momentum": "down",
+  "time_utc": "2026-08-14T15:27:44+00:00",
+  "status": "open"
  }
 ]
