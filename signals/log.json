@@ -2654,7 +2654,8 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-17T05:19:34+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-08-17T15:14:19+00:00"
  },
  {
   "id": "d6b6b501",
