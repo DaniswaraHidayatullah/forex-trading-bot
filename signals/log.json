@@ -2600,7 +2600,8 @@
   "version": "v2",
   "momentum": "down",
   "time_utc": "2026-08-14T14:36:21+00:00",
-  "status": "open"
+  "status": "win",
+  "closed_utc": "2026-08-17T03:10:03+00:00"
  },
  {
   "id": "19a351a8",
@@ -2635,6 +2636,7 @@
   "version": "v2",
   "momentum": "down",
   "time_utc": "2026-08-14T15:27:44+00:00",
-  "status": "open"
+  "status": "win",
+  "closed_utc": "2026-08-17T03:10:03+00:00"
  }
 ]
