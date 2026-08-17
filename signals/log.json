@@ -2724,7 +2724,8 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-17T16:18:21+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-08-17T17:50:23+00:00"
  },
  {
   "id": "2cd41773",
@@ -2741,6 +2742,23 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-17T16:51:22+00:00",
+  "status": "open"
+ },
+ {
+  "id": "883115c6",
+  "symbol": "BTCUSD",
+  "profile": "BTC",
+  "side": "sell",
+  "entry": 64303.86,
+  "sl": 64621.78,
+  "tp": 63668.03,
+  "rr": 2.0,
+  "risk_usd": 1.59,
+  "reward_usd": 3.18,
+  "confidence": 2,
+  "version": "v2",
+  "momentum": "up",
+  "time_utc": "2026-08-17T17:50:30+00:00",
   "status": "open"
  }
 ]
