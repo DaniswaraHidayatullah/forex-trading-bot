@@ -2870,7 +2870,8 @@
   "version": "v2",
   "momentum": "down",
   "time_utc": "2026-08-18T20:37:11+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-08-18T23:55:21+00:00"
  },
  {
   "id": "09da7c0c",
