@@ -2799,5 +2799,22 @@
   "momentum": "down",
   "time_utc": "2026-08-18T15:19:31+00:00",
   "status": "open"
+ },
+ {
+  "id": "47c1b006",
+  "symbol": "XAUUSD",
+  "profile": "MeanRev",
+  "side": "buy",
+  "entry": 4364.72,
+  "sl": 4347.64,
+  "tp": 4398.88,
+  "rr": 2.0,
+  "risk_usd": 3.42,
+  "reward_usd": 6.83,
+  "confidence": 2,
+  "version": "v2",
+  "momentum": "down",
+  "time_utc": "2026-08-18T15:53:50+00:00",
+  "status": "open"
  }
 ]
