@@ -4,15 +4,15 @@
 //|                                                                  |
 //|   >>> Edge BTC ada di H1, BUKAN M15 (M15 = koin-flip). <<<        |
 //|     * Fade RSI ekstrem di H1: BUY RSI<=30, SELL RSI>=70.          |
-//|     * SL = ATR(H1) x 1.2 (swing lebar ~ratusan $), RR 1:2.        |
+//|     * SL = ATR(H1) x 1.2 (swing lebar ~ratusan $), RR 1:1.5.      |
 //|     * TANPA filter tren (di BTC filter malah NURUNIN hasil).      |
 //|     * 24/7 (BTC jalan terus, termasuk weekend).                   |
 //|     * AUTO-LOT: lot dihitung dari SL biar rugi = InpRiskPct% saldo.|
 //|       -> mau BTC $40k/$64k atau akun cent/standard, risiko tetap. |
 //|     * Maks 2 posisi barengan.                                     |
 //|                                                                  |
-//|   Backtest ~2bln (2% risiko/trade): WR 44%, ekspektansi +0.30R,   |
-//|   +$25/bln (~25% akun), DD ~$16 (16%), profit tiap bulan.         |
+//|   Backtest ~2bln (2% risiko/trade, RR1.5): WR 54%, +0.33R,        |
+//|   +$53 net (~$26/bln), DD ~$14 (14%), profit tiap bulan.          |
 //|   PELENGKAP Gold v6 (ritme beda -> DD gabungan TAK numpuk).       |
 //|                                                                  |
 //|   Indikator dibaca di bar TERTUTUP (shift 1) -> anti look-ahead.  |
@@ -29,7 +29,7 @@ CTrade trade;
 input bool   InpUseAutoLot   = true;    // ON=hitung lot dari risiko% (SANGAT disaranin utk BTC)
 input double InpRiskPct      = 2.0;     // risiko per trade (% saldo) kalau auto-lot
 input double InpLot          = 0.20;    // lot tetap (dipakai kalau auto-lot OFF)
-input double InpRR           = 2.0;     // Reward:Risk (TP = SL x ini)
+input double InpRR           = 1.5;     // Reward:Risk (TP = SL x ini). BTC: 1.5 = WR 54% (lebih tahan mental) vs 2.0 WR44%; profit ~sama (noise)
 input double InpAtrMult      = 1.2;     // SL = ATR(H1) x ini
 input int    InpAtrPeriod    = 14;      // periode ATR (H1)
 input int    InpRsiPeriod    = 14;      // periode RSI (H1)
