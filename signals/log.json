@@ -2994,6 +2994,24 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-19T15:53:32+00:00",
+  "status": "loss",
+  "closed_utc": "2026-08-19T16:17:20+00:00"
+ },
+ {
+  "id": "5884cca1",
+  "symbol": "BTCUSD",
+  "profile": "BTC",
+  "side": "sell",
+  "entry": 68711.83,
+  "sl": 69769.02,
+  "tp": 66597.45,
+  "rr": 2.0,
+  "risk_usd": 5.29,
+  "reward_usd": 10.57,
+  "confidence": 1,
+  "version": "v2",
+  "momentum": "up",
+  "time_utc": "2026-08-19T16:17:28+00:00",
   "status": "open"
  }
 ]
