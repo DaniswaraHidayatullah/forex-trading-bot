@@ -2942,7 +2942,8 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-19T14:49:50+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-08-19T19:23:56+00:00"
  },
  {
   "id": "e840e193",
@@ -2959,7 +2960,8 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-19T15:19:34+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-08-19T19:23:56+00:00"
  },
  {
   "id": "98d205c9",
