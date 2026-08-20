@@ -3050,7 +3050,8 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-19T21:36:57+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-08-20T08:22:57+00:00"
  },
  {
   "id": "d10323eb",
@@ -3067,6 +3068,24 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-19T21:57:56+00:00",
+  "status": "loss",
+  "closed_utc": "2026-08-20T08:22:57+00:00"
+ },
+ {
+  "id": "3ab125fb",
+  "symbol": "BTCUSD",
+  "profile": "BTC",
+  "side": "sell",
+  "entry": 71174.0,
+  "sl": 71984.47,
+  "tp": 69553.06,
+  "rr": 2.0,
+  "risk_usd": 4.05,
+  "reward_usd": 8.1,
+  "confidence": 1,
+  "version": "v2",
+  "momentum": "up",
+  "time_utc": "2026-08-20T08:23:03+00:00",
   "status": "open"
  }
 ]
