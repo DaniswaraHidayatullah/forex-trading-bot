@@ -3230,7 +3230,8 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-21T07:57:08+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-08-21T09:18:07+00:00"
  },
  {
   "id": "2d15b843",
@@ -3247,6 +3248,7 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-21T08:31:27+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-08-21T09:18:07+00:00"
  }
 ]
