@@ -3231,5 +3231,22 @@
   "momentum": "up",
   "time_utc": "2026-08-21T07:57:08+00:00",
   "status": "open"
+ },
+ {
+  "id": "2d15b843",
+  "symbol": "BTCUSD",
+  "profile": "BTC",
+  "side": "sell",
+  "entry": 77284.24,
+  "sl": 78399.28,
+  "tp": 75054.17,
+  "rr": 2.0,
+  "risk_usd": 5.58,
+  "reward_usd": 11.15,
+  "confidence": 2,
+  "version": "v2",
+  "momentum": "up",
+  "time_utc": "2026-08-21T08:31:27+00:00",
+  "status": "open"
  }
 ]
