@@ -3355,6 +3355,7 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-25T19:52:00+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-08-25T23:02:52+00:00"
  }
 ]
