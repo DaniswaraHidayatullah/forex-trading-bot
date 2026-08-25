@@ -3319,6 +3319,24 @@
   "version": "v2",
   "momentum": "down",
   "time_utc": "2026-08-25T14:11:11+00:00",
+  "status": "win",
+  "closed_utc": "2026-08-25T19:21:42+00:00"
+ },
+ {
+  "id": "322db9d3",
+  "symbol": "XAUUSD",
+  "profile": "MeanRev",
+  "side": "sell",
+  "entry": 4666.57,
+  "sl": 4676.33,
+  "tp": 4647.06,
+  "rr": 2.0,
+  "risk_usd": 1.95,
+  "reward_usd": 3.9,
+  "confidence": 1,
+  "version": "v2",
+  "momentum": "up",
+  "time_utc": "2026-08-25T19:21:46+00:00",
   "status": "open"
  }
 ]
