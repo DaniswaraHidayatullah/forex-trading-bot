@@ -3302,7 +3302,8 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-25T03:56:30+00:00",
-  "status": "open"
+  "status": "win",
+  "closed_utc": "2026-08-25T21:15:58+00:00"
  },
  {
   "id": "39e24552",
