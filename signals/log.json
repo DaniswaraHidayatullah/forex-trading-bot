@@ -3284,7 +3284,8 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-25T03:10:16+00:00",
-  "status": "open"
+  "status": "win",
+  "closed_utc": "2026-08-25T12:22:50+00:00"
  },
  {
   "id": "39547848",
