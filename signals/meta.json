@@ -1,5 +1,5 @@
 {
- "last_price": "2026-08-26T10:16:53+00:00",
+ "last_price": "2026-08-26T11:23:44+00:00",
  "sent_titles": [
   "federal reserve: warsh faces a communication test \u2013 dbs",
   "usd/jpy price forecast: us dollar keeps crawling towards the",
@@ -154,7 +154,7 @@
  ],
  "last_news": "2026-08-26T09:39:28+00:00",
  "last_dollar": "2026-08-25T23:35:17+00:00",
- "last_prediction_state": "up|flat|long|long",
+ "last_prediction_state": "down|flat|long|long",
  "sent_titles_gen": [
   "workers can't agree if junior employees should use ai at wor",
   "hhs plans new fda deputy commissioner roles for technology a",
@@ -420,11 +420,12 @@
   "Federal Funds Rate|2026-07-29T18:00:00+00:00"
  ],
  "news_predicted": [
-  "Core CPI m/m|2026-08-12T12:30:00+00:00",
+  "Average Hourly Earnings m/m|2026-08-07T12:30:00+00:00",
   "Core CPI y/y|2026-08-12T12:30:00+00:00",
   "Core PPI m/m|2026-08-13T12:30:00+00:00",
-  "Average Hourly Earnings m/m|2026-08-07T12:30:00+00:00",
+  "Prelim GDP q/q|2026-08-26T12:30:00+00:00",
   "FOMC Meeting Minutes|2026-08-19T18:00:00+00:00",
+  "Core CPI m/m|2026-08-12T12:30:00+00:00",
   "Core PCE Price Index m/m|2026-08-26T12:30:00+00:00"
  ]
 }
