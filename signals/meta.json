@@ -420,10 +420,11 @@
   "Federal Funds Rate|2026-07-29T18:00:00+00:00"
  ],
  "news_predicted": [
-  "Core PPI m/m|2026-08-13T12:30:00+00:00",
   "Core CPI m/m|2026-08-12T12:30:00+00:00",
   "Core CPI y/y|2026-08-12T12:30:00+00:00",
+  "Core PPI m/m|2026-08-13T12:30:00+00:00",
+  "Average Hourly Earnings m/m|2026-08-07T12:30:00+00:00",
   "FOMC Meeting Minutes|2026-08-19T18:00:00+00:00",
-  "Average Hourly Earnings m/m|2026-08-07T12:30:00+00:00"
+  "Core PCE Price Index m/m|2026-08-26T12:30:00+00:00"
  ]
 }
