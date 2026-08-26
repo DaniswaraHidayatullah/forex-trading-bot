@@ -3338,7 +3338,8 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-08-25T19:21:46+00:00",
-  "status": "open"
+  "status": "win",
+  "closed_utc": "2026-08-26T00:55:47+00:00"
  },
  {
   "id": "e913b161",
