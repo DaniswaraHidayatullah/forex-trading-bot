@@ -3374,7 +3374,8 @@
   "version": "v2",
   "momentum": "down",
   "time_utc": "2026-08-26T09:39:19+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-08-26T13:31:02+00:00"
  },
  {
   "id": "4a60c312",
@@ -3391,6 +3392,7 @@
   "version": "v2",
   "momentum": "down",
   "time_utc": "2026-08-26T10:16:51+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-08-26T13:31:02+00:00"
  }
 ]
