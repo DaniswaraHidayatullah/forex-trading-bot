@@ -3412,5 +3412,22 @@
   "time_utc": "2026-08-28T22:40:37+00:00",
   "status": "expired",
   "closed_utc": "2026-08-31T23:21:34+00:00"
+ },
+ {
+  "id": "5219b640",
+  "symbol": "XAUUSD",
+  "profile": "MeanRev",
+  "side": "sell",
+  "entry": 4431.45,
+  "sl": 4443.14,
+  "tp": 4408.07,
+  "rr": 2.0,
+  "risk_usd": 2.34,
+  "reward_usd": 4.68,
+  "confidence": 2,
+  "version": "v2",
+  "momentum": "down",
+  "time_utc": "2026-09-03T05:48:28+00:00",
+  "status": "open"
  }
 ]
