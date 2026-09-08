@@ -3484,5 +3484,22 @@
   "time_utc": "2026-09-03T20:58:38+00:00",
   "status": "loss",
   "closed_utc": "2026-09-03T22:57:39+00:00"
+ },
+ {
+  "id": "eb67c586",
+  "symbol": "XAUUSD",
+  "profile": "MeanRev",
+  "side": "buy",
+  "entry": 4396.96,
+  "sl": 4383.71,
+  "tp": 4423.46,
+  "rr": 2.0,
+  "risk_usd": 2.65,
+  "reward_usd": 5.3,
+  "confidence": 2,
+  "version": "v2",
+  "momentum": "up",
+  "time_utc": "2026-09-08T09:12:48+00:00",
+  "status": "open"
  }
 ]
