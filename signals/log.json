@@ -3662,6 +3662,24 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-09-18T09:41:26+00:00",
+  "status": "loss",
+  "closed_utc": "2026-09-18T13:49:07+00:00"
+ },
+ {
+  "id": "a820a048",
+  "symbol": "BTCUSD",
+  "profile": "BTC",
+  "side": "sell",
+  "entry": 79878.04,
+  "sl": 80422.32,
+  "tp": 78789.49,
+  "rr": 2.0,
+  "risk_usd": 2.72,
+  "reward_usd": 5.44,
+  "confidence": 3,
+  "version": "v2",
+  "momentum": "down",
+  "time_utc": "2026-09-18T13:49:14+00:00",
   "status": "open"
  }
 ]
