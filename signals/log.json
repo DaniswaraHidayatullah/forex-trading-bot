@@ -3788,6 +3788,24 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-09-21T18:38:44+00:00",
+  "status": "loss",
+  "closed_utc": "2026-09-21T22:11:35+00:00"
+ },
+ {
+  "id": "63925eab",
+  "symbol": "BTCUSD",
+  "profile": "BTC",
+  "side": "sell",
+  "entry": 86568.65,
+  "sl": 87739.21,
+  "tp": 84227.53,
+  "rr": 2.0,
+  "risk_usd": 5.85,
+  "reward_usd": 11.71,
+  "confidence": 2,
+  "version": "v2",
+  "momentum": "up",
+  "time_utc": "2026-09-21T22:11:43+00:00",
   "status": "open"
  }
 ]
