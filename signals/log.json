@@ -3898,5 +3898,22 @@
   "time_utc": "2026-10-02T12:33:53+00:00",
   "status": "win",
   "closed_utc": "2026-10-02T18:01:15+00:00"
+ },
+ {
+  "id": "7b0f458d",
+  "symbol": "BTCUSD",
+  "profile": "BTC",
+  "side": "sell",
+  "entry": 86123.75,
+  "sl": 86442.25,
+  "tp": 85486.75,
+  "rr": 2.0,
+  "risk_usd": 1.59,
+  "reward_usd": 3.19,
+  "confidence": 2,
+  "version": "v2",
+  "momentum": "up",
+  "time_utc": "2026-10-04T22:03:15+00:00",
+  "status": "open"
  }
 ]
