@@ -3914,6 +3914,24 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-10-04T22:03:15+00:00",
+  "status": "loss",
+  "closed_utc": "2026-10-05T00:52:38+00:00"
+ },
+ {
+  "id": "c147a1af",
+  "symbol": "BTCUSD",
+  "profile": "BTC",
+  "side": "sell",
+  "entry": 86620.0,
+  "sl": 87017.28,
+  "tp": 85825.45,
+  "rr": 2.0,
+  "risk_usd": 1.99,
+  "reward_usd": 3.97,
+  "confidence": 2,
+  "version": "v2",
+  "momentum": "up",
+  "time_utc": "2026-10-05T00:52:48+00:00",
   "status": "open"
  }
 ]
