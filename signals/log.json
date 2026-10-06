@@ -3934,5 +3934,22 @@
   "time_utc": "2026-10-05T00:52:48+00:00",
   "status": "win",
   "closed_utc": "2026-10-05T06:22:34+00:00"
+ },
+ {
+  "id": "bda457d5",
+  "symbol": "XAUUSD",
+  "profile": "MeanRev",
+  "side": "sell",
+  "entry": 4152.13,
+  "sl": 4160.06,
+  "tp": 4136.29,
+  "rr": 2.0,
+  "risk_usd": 1.58,
+  "reward_usd": 3.17,
+  "confidence": 1,
+  "version": "v2",
+  "momentum": "up",
+  "time_utc": "2026-10-06T08:55:07+00:00",
+  "status": "open"
  }
 ]
