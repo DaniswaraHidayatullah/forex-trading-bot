@@ -3952,5 +3952,39 @@
   "time_utc": "2026-10-06T08:55:07+00:00",
   "status": "loss",
   "closed_utc": "2026-10-06T15:31:07+00:00"
+ },
+ {
+  "id": "ab3f4a2a",
+  "symbol": "XAUUSD",
+  "profile": "MeanRev",
+  "side": "buy",
+  "entry": 4136.68,
+  "sl": 4129.11,
+  "tp": 4151.82,
+  "rr": 2.0,
+  "risk_usd": 1.51,
+  "reward_usd": 3.03,
+  "confidence": 1,
+  "version": "v2",
+  "momentum": "down",
+  "time_utc": "2026-10-07T05:50:59+00:00",
+  "status": "open"
+ },
+ {
+  "id": "79f59354",
+  "symbol": "BTCUSD",
+  "profile": "BTC",
+  "side": "buy",
+  "entry": 84314.13,
+  "sl": 83352.14,
+  "tp": 86238.11,
+  "rr": 2.0,
+  "risk_usd": 4.81,
+  "reward_usd": 9.62,
+  "confidence": 1,
+  "version": "v2",
+  "momentum": "down",
+  "time_utc": "2026-10-07T05:51:01+00:00",
+  "status": "open"
  }
 ]
