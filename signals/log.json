@@ -4024,5 +4024,22 @@
   "time_utc": "2026-10-07T18:55:40+00:00",
   "status": "loss",
   "closed_utc": "2026-10-08T09:38:14+00:00"
+ },
+ {
+  "id": "58b8fc7f",
+  "symbol": "BTCUSD",
+  "profile": "BTC",
+  "side": "buy",
+  "entry": 81020.0,
+  "sl": 80175.9,
+  "tp": 82708.2,
+  "rr": 2.0,
+  "risk_usd": 4.22,
+  "reward_usd": 8.44,
+  "confidence": 1,
+  "version": "v2",
+  "momentum": "down",
+  "time_utc": "2026-10-08T16:55:41+00:00",
+  "status": "open"
  }
 ]
