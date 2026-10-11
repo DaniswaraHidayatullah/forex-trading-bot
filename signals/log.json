@@ -4042,5 +4042,22 @@
   "time_utc": "2026-10-08T16:55:41+00:00",
   "status": "win",
   "closed_utc": "2026-10-09T14:38:43+00:00"
+ },
+ {
+  "id": "dfc162b5",
+  "symbol": "BTCUSD",
+  "profile": "BTC",
+  "side": "sell",
+  "entry": 83601.51,
+  "sl": 84333.16,
+  "tp": 82138.21,
+  "rr": 2.0,
+  "risk_usd": 3.66,
+  "reward_usd": 7.32,
+  "confidence": 2,
+  "version": "v2",
+  "momentum": "up",
+  "time_utc": "2026-10-11T18:54:28+00:00",
+  "status": "open"
  }
 ]
