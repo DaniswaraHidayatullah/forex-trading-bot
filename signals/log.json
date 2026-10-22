@@ -4150,5 +4150,22 @@
   "time_utc": "2026-10-21T20:44:22+00:00",
   "status": "win",
   "closed_utc": "2026-10-22T06:45:53+00:00"
+ },
+ {
+  "id": "3da20019",
+  "symbol": "BTCUSD",
+  "profile": "BTC",
+  "side": "buy",
+  "entry": 81684.9,
+  "sl": 81088.12,
+  "tp": 82878.46,
+  "rr": 2.0,
+  "risk_usd": 2.98,
+  "reward_usd": 5.97,
+  "confidence": 1,
+  "version": "v2",
+  "momentum": "down",
+  "time_utc": "2026-10-22T12:36:00+00:00",
+  "status": "open"
  }
 ]
