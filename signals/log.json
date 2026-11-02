@@ -4240,5 +4240,22 @@
   "time_utc": "2026-10-30T02:56:29+00:00",
   "status": "expired",
   "closed_utc": "2026-11-02T09:44:00+00:00"
+ },
+ {
+  "id": "fcdee163",
+  "symbol": "BTCUSD",
+  "profile": "BTC",
+  "side": "buy",
+  "entry": 76718.02,
+  "sl": 76136.33,
+  "tp": 77881.4,
+  "rr": 2.0,
+  "risk_usd": 2.91,
+  "reward_usd": 5.82,
+  "confidence": 1,
+  "version": "v2",
+  "momentum": "down",
+  "time_utc": "2026-11-02T19:47:41+00:00",
+  "status": "open"
  }
 ]
