@@ -4258,5 +4258,22 @@
   "time_utc": "2026-11-02T19:47:41+00:00",
   "status": "win",
   "closed_utc": "2026-11-03T16:41:49+00:00"
+ },
+ {
+  "id": "81415629",
+  "symbol": "BTCUSD",
+  "profile": "BTC",
+  "side": "sell",
+  "entry": 80615.19,
+  "sl": 81549.93,
+  "tp": 78745.72,
+  "rr": 2.0,
+  "risk_usd": 4.67,
+  "reward_usd": 9.35,
+  "confidence": 2,
+  "version": "v2",
+  "momentum": "up",
+  "time_utc": "2026-11-04T16:18:45+00:00",
+  "status": "open"
  }
 ]
