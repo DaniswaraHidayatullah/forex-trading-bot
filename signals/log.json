@@ -4274,7 +4274,8 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-11-04T16:18:45+00:00",
-  "status": "open"
+  "status": "win",
+  "closed_utc": "2026-11-05T17:29:41+00:00"
  },
  {
   "id": "1fda2610",
@@ -4291,6 +4292,24 @@
   "version": "v2",
   "momentum": "up",
   "time_utc": "2026-11-05T02:01:22+00:00",
+  "status": "win",
+  "closed_utc": "2026-11-05T17:29:41+00:00"
+ },
+ {
+  "id": "91331816",
+  "symbol": "BTCUSD",
+  "profile": "BTC",
+  "side": "buy",
+  "entry": 75931.54,
+  "sl": 74840.47,
+  "tp": 78113.68,
+  "rr": 2.0,
+  "risk_usd": 5.46,
+  "reward_usd": 10.91,
+  "confidence": 1,
+  "version": "v2",
+  "momentum": "down",
+  "time_utc": "2026-11-05T17:29:51+00:00",
   "status": "open"
  }
 ]
