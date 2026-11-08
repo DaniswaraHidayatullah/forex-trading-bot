@@ -4310,7 +4310,8 @@
   "version": "v2",
   "momentum": "down",
   "time_utc": "2026-11-05T17:29:51+00:00",
-  "status": "open"
+  "status": "expired",
+  "closed_utc": "2026-11-08T19:08:35+00:00"
  },
  {
   "id": "065f87d7",
