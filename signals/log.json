@@ -4384,5 +4384,22 @@
   "time_utc": "2026-11-10T18:00:17+00:00",
   "status": "win",
   "closed_utc": "2026-11-11T02:22:43+00:00"
+ },
+ {
+  "id": "dacfceeb",
+  "symbol": "BTCUSD",
+  "profile": "BTC",
+  "side": "buy",
+  "entry": 71624.05,
+  "sl": 70891.68,
+  "tp": 73088.79,
+  "rr": 2.0,
+  "risk_usd": 3.66,
+  "reward_usd": 7.32,
+  "confidence": 1,
+  "version": "v2",
+  "momentum": "down",
+  "time_utc": "2026-11-12T20:25:52+00:00",
+  "status": "open"
  }
 ]
