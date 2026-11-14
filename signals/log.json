@@ -4454,6 +4454,24 @@
   "version": "v2",
   "momentum": "down",
   "time_utc": "2026-11-14T15:03:11+00:00",
+  "status": "loss",
+  "closed_utc": "2026-11-14T19:54:18+00:00"
+ },
+ {
+  "id": "3c7a4aa8",
+  "symbol": "BTCUSD",
+  "profile": "BTC",
+  "side": "buy",
+  "entry": 65698.52,
+  "sl": 64660.11,
+  "tp": 67775.34,
+  "rr": 2.0,
+  "risk_usd": 5.19,
+  "reward_usd": 10.38,
+  "confidence": 1,
+  "version": "v2",
+  "momentum": "down",
+  "time_utc": "2026-11-14T19:54:22+00:00",
   "status": "open"
  }
 ]
