@@ -1,0 +1,44 @@
+{
+ "start": "2026-11-19T21:49:02.073262+00:00",
+ "cursor": "2026-11-19T21:45:00+00:00",
+ "signals": [],
+ "strategy": {
+  "lot": null,
+  "leverage": null,
+  "balance": null,
+  "pos": null,
+  "trades": [],
+  "margin_skips": 0,
+  "overlap_skips": 0
+ },
+ "accounts": {
+  "0.1 lot · Unlimited": {
+   "lot": 0.1,
+   "leverage": "Unlimited",
+   "balance": 100.0,
+   "pos": null,
+   "trades": [],
+   "margin_skips": 0,
+   "overlap_skips": 0
+  },
+  "0.05 lot · Unlimited": {
+   "lot": 0.05,
+   "leverage": "Unlimited",
+   "balance": 100.0,
+   "pos": null,
+   "trades": [],
+   "margin_skips": 0,
+   "overlap_skips": 0
+  }
+ },
+ "alerts": {
+  "watch-202611192130": {
+   "kind": "watch",
+   "time": "2026-11-19T21:45:00+00:00",
+   "checked_utc": "2026-11-19T21:49:02.228687+00:00",
+   "breakdown_utc": "2026-11-19T21:30:00+00:00",
+   "support": 3633.72093,
+   "status": "missing_m1"
+  }
+ }
+}

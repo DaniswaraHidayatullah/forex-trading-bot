@@ -1,0 +1,21 @@
+{
+ "started_utc": "2026-11-19T21:49:02+00:00",
+ "last_candle_utc": "2026-11-19 21:30:00",
+ "entries": [],
+ "pip_price": 0.01,
+ "summary": {
+  "signals": 0,
+  "closed": 0,
+  "open": 0,
+  "win": 0,
+  "loss": 0,
+  "unknown": 0,
+  "expired": 0,
+  "win_rate_pct": null,
+  "net_r": 0,
+  "expectancy_r": null,
+  "max_drawdown_r": 0,
+  "profit_factor": null,
+  "late": 0
+ }
+}
