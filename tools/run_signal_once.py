@@ -764,6 +764,12 @@ def main_run() -> None:
     meta = _load_meta()
     _resolve_open(entries)
     _new_signals(entries)
+    # Riset paper terpisah: kegagalannya tidak boleh menghentikan bot utama.
+    try:
+        from run_trial_once import run_trial
+        run_trial()
+    except Exception as exc:  # noqa: BLE001
+        print("[paper] ERROR (bot utama tetap berjalan):", repr(exc)[:200])
     _new_btc_signals(entries)
     _check_burst(meta)
     _daily_digest(entries, meta)

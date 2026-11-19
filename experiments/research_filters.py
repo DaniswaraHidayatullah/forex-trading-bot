@@ -18,7 +18,7 @@ sys.path.insert(0, str(ROOT / "data_service"))
 from fetchers.signal_engine import atr_series, ema_series, rsi_series  # noqa: E402
 from fetchers.tracker import parse_utc  # noqa: E402
 
-KEY = os.getenv("TWELVEDATA_API_KEY", "096b399350f5428d8a35f9538b7801cf")
+KEY = os.getenv("TWELVEDATA_API_KEY", "")
 SL_MULT, RR, SPREAD = 1.2, 2.0, 0.40
 
 

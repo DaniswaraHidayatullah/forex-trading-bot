@@ -45,6 +45,8 @@ jobs:
           SIGNAL_PROFILES: ${{ vars.SIGNAL_PROFILES || 'meanrev' }}
           SIGNAL_MIN_CONFIDENCE: ${{ vars.SIGNAL_MIN_CONFIDENCE || 'none' }}
           SIGNAL_MAX_RISK_USD: ${{ vars.SIGNAL_MAX_RISK_USD || '6' }}
+          TRIAL_ENABLED: ${{ vars.TRIAL_ENABLED || 'true' }}
+          DISCORD_TRIAL_CHANNEL_ID: ${{ vars.DISCORD_TRIAL_CHANNEL_ID }}
           GSHEET_SA_JSON: ${{ secrets.GSHEET_SA_JSON }}
           GSHEET_ID: ${{ secrets.GSHEET_ID }}
         run: python tools/run_signal_once.py
