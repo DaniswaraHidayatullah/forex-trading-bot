@@ -98,11 +98,11 @@ def run_trial(now: datetime | None = None) -> dict:
     if not key:
         print("[paper] TWELVEDATA_API_KEY tidak tersedia")
         return {"enabled": True, "error": "no-price-key"}
-    # Keep the trial's longer history separate from the live engine's 60 bars:
-    # sharing a cache here would subtly change the live RSI/ATR calculation.
-    # This costs one extra M15 API request per scheduled run (~96/day).
+    # Prime the live M15 cache once with long history. The live engine slices
+    # it back to its original 60 bars, so indicators and API-call count stay
+    # unchanged while paper research gets sufficient H1 history.
     bars = main.get_or_set(
-        f"trial_px_{main.settings.signal_symbol}_15min", 300,
+        f"px_{main.settings.signal_symbol}_15min", 300,
         lambda: signal_engine.fetch_series(main.settings.signal_symbol, "15min", 500, key),
     )
     entries = state["entries"]

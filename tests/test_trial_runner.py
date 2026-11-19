@@ -41,3 +41,25 @@ def test_trial_isolated_deduped_and_ends(monkeypatch, tmp_path):
     state = json.loads(log.read_text(encoding="utf-8"))
     assert len(state["entries"]) == 1
     assert state["finished_utc"]
+
+
+def test_live_signal_keeps_its_original_60_bar_window(monkeypatch):
+    observed = {}
+
+    def fake_cache(key, ttl, fetch):
+        if key.startswith("px_"):
+            return list(range(500))  # trial primed a longer M15 cache
+        if key.startswith("quote_"):
+            return 4000.0
+        return fetch()
+
+    def fake_engine(**kwargs):
+        observed["bars"] = kwargs["fetch_fn"]("15min", 60)
+        return {"signal": "none"}
+
+    monkeypatch.setattr(runner.main, "get_or_set", fake_cache)
+    monkeypatch.setattr(runner.main, "context", lambda symbol: {
+        "trade_allowed": True, "sentiment_bias": "flat", "sentiment": {}})
+    monkeypatch.setattr(runner.main.signal_engine, "build_signal", fake_engine)
+    runner.main._signal_for("XAUUSD", 100.0, "meanrev")
+    assert observed["bars"] == list(range(440, 500))

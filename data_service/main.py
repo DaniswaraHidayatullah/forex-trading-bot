@@ -154,13 +154,16 @@ def _signal_for(symbol: str, equity: float, profile: str) -> dict:
         quote = None
 
     def _cached_fetch(interval: str, size: int) -> list[dict]:
-        return get_or_set(
+        series = get_or_set(
             f"px_{settings.signal_symbol}_{interval}",
             _PRICE_TTL.get(interval, 600),
             lambda: signal_engine.fetch_series(
                 settings.signal_symbol, interval, size, settings.twelvedata_api_key
             ),
         )
+        # Paper research may prime M15 with 500 bars. Preserve the live
+        # indicator window (normally 60 bars) exactly as before.
+        return series[-size:]
 
     def _produce() -> dict:
         sig = signal_engine.build_signal(
