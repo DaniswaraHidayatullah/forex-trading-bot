@@ -769,6 +769,11 @@ def main_run() -> None:
         run_trial()
     except Exception as exc:  # noqa: BLE001
         print("[paper] ERROR (bot utama tetap berjalan):", repr(exc)[:200])
+    try:
+        from run_btc_futures_trial import run_trial as run_btc_futures_trial
+        run_btc_futures_trial()
+    except Exception as exc:  # noqa: BLE001
+        print("[btc-paper] ERROR (bot utama tetap berjalan):", repr(exc)[:200])
     _new_signals(entries)
     _new_btc_signals(entries)
     _check_burst(meta)
