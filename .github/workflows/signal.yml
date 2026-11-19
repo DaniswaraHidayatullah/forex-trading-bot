@@ -48,6 +48,7 @@ jobs:
           TRIAL_ENABLED: ${{ vars.TRIAL_ENABLED || 'true' }}
           DISCORD_TRIAL_CHANNEL_ID: ${{ vars.DISCORD_TRIAL_CHANNEL_ID }}
           NANDA_TRIAL_ENABLED: ${{ vars.NANDA_TRIAL_ENABLED || 'true' }}
+          NANDA_V2_ENABLED: ${{ vars.NANDA_V2_ENABLED || 'true' }}
           BTC_FUTURES_TRIAL_ENABLED: ${{ vars.BTC_FUTURES_TRIAL_ENABLED || 'true' }}
           DISCORD_BTC_TRIAL_CHANNEL_ID: ${{ vars.DISCORD_BTC_TRIAL_CHANNEL_ID }}
           GSHEET_SA_JSON: ${{ secrets.GSHEET_SA_JSON }}

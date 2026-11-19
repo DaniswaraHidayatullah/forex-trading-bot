@@ -66,3 +66,36 @@ def test_runner_keeps_separate_state_and_tags_discord(monkeypatch, tmp_path):
     assert runner.run_trial(t + timedelta(days=30))["win"] == 1
     assert [channel for _, channel in sent] == ["sinyal", "report"]
     assert all("NANDA METHOD" in msg["embeds"][0]["title"] for msg, _ in sent)
+
+
+def test_v2_rejection_no_lookahead_and_uncapped_usd_accounts():
+    from data_service.fetchers import nanda_v2 as v2
+
+    bars = sample()
+    bars[-1].update(open=3788.9, close=3788.6)
+    t = datetime.fromisoformat(bars[-1]["datetime"]) + nanda.BAR
+    bars.append(dict(datetime=t.isoformat(), open=3788.6, high=3795, low=3787, close=3794))
+    state = v2.initial(t)
+    event, = v2.advance(state, bars, t)
+    assert event["entry"] == 3788.6 and event["distance"] == 5
+    assert all(book["balance"] == 100 and book["pos"] for book in state["accounts"].values())
+    assert not v2.advance(state, bars, t)
+    end = t + nanda.BAR
+    bars.append(dict(datetime=end.isoformat(), open=3794, high=3794, low=3794, close=3794))
+    v2.advance(state, bars, end)
+    assert {book["lot"]: book["balance"] for book in state["accounts"].values()} == {
+        0.1: 50, 0.05: 75}
+    assert len(state["signals"]) == 1
+
+
+def test_v2_unlimited_does_not_revive_stopped_account():
+    from data_service.fetchers import nanda_v2 as v2
+
+    t = datetime(2026, 11, 20, tzinfo=timezone.utc)
+    book = v2.ledger(.1, "Unlimited")
+    e = dict(id="test", time=t.isoformat(), sl=4020, tp=3960, entry=4000, distance=20)
+    v2.enter(book, e)
+    v2.settle(book, dict(datetime=t.isoformat(), high=4010, low=3999), t + nanda.BAR)
+    assert book["balance"] == 0 and book["trades"][0]["reason"] == "stopout"
+    v2.enter(book, e)
+    assert book["pos"] is None

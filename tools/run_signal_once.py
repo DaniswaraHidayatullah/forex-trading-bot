@@ -775,6 +775,11 @@ def main_run() -> None:
     except Exception as exc:  # noqa: BLE001
         print("[nanda-paper] ERROR (bot utama tetap berjalan):", type(exc).__name__)
     try:
+        from run_nanda_v2 import run_trial as run_nanda_v2
+        run_nanda_v2()
+    except Exception as exc:  # noqa: BLE001
+        print("[nanda-v2] ERROR:", type(exc).__name__)
+    try:
         from run_btc_futures_trial import run_trial as run_btc_futures_trial
         run_btc_futures_trial()
     except Exception as exc:  # noqa: BLE001
