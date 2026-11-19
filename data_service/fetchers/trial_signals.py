@@ -122,11 +122,12 @@ def resolve(entries: list[dict[str, Any]], bars: list[dict[str, Any]], now: date
             continue
         start = _utc(entry["entry_candle_utc"])
         expiry = start + timedelta(days=2)
-        expected = start
+        monitor_from = _utc(entry.get("monitor_from_utc", entry["entry_candle_utc"]))
+        expected = monitor_from
         saw_bar = False
         for bar in bars:
             dt = _utc(bar["datetime"])
-            if dt < start or dt > cutoff or dt > expiry:
+            if dt < monitor_from or dt > cutoff or dt > expiry:
                 continue
             if dt != expected:
                 entry["status"] = "unknown"  # missing prices: never guess win/loss
@@ -145,7 +146,7 @@ def resolve(entries: list[dict[str, Any]], bars: list[dict[str, Any]], now: date
                 entry["exit_candle_utc"] = dt.isoformat()
                 entry["result_r"] = -1.0 if hit_sl else 2.0
                 break
-        if entry["status"] == "open" and not saw_bar and now - start > timedelta(minutes=30):
+        if entry["status"] == "open" and not saw_bar and now - monitor_from > timedelta(minutes=30):
             entry["status"] = "unknown"
             entry["exit_candle_utc"] = now.isoformat()
         if entry["status"] == "open" and now > expiry:
