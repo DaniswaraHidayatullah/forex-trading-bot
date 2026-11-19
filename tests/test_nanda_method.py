@@ -99,3 +99,52 @@ def test_v2_unlimited_does_not_revive_stopped_account():
     assert book["balance"] == 0 and book["trades"][0]["reason"] == "stopout"
     v2.enter(book, e)
     assert book["pos"] is None
+
+
+def test_watch_before_touch_and_confirm_guard(monkeypatch):
+    import run_nanda_v2 as v2runner
+
+    bars = sample()
+    t = datetime.fromisoformat(bars[-1]["datetime"])
+    state = v2runner.nanda_v2.initial(t)
+    m = dict(datetime=t.isoformat(), high=3771., low=3769., close=3770.)
+    monkeypatch.setattr(v2runner.signal_engine, "fetch_series", lambda *args: [m])
+    sent = []
+    monkeypatch.setattr(v2runner, "_post", lambda title, msg, ch: sent.append((title,ch)) or True)
+    for _ in range(2):
+        v2runner.notify(state, bars[:-1], "XAU/USD", "fake", lambda: t)
+    assert len(sent) == 1 and "Pantau retest" in sent[0][0] and sent[0][1] == "sinyal"
+    assert list(state["alerts"].values())[0]["acknowledged_utc"] == t.isoformat()
+    state["alerts"].clear()
+    m["high"] = 3789.
+    v2runner.notify(state, bars[:-1], "XAU/USD", "fake", lambda: t)
+    assert len(sent) == 1 and list(state["alerts"].values())[0]["status"] == "already_retested"
+
+    bars[-1].update(open=3788.9, close=3788.6)
+    t += nanda.BAR
+    bars.append(dict(datetime=t.isoformat(), open=3788.6, high=3789, low=3788, close=3788.5))
+    event, = v2runner.nanda_v2.advance(state, bars, t)
+    m.update(datetime=t.isoformat(), high=3789., low=3788., close=3788.5)
+    v2runner.notify(state, bars, "XAU/USD", "fake", lambda: t)
+    assert "Rejection terkonfirmasi" in sent[-1][0]
+    assert state["alerts"][event["id"]]["status"] == "sent"
+    state["alerts"].clear()
+    m["high"] = event["sl"]
+    v2runner.notify(state, bars, "XAU/USD", "fake", lambda: t)
+    assert state["alerts"][event["id"]]["status"] == "already_hit_exit"
+    assert len(sent) == 2
+    assert v2runner.nanda_alerts.guard(event, [m], t+timedelta(minutes=1), "confirm") == "missing_m1"
+    assert v2runner.nanda_alerts.guard(event, [m], t+nanda.BAR, "confirm") == "stale"
+
+
+def test_post_notification_replay_only_after_discord_ack():
+    from eval_nanda_notifications import evaluate
+
+    t = datetime(2026, 11, 20, tzinfo=timezone.utc)
+    e = dict(tp=99, sl=105)
+    times = [t+timedelta(seconds=i) for i in (-1, 1, 2, 3)]
+    prices = [(98, 98.5), (100, 100.4), (98.9, 99.2), (98.5, 98.9)]
+    r = evaluate(e, t, times, prices)
+    assert r["result"] == "tp" and r["exit_utc"] == times[-1].isoformat()
+    assert evaluate(e, t, [], [])["result"] == "no_entry_tick"
+    assert evaluate(e, t, [t, t+timedelta(minutes=3)], prices[1:3])["result"] == "tick_gap"

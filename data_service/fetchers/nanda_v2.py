@@ -99,7 +99,8 @@ def advance(state, bars, now):
             if prev["close"] < min(level, prev["open"]) and p < level:
                 d = round(max(5.0, prev["high"] + SPREAD + 0.10 - p), 6)
                 e = dict(id=f"nanda-v2-{t:%Y%m%d%H%M}", time=t.isoformat(), support=level,
-                         retest_high=prev["high"], entry=p, distance=d, sl=round(p+d, 6),
+                         breakdown_utc=touch["breakdown_utc"], retest_high=prev["high"],
+                         entry=p, distance=d, sl=round(p+d, 6),
                          tp=round(p-2*d, 6), strategy_taken=not state["strategy"]["pos"])
                 state["signals"].append(e)
                 for book in books:

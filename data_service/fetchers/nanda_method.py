@@ -13,6 +13,22 @@ SPREAD = 0.30
 EXNESS_PIP_PRICE = 0.01  # Exness XAUUSD instrument specification, not legacy bot convention
 
 
+def broken_support(bars, times, j, hours, hour_ends):
+    """Return the support broken on closed bar j, using only information then available."""
+    if j < SUPPORT_BARS or times[j] - times[j - SUPPORT_BARS] != SUPPORT_BARS * BAR:
+        return None
+    h = bisect_right(hour_ends, times[j] + BAR) - 1
+    if h < 20:
+        return None
+    window = [v["close"] for v in hours[h - 20:h + 1]]
+    if window[-1] >= sum(window[1:]) / 20 or window[-1] >= window[0]:
+        return None
+    level = min(b["low"] for b in bars[j - SUPPORT_BARS:j])
+    if bars[j - 1]["close"] >= level and bars[j]["close"] < level - SPREAD:
+        return level
+    return None
+
+
 def candidates(bars: list[dict], now: datetime, after: str | None,
                pip_price: float) -> tuple[list[dict], str | None]:
     """Arm a theoretical sell limit after a closed breakdown, not after the retest."""
@@ -30,16 +46,8 @@ def candidates(bars: list[dict], now: datetime, after: str | None,
     found: dict[int, dict] = {}
     # Scan enough prior breakdowns so a restart can still find the first retest.
     for j in range(max(SUPPORT_BARS, start - RETEST_BARS), end):
-        if times[j] - times[j - SUPPORT_BARS] != SUPPORT_BARS * BAR:
-            continue
-        h = bisect_right(hour_ends, times[j] + BAR) - 1
-        if h < 20:
-            continue
-        window = [v["close"] for v in hours[h - 20:h + 1]]
-        if not (window[-1] < sum(window[1:]) / 20 and window[-1] < window[0]):
-            continue  # H1 close below SMA20, with falling SMA20
-        level = min(b["low"] for b in bars[j - SUPPORT_BARS:j])
-        if not (bars[j - 1]["close"] >= level and bars[j]["close"] < level - SPREAD):
+        level = broken_support(bars, times, j, hours, hour_ends)
+        if level is None:
             continue
         for i in range(j + 1, min(end, j + RETEST_BARS) + 1):
             if times[i] != times[j] + (i - j) * BAR:
