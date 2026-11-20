@@ -1,6 +1,6 @@
 {
  "start": "2026-11-19T21:49:02.073262+00:00",
- "cursor": "2026-11-20T10:15:00+00:00",
+ "cursor": "2026-11-20T18:45:00+00:00",
  "signals": [
   {
    "id": "nanda-v2-202611192315",
@@ -49,13 +49,36 @@
    "sl": 3559.07753,
    "tp": 3535.91465,
    "strategy_taken": false
+  },
+  {
+   "id": "nanda-v2-202611201845",
+   "time": "2026-11-20T18:45:00+00:00",
+   "support": 3520.3613,
+   "breakdown_utc": "2026-11-20T18:15:00+00:00",
+   "retest_high": 3521.64527,
+   "entry": 3509.57048,
+   "distance": 12.47479,
+   "sl": 3522.04527,
+   "tp": 3484.6209,
+   "strategy_taken": true
   }
  ],
  "strategy": {
   "lot": null,
   "leverage": null,
   "balance": null,
-  "pos": null,
+  "pos": {
+   "id": "nanda-v2-202611201845",
+   "time": "2026-11-20T18:45:00+00:00",
+   "support": 3520.3613,
+   "breakdown_utc": "2026-11-20T18:15:00+00:00",
+   "retest_high": 3521.64527,
+   "entry": 3509.57048,
+   "distance": 12.47479,
+   "sl": 3522.04527,
+   "tp": 3484.6209,
+   "strategy_taken": true
+  },
   "trades": [
    {
     "id": "nanda-v2-202611192315",
@@ -86,14 +109,25 @@
      "balance": 0.0
     }
    ],
-   "margin_skips": 3,
+   "margin_skips": 4,
    "overlap_skips": 0
   },
   "0.05 lot · Unlimited": {
    "lot": 0.05,
    "leverage": "Unlimited",
    "balance": 96.21985,
-   "pos": null,
+   "pos": {
+    "id": "nanda-v2-202611201845",
+    "time": "2026-11-20T18:45:00+00:00",
+    "support": 3520.3613,
+    "breakdown_utc": "2026-11-20T18:15:00+00:00",
+    "retest_high": 3521.64527,
+    "entry": 3509.57048,
+    "distance": 12.47479,
+    "sl": 3522.04527,
+    "tp": 3484.6209,
+    "strategy_taken": true
+   },
    "trades": [
     {
      "id": "nanda-v2-202611192315",
@@ -121,6 +155,22 @@
    "checked_utc": "2026-11-19T21:49:02.228687+00:00",
    "breakdown_utc": "2026-11-19T21:30:00+00:00",
    "support": 3633.72093,
+   "status": "missing_m1"
+  },
+  "watch-202611201830": {
+   "kind": "watch",
+   "time": "2026-11-20T18:45:00+00:00",
+   "checked_utc": "2026-11-20T18:48:27.670222+00:00",
+   "breakdown_utc": "2026-11-20T18:30:00+00:00",
+   "support": 3510.37315,
+   "status": "missing_m1"
+  },
+  "nanda-v2-202611201845": {
+   "kind": "confirm",
+   "time": "2026-11-20T18:45:00+00:00",
+   "checked_utc": "2026-11-20T18:48:27.670276+00:00",
+   "breakdown_utc": "2026-11-20T18:15:00+00:00",
+   "support": 3520.3613,
    "status": "missing_m1"
   }
  }
