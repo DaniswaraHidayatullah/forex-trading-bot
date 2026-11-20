@@ -1,6 +1,6 @@
 {
  "started_utc": "2026-11-19T21:49:02+00:00",
- "last_candle_utc": "2026-11-20 02:15:00",
+ "last_candle_utc": "2026-11-20 10:15:00",
  "entries": [
   {
    "id": "nanda-v1-202611192300",
@@ -97,22 +97,46 @@
    "late": true,
    "exit_candle_utc": "2026-11-20T01:45:00+00:00",
    "result_r": -1
+  },
+  {
+   "id": "nanda-v1-202611200245",
+   "setup": "nanda_v1",
+   "symbol": "XAUUSD",
+   "side": "sell",
+   "paper": true,
+   "breakdown_utc": "2026-11-20T02:00:00+00:00",
+   "breakdown_close": 3537.06186,
+   "candle_utc": "2026-11-20T02:45:00+00:00",
+   "entry_candle_utc": "2026-11-20T02:45:00+00:00",
+   "monitor_from_utc": "2026-11-20T03:00:00+00:00",
+   "entry": 3558.59222,
+   "sl": 3559.09222,
+   "tp": 3557.59222,
+   "sl_pips": 50,
+   "tp_pips": 100,
+   "rr": 2,
+   "spread_assumed": 0.3,
+   "pip_price": 0.01,
+   "status": "win",
+   "late": true,
+   "exit_candle_utc": "2026-11-20T02:45:00+00:00",
+   "result_r": 2
   }
  ],
  "pip_price": 0.01,
  "summary": {
-  "signals": 4,
-  "closed": 4,
+  "signals": 5,
+  "closed": 5,
   "open": 0,
-  "win": 0,
+  "win": 1,
   "loss": 4,
   "unknown": 0,
   "expired": 0,
-  "win_rate_pct": 0.0,
-  "net_r": -4,
-  "expectancy_r": -1,
+  "win_rate_pct": 20.0,
+  "net_r": -2,
+  "expectancy_r": -0.4,
   "max_drawdown_r": 4,
-  "profit_factor": 0.0,
-  "late": 4
+  "profit_factor": 0.5,
+  "late": 5
  }
 }

@@ -1,6 +1,6 @@
 {
  "start": "2026-11-19T21:49:02.073262+00:00",
- "cursor": "2026-11-20T02:30:00+00:00",
+ "cursor": "2026-11-20T10:15:00+00:00",
  "signals": [
   {
    "id": "nanda-v2-202611192315",
@@ -37,33 +37,39 @@
    "sl": 3577.70557,
    "tp": 3524.25394,
    "strategy_taken": false
+  },
+  {
+   "id": "nanda-v2-202611200300",
+   "time": "2026-11-20T03:00:00+00:00",
+   "support": 3558.59222,
+   "breakdown_utc": "2026-11-20T02:00:00+00:00",
+   "retest_high": 3558.67753,
+   "entry": 3551.35657,
+   "distance": 7.72096,
+   "sl": 3559.07753,
+   "tp": 3535.91465,
+   "strategy_taken": false
   }
  ],
  "strategy": {
   "lot": null,
   "leverage": null,
   "balance": null,
-  "pos": {
-   "id": "nanda-v2-202611200145",
-   "time": "2026-11-20T01:45:00+00:00",
-   "support": 3580.905,
-   "breakdown_utc": "2026-11-20T01:15:00+00:00",
-   "retest_high": 3590.79321,
-   "entry": 3565.81648,
-   "distance": 25.37673,
-   "sl": 3591.19321,
-   "tp": 3515.06302,
-   "strategy_taken": true
-  },
+  "pos": null,
   "trades": [
    {
     "id": "nanda-v2-202611192315",
     "reason": "tp",
     "observed_utc": "2026-11-19T23:45:00+00:00"
+   },
+   {
+    "id": "nanda-v2-202611200145",
+    "reason": "sl",
+    "observed_utc": "2026-11-20T08:45:00+00:00"
    }
   ],
   "margin_skips": 0,
-  "overlap_skips": 1
+  "overlap_skips": 2
  },
  "accounts": {
   "0.1 lot · Unlimited": {
@@ -80,25 +86,14 @@
      "balance": 0.0
     }
    ],
-   "margin_skips": 2,
+   "margin_skips": 3,
    "overlap_skips": 0
   },
   "0.05 lot · Unlimited": {
    "lot": 0.05,
    "leverage": "Unlimited",
-   "balance": 223.1035,
-   "pos": {
-    "id": "nanda-v2-202611200145",
-    "time": "2026-11-20T01:45:00+00:00",
-    "support": 3580.905,
-    "breakdown_utc": "2026-11-20T01:15:00+00:00",
-    "retest_high": 3590.79321,
-    "entry": 3565.81648,
-    "distance": 25.37673,
-    "sl": 3591.19321,
-    "tp": 3515.06302,
-    "strategy_taken": true
-   },
+   "balance": 96.21985,
+   "pos": null,
    "trades": [
     {
      "id": "nanda-v2-202611192315",
@@ -106,10 +101,17 @@
      "observed_utc": "2026-11-19T23:45:00+00:00",
      "pnl_usd": 123.1035,
      "balance": 223.1035
+    },
+    {
+     "id": "nanda-v2-202611200145",
+     "reason": "sl",
+     "observed_utc": "2026-11-20T08:45:00+00:00",
+     "pnl_usd": -126.88365,
+     "balance": 96.21985
     }
    ],
    "margin_skips": 0,
-   "overlap_skips": 1
+   "overlap_skips": 2
   }
  },
  "alerts": {
