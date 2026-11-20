@@ -20,7 +20,8 @@ jobs:
               raise SystemExit("Discord bot token or channel ID unavailable.")
           req = urllib.request.Request(
               f"https://discord.com/api/v10/channels/{channel}/messages",
-              headers={"Authorization": f"Bot {token}", "Content-Type": "application/json"},
+              headers={"Authorization": f"Bot {token}", "Content-Type": "application/json",
+                       "User-Agent": "DiscordBot (https://github.com/DaniswaraHidayatullah/forex-trading-bot, 1.0)"},
               data=json.dumps({"content": "Sclapers Boys | TES KONEKSI — bukan sinyal.",
                                "allowed_mentions": {"parse": []}}).encode(),
           )
@@ -28,6 +29,10 @@ jobs:
               with urllib.request.urlopen(req, timeout=15) as res:
                   result = json.load(res)
           except urllib.error.HTTPError as exc:
-              raise SystemExit(f"Discord rejected delivery: HTTP {exc.code}") from None
+              try:
+                  code = json.load(exc).get("code")
+              except ValueError:
+                  code = None
+              raise SystemExit(f"Discord rejected delivery: HTTP {exc.code}; API code {code if isinstance(code,int) else 'unavailable'}") from None
           print("DISCORD_DELIVERED", result["channel_id"], result["id"])
           PY
