@@ -1,0 +1,33 @@
+name: Sclapers Boys Discord connection check
+on:
+  push:
+    branches: [test/sclapers-discord-connection]
+    paths: [.github/workflows/sclapers-connection-check.yml]
+permissions: {}
+jobs:
+  message:
+    runs-on: ubuntu-latest
+    env:
+      DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+      DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
+    steps:
+      - run: |
+          python3 - <<'PY'
+          import json, os, urllib.error, urllib.request
+          channel = os.environ["DISCORD_CHANNEL_ID"]
+          token = os.environ["DISCORD_BOT_TOKEN"]
+          if not (channel.isascii() and channel.isdecimal() and token):
+              raise SystemExit("Discord bot token or channel ID unavailable.")
+          req = urllib.request.Request(
+              f"https://discord.com/api/v10/channels/{channel}/messages",
+              headers={"Authorization": f"Bot {token}", "Content-Type": "application/json"},
+              data=json.dumps({"content": "Sclapers Boys | TES KONEKSI — bukan sinyal.",
+                               "allowed_mentions": {"parse": []}}).encode(),
+          )
+          try:
+              with urllib.request.urlopen(req, timeout=15) as res:
+                  result = json.load(res)
+          except urllib.error.HTTPError as exc:
+              raise SystemExit(f"Discord rejected delivery: HTTP {exc.code}") from None
+          print("DISCORD_DELIVERED", result["channel_id"], result["id"])
+          PY
