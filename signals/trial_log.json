@@ -1,6 +1,6 @@
 {
  "started_utc": "2026-11-19T13:43:30+00:00",
- "last_candle_utc": "2026-11-22 15:15:00",
+ "last_candle_utc": "2026-11-22 21:00:00",
  "entries": [
   {
    "id": "paper-trend-202611200615",
@@ -62,9 +62,10 @@
    "spread_assumed": 0.3,
    "slippage_assumed": 0.0,
    "risk_usd_at_02_cent_lot_assumed": 8.95,
-   "status": "open",
+   "status": "expired",
    "paper": true,
-   "late": true
+   "late": true,
+   "exit_candle_utc": "2026-11-22T21:16:44.864984+00:00"
   }
  ]
 }
