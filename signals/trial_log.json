@@ -1,6 +1,6 @@
 {
  "started_utc": "2026-11-19T13:43:30+00:00",
- "last_candle_utc": "2026-11-23 01:30:00",
+ "last_candle_utc": "2026-11-23 09:30:00",
  "entries": [
   {
    "id": "paper-trend-202611200615",
@@ -66,6 +66,50 @@
    "paper": true,
    "late": true,
    "exit_candle_utc": "2026-11-22T21:16:44.864984+00:00"
+  },
+  {
+   "id": "paper-range-202611230645",
+   "symbol": "XAUUSD",
+   "setup": "range",
+   "side": "sell",
+   "candle_utc": "2026-11-23T06:45:00+00:00",
+   "entry_candle_utc": "2026-11-23T07:00:00+00:00",
+   "entry": 3623.708,
+   "sl": 3634.916,
+   "tp": 3601.292,
+   "rr": 2.0,
+   "rsi": 67.6,
+   "atr": 9.34,
+   "spread_assumed": 0.3,
+   "slippage_assumed": 0.0,
+   "risk_usd_at_02_cent_lot_assumed": 2.24,
+   "status": "loss",
+   "paper": true,
+   "late": true,
+   "exit_candle_utc": "2026-11-23T07:00:00+00:00",
+   "result_r": -1.0
+  },
+  {
+   "id": "paper-range-202611230715",
+   "symbol": "XAUUSD",
+   "setup": "range",
+   "side": "sell",
+   "candle_utc": "2026-11-23T07:15:00+00:00",
+   "entry_candle_utc": "2026-11-23T07:30:00+00:00",
+   "entry": 3632.478,
+   "sl": 3643.629,
+   "tp": 3610.177,
+   "rr": 2.0,
+   "rsi": 70.0,
+   "atr": 9.292,
+   "spread_assumed": 0.3,
+   "slippage_assumed": 0.0,
+   "risk_usd_at_02_cent_lot_assumed": 2.23,
+   "status": "win",
+   "paper": true,
+   "late": true,
+   "exit_candle_utc": "2026-11-23T08:00:00+00:00",
+   "result_r": 2.0
   }
  ]
 }
