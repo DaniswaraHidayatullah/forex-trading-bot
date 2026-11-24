@@ -1,6 +1,6 @@
 {
  "started_utc": "2026-11-19T13:43:30+00:00",
- "last_candle_utc": "2026-11-23 21:30:00",
+ "last_candle_utc": "2026-11-24 05:15:00",
  "entries": [
   {
    "id": "paper-trend-202611200615",
@@ -176,6 +176,26 @@
    "late": true,
    "exit_candle_utc": "2026-11-23T20:45:00+00:00",
    "result_r": -1.0
+  },
+  {
+   "id": "paper-trend-202611240445",
+   "symbol": "XAUUSD",
+   "setup": "trend",
+   "side": "buy",
+   "candle_utc": "2026-11-24T04:45:00+00:00",
+   "entry_candle_utc": "2026-11-24T05:00:00+00:00",
+   "entry": 3633.043,
+   "sl": 3619.558,
+   "tp": 3660.014,
+   "rr": 2.0,
+   "rsi": 41.8,
+   "atr": 9.505,
+   "spread_assumed": 0.3,
+   "slippage_assumed": 0.0,
+   "risk_usd_at_02_cent_lot_assumed": 2.7,
+   "status": "open",
+   "paper": true,
+   "late": true
   }
  ]
 }
