@@ -1,6 +1,6 @@
 {
  "start": "2026-11-19T21:49:02.073262+00:00",
- "cursor": "2026-11-24T16:15:00+00:00",
+ "cursor": "2026-11-25T00:45:00+00:00",
  "signals": [
   {
    "id": "nanda-v2-202611192315",
@@ -85,6 +85,18 @@
    "sl": 3590.70865,
    "tp": 3522.40594,
    "strategy_taken": true
+  },
+  {
+   "id": "nanda-v2-202611242045",
+   "time": "2026-11-24T20:45:00+00:00",
+   "support": 3552.52407,
+   "breakdown_utc": "2026-11-24T20:15:00+00:00",
+   "retest_high": 3554.41814,
+   "entry": 3549.97923,
+   "distance": 5.0,
+   "sl": 3554.97923,
+   "tp": 3539.97923,
+   "strategy_taken": false
   }
  ],
  "strategy": {
@@ -126,7 +138,7 @@
    }
   ],
   "margin_skips": 0,
-  "overlap_skips": 2
+  "overlap_skips": 3
  },
  "accounts": {
   "0.1 lot · Unlimited": {
@@ -143,7 +155,7 @@
      "balance": 0.0
     }
    ],
-   "margin_skips": 6,
+   "margin_skips": 7,
    "overlap_skips": 0
   },
   "0.05 lot · Unlimited": {
@@ -181,7 +193,7 @@
      "balance": 0.8133
     }
    ],
-   "margin_skips": 1,
+   "margin_skips": 2,
    "overlap_skips": 2
   }
  },

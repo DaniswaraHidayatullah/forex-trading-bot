@@ -4562,6 +4562,7 @@
   "version": "v2",
   "momentum": "down",
   "time_utc": "2026-11-24T16:22:41+00:00",
-  "status": "open"
+  "status": "loss",
+  "closed_utc": "2026-11-25T00:55:50+00:00"
  }
 ]
