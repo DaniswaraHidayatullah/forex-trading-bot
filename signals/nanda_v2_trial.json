@@ -1,6 +1,6 @@
 {
  "start": "2026-11-19T21:49:02.073262+00:00",
- "cursor": "2026-11-25T09:15:00+00:00",
+ "cursor": "2026-11-25T19:15:00+00:00",
  "signals": [
   {
    "id": "nanda-v2-202611192315",
@@ -97,6 +97,30 @@
    "sl": 3554.97923,
    "tp": 3539.97923,
    "strategy_taken": false
+  },
+  {
+   "id": "nanda-v2-202611251200",
+   "time": "2026-11-25T12:00:00+00:00",
+   "support": 3517.16376,
+   "breakdown_utc": "2026-11-25T11:30:00+00:00",
+   "retest_high": 3518.77313,
+   "entry": 3510.95139,
+   "distance": 8.22174,
+   "sl": 3519.17313,
+   "tp": 3494.50791,
+   "strategy_taken": true
+  },
+  {
+   "id": "nanda-v2-202611251400",
+   "time": "2026-11-25T14:00:00+00:00",
+   "support": 3484.44197,
+   "breakdown_utc": "2026-11-25T13:30:00+00:00",
+   "retest_high": 3489.70186,
+   "entry": 3469.65604,
+   "distance": 20.44582,
+   "sl": 3490.10186,
+   "tp": 3428.7644,
+   "strategy_taken": true
   }
  ],
  "strategy": {
@@ -129,6 +153,16 @@
     "id": "nanda-v2-202611241600",
     "reason": "tp",
     "observed_utc": "2026-11-25T06:15:00+00:00"
+   },
+   {
+    "id": "nanda-v2-202611251200",
+    "reason": "tp",
+    "observed_utc": "2026-11-25T12:15:00+00:00"
+   },
+   {
+    "id": "nanda-v2-202611251400",
+    "reason": "tp",
+    "observed_utc": "2026-11-25T15:30:00+00:00"
    }
   ],
   "margin_skips": 0,
@@ -149,7 +183,7 @@
      "balance": 0.0
     }
    ],
-   "margin_skips": 7,
+   "margin_skips": 9,
    "overlap_skips": 0
   },
   "0.05 lot · Unlimited": {
@@ -187,7 +221,7 @@
      "balance": 0.8133
     }
    ],
-   "margin_skips": 2,
+   "margin_skips": 4,
    "overlap_skips": 2
   }
  },
