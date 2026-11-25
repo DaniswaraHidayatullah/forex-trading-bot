@@ -1,6 +1,6 @@
 {
  "start": "2026-11-19T21:49:02.073262+00:00",
- "cursor": "2026-11-25T00:45:00+00:00",
+ "cursor": "2026-11-25T09:15:00+00:00",
  "signals": [
   {
    "id": "nanda-v2-202611192315",
@@ -103,18 +103,7 @@
   "lot": null,
   "leverage": null,
   "balance": null,
-  "pos": {
-   "id": "nanda-v2-202611241600",
-   "time": "2026-11-24T16:00:00+00:00",
-   "support": 3583.33035,
-   "breakdown_utc": "2026-11-24T15:30:00+00:00",
-   "retest_high": 3590.30865,
-   "entry": 3567.94108,
-   "distance": 22.76757,
-   "sl": 3590.70865,
-   "tp": 3522.40594,
-   "strategy_taken": true
-  },
+  "pos": null,
   "trades": [
    {
     "id": "nanda-v2-202611192315",
@@ -135,6 +124,11 @@
     "id": "nanda-v2-202611241415",
     "reason": "sl",
     "observed_utc": "2026-11-24T14:45:00+00:00"
+   },
+   {
+    "id": "nanda-v2-202611241600",
+    "reason": "tp",
+    "observed_utc": "2026-11-25T06:15:00+00:00"
    }
   ],
   "margin_skips": 0,
